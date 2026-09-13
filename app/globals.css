@@ -1,26 +1,2875 @@
 @import "tailwindcss";
 
+/* =========================================================
+   NEXAFLOW AI — OBSIDIAN FIRE PREMIUM DESIGN SYSTEM
+   ---------------------------------------------------------
+   Direction:
+   Obsidian Black
+   Graphite
+   Warm White
+   Champagne Gold
+   Amber
+   Fire Orange
+   Minimal Fire Red
+   ========================================================= */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* =======================================================
+     CORE
+     ======================================================= */
+
+  --nf-bg: #060606;
+  --nf-bg-soft: #0a0a09;
+  --nf-bg-elevated: #10100e;
+  --nf-bg-panel: #151411;
+
+  --nf-surface: rgba(18, 17, 14, 0.76);
+  --nf-surface-strong: rgba(20, 19, 16, 0.94);
+  --nf-surface-soft: rgba(255, 255, 255, 0.035);
+
+  /* =======================================================
+     FIRE PALETTE
+     ======================================================= */
+
+  --nf-gold-100: #fff4c7;
+  --nf-gold-200: #ffe89a;
+  --nf-gold-300: #ffd96a;
+  --nf-gold-400: #ffc83d;
+  --nf-gold-500: #f5b51b;
+
+  --nf-amber-400: #f6a500;
+  --nf-amber-500: #e98c00;
+
+  --nf-orange-400: #ff8a00;
+  --nf-orange-500: #ff6a00;
+
+  /* Very limited red */
+  --nf-fire-red: #d94a16;
+
+  --nf-primary: #ffc83d;
+  --nf-primary-bright: #ffd96a;
+  --nf-primary-dark: #c58b00;
+
+  --nf-fire-glow: rgba(255, 168, 0, 0.16);
+  --nf-fire-glow-soft: rgba(255, 168, 0, 0.07);
+  --nf-fire-glow-strong: rgba(255, 145, 0, 0.24);
+
+  /* =======================================================
+     BORDERS
+     ======================================================= */
+
+  --nf-border: rgba(255, 255, 255, 0.085);
+  --nf-border-soft: rgba(255, 255, 255, 0.05);
+  --nf-border-strong: rgba(255, 255, 255, 0.14);
+
+  --nf-border-fire: rgba(255, 184, 45, 0.22);
+  --nf-border-fire-strong: rgba(255, 193, 55, 0.42);
+
+  /* =======================================================
+     TEXT
+     ======================================================= */
+
+  --nf-text: #f8f7f2;
+  --nf-text-soft: #dedbd2;
+  --nf-text-muted: #96938b;
+  --nf-text-faint: #62615c;
+
+  /* =======================================================
+     STATUS
+     ======================================================= */
+
+  --nf-success: #4ade80;
+  --nf-warning: #f5b51b;
+  --nf-danger: #d94a16;
+
+  /* =======================================================
+     RADIUS
+     ======================================================= */
+
+  --nf-radius-xs: 8px;
+  --nf-radius-sm: 12px;
+  --nf-radius-md: 16px;
+  --nf-radius-lg: 22px;
+  --nf-radius-xl: 28px;
+  --nf-radius-2xl: 36px;
+
+  /* =======================================================
+     SHADOWS
+     ======================================================= */
+
+  --nf-shadow-sm:
+    0 10px 30px rgba(0, 0, 0, 0.28);
+
+  --nf-shadow-md:
+    0 20px 65px rgba(0, 0, 0, 0.38);
+
+  --nf-shadow-lg:
+    0 40px 120px rgba(0, 0, 0, 0.58);
+
+  --nf-shadow-fire:
+    0 0 35px rgba(255, 174, 0, 0.11),
+    0 0 90px rgba(255, 119, 0, 0.045);
+
+  --nf-transition:
+    240ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* =========================================================
+   RESET / BASE
+   ========================================================= */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
+  background: var(--nf-bg);
+  scrollbar-width: thin;
+  scrollbar-color:
+    rgba(255, 170, 0, 0.72)
+    #060606;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: hidden;
+
+  background:
+    radial-gradient(
+      circle at 50% -12%,
+      rgba(255, 184, 35, 0.085),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 8% 28%,
+      rgba(255, 125, 0, 0.035),
+      transparent 26%
+    ),
+    radial-gradient(
+      circle at 92% 72%,
+      rgba(217, 74, 22, 0.022),
+      transparent 24%
+    ),
+    #060606;
+
+  color: var(--nf-text);
+
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+::selection {
+  background: rgba(255, 184, 35, 0.28);
+  color: #fffdf5;
+}
+
+::-moz-selection {
+  background: rgba(255, 184, 35, 0.28);
+  color: #fffdf5;
+}
+
+button,
+a,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+img,
+svg,
+video {
+  max-width: 100%;
+}
+
+img,
+video {
+  display: block;
+}
+
+/* =========================================================
+   SCROLLBAR
+   ========================================================= */
+
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+::-webkit-scrollbar-track {
+  background: #060606;
+}
+
+::-webkit-scrollbar-thumb {
+  border: 2px solid #060606;
+  border-radius: 999px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #ffd96a 0%,
+      #ffb300 42%,
+      #ff7a00 78%,
+      #d94a16 100%
+    );
+
+  box-shadow:
+    0 0 12px rgba(255, 170, 0, 0.2);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background:
+    linear-gradient(
+      180deg,
+      #fff0a6,
+      #ffc83d,
+      #ff8a00
+    );
+}
+
+/* =========================================================
+   ACCESSIBILITY
+   ========================================================= */
+
+:focus-visible {
+  outline: 2px solid rgba(255, 200, 61, 0.9);
+  outline-offset: 3px;
+}
+
+/* =========================================================
+   PREMIUM TYPOGRAPHY
+   ========================================================= */
+
+.nf-gradient-text {
+  background:
+    linear-gradient(
+      105deg,
+      #ffffff 0%,
+      #ffffff 30%,
+      #fff0b0 53%,
+      #ffd05a 72%,
+      #ff9a00 100%
+    );
+
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.nf-gradient-text-warm {
+  background:
+    linear-gradient(
+      105deg,
+      #ffffff 0%,
+      #fff7dc 35%,
+      #ffd96a 66%,
+      #ff8a00 100%
+    );
+
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.nf-text-glow {
+  text-shadow:
+    0 0 20px rgba(255, 193, 55, 0.16),
+    0 0 55px rgba(255, 140, 0, 0.06);
+}
+
+/* =========================================================
+   CINEMATIC BACKGROUND
+   ========================================================= */
+
+.nf-cinematic-bg {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      ellipse at 50% 12%,
+      rgba(255, 190, 45, 0.075),
+      transparent 34%
+    ),
+    radial-gradient(
+      ellipse at 15% 45%,
+      rgba(255, 120, 0, 0.025),
+      transparent 28%
+    ),
+    #060606;
+}
+
+.nf-cinematic-bg::before {
+  content: "";
+  position: absolute;
+  inset: -18%;
+  z-index: -3;
+  pointer-events: none;
+
+  background:
+    radial-gradient(
+      ellipse at 50% 35%,
+      rgba(255, 193, 55, 0.12),
+      transparent 27%
+    ),
+    radial-gradient(
+      ellipse at 18% 30%,
+      rgba(255, 142, 0, 0.055),
+      transparent 25%
+    ),
+    radial-gradient(
+      ellipse at 82% 68%,
+      rgba(217, 74, 22, 0.025),
+      transparent 22%
+    );
+
+  filter: blur(24px);
+
+  animation:
+    nfCinematicZoom 18s ease-in-out infinite alternate,
+    nfAmbientDrift 26s ease-in-out infinite alternate;
+}
+
+.nf-cinematic-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      115deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.012) 40%,
+      transparent 62%
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 79px,
+      rgba(255, 255, 255, 0.012) 80px
+    );
+
+  opacity: 0.55;
+}
+
+@keyframes nfCinematicZoom {
+  0% {
+    transform:
+      scale(1)
+      translate3d(0, 0, 0);
+  }
+
+  100% {
+    transform:
+      scale(1.11)
+      translate3d(-1%, -1%, 0);
+  }
+}
+
+@keyframes nfAmbientDrift {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  100% {
+    transform: translate3d(1.5%, -1%, 0);
+  }
+}
+
+/* =========================================================
+   PREMIUM GRID
+   ========================================================= */
+
+.nf-grid-bg {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.nf-grid-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+  pointer-events: none;
+
+  background-image:
+    linear-gradient(
+      rgba(255, 255, 255, 0.022) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.022) 1px,
+      transparent 1px
+    );
+
+  background-size: 58px 58px;
+
+  mask-image:
+    linear-gradient(
+      to bottom,
+      black,
+      rgba(0, 0, 0, 0.68),
+      transparent 94%
+    );
+
+  -webkit-mask-image:
+    linear-gradient(
+      to bottom,
+      black,
+      rgba(0, 0, 0, 0.68),
+      transparent 94%
+    );
+
+  transform:
+    perspective(900px)
+    rotateX(52deg)
+    scale(1.55);
+
+  transform-origin: center bottom;
+  opacity: 0.68;
+}
+
+.nf-grid-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(255, 190, 40, 0.085),
+      transparent 31%
+    ),
+    radial-gradient(
+      circle at 0% 55%,
+      rgba(255, 130, 0, 0.025),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 100% 55%,
+      rgba(255, 180, 40, 0.02),
+      transparent 28%
+    );
+}
+
+/* =========================================================
+   BACKGROUND VISUAL
+   ========================================================= */
+
+.nf-bg-visual {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.nf-bg-visual::before,
+.nf-bg-visual::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.nf-bg-visual::before {
+  width: min(58vw, 720px);
+  height: min(58vw, 720px);
+
+  left: 50%;
+  top: 18%;
+
+  transform:
+    translate(-50%, -50%);
+
+  background:
+    radial-gradient(
+      circle at 34% 25%,
+      rgba(255, 255, 255, 0.13),
+      transparent 4%
+    ),
+    radial-gradient(
+      circle at center,
+      rgba(255, 205, 80, 0.12),
+      rgba(255, 166, 0, 0.065) 28%,
+      rgba(255, 116, 0, 0.025) 48%,
+      transparent 70%
+    );
+
+  filter: blur(8px);
+
+  animation:
+    nfBackgroundOrb 15s ease-in-out infinite alternate,
+    nfBackgroundPulse 8s ease-in-out infinite;
+}
+
+.nf-bg-visual::after {
+  width: 360px;
+  height: 360px;
+
+  right: -90px;
+  bottom: 8%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(255, 140, 0, 0.065),
+      transparent 68%
+    );
+
+  filter: blur(50px);
+
+  animation:
+    nfBackgroundOrbTwo 14s ease-in-out infinite alternate;
+}
+
+@keyframes nfBackgroundOrb {
+  0% {
+    transform:
+      translate(-50%, -50%)
+      scale(0.92)
+      rotate(0deg);
+  }
+
+  100% {
+    transform:
+      translate(-47%, -54%)
+      scale(1.16)
+      rotate(7deg);
+  }
+}
+
+@keyframes nfBackgroundPulse {
+  0%,
+  100% {
+    opacity: 0.66;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes nfBackgroundOrbTwo {
+  0% {
+    transform:
+      translate3d(0, 0, 0)
+      scale(0.8);
+  }
+
+  100% {
+    transform:
+      translate3d(-80px, -55px, 0)
+      scale(1.18);
+  }
+}
+
+/* =========================================================
+   GLASS SYSTEM
+   ========================================================= */
+
+.nf-glass {
+  border: 1px solid var(--nf-border);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.052),
+      rgba(255, 255, 255, 0.01)
+    ),
+    rgba(14, 14, 13, 0.76);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.055),
+    0 18px 60px rgba(0, 0, 0, 0.25);
+
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+
+.nf-glass-strong {
+  border: 1px solid rgba(255, 255, 255, 0.105);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.065),
+      rgba(255, 255, 255, 0.012)
+    ),
+    rgba(12, 12, 11, 0.93);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 25px 85px rgba(0, 0, 0, 0.35);
+
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+}
+
+/* =========================================================
+   FIRE GLASS
+   ========================================================= */
+
+.nf-red-glass {
+  border: 1px solid rgba(255, 184, 40, 0.18);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 180, 30, 0.075),
+      rgba(255, 255, 255, 0.012)
+    ),
+    rgba(15, 13, 10, 0.79);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 22px 75px rgba(0, 0, 0, 0.34),
+    0 0 55px rgba(255, 155, 0, 0.045);
+
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+/* =========================================================
+   3D SCENE
+   ========================================================= */
+
+.nf-3d-scene {
+  perspective: 1500px;
+  perspective-origin: 50% 50%;
+  transform-style: preserve-3d;
+}
+
+.nf-3d-preserve {
+  transform-style: preserve-3d;
+}
+
+.nf-3d-card {
+  transform-style: preserve-3d;
+
+  transition:
+    transform 650ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 300ms ease,
+    box-shadow 400ms ease;
+
+  will-change: transform;
+}
+
+.nf-3d-card:hover {
+  transform:
+    translateY(-9px)
+    rotateX(2.5deg)
+    rotateY(-2.5deg)
+    translateZ(18px);
+
+  border-color:
+    rgba(255, 193, 55, 0.28);
+
+  box-shadow:
+    0 35px 100px rgba(0, 0, 0, 0.5),
+    0 0 65px rgba(255, 165, 0, 0.075);
+}
+
+.nf-3d-layer-1 {
+  transform: translateZ(12px);
+}
+
+.nf-3d-layer-2 {
+  transform: translateZ(24px);
+}
+
+.nf-3d-layer-3 {
+  transform: translateZ(42px);
+}
+
+.nf-3d-layer-4 {
+  transform: translateZ(64px);
+}
+
+/* =========================================================
+   FLOATING 3D
+   ========================================================= */
+
+.nf-float {
+  animation:
+    nfFloat 7s ease-in-out infinite;
+}
+
+.nf-float-slow {
+  animation:
+    nfFloatSlow 11s ease-in-out infinite;
+}
+
+.nf-float-fast {
+  animation:
+    nfFloatFast 5s ease-in-out infinite;
+}
+
+@keyframes nfFloat {
+  0%,
+  100% {
+    transform:
+      translate3d(0, 0, 0)
+      rotateZ(0deg);
+  }
+
+  50% {
+    transform:
+      translate3d(0, -13px, 0)
+      rotateZ(0.4deg);
+  }
+}
+
+@keyframes nfFloatSlow {
+  0%,
+  100% {
+    transform:
+      translate3d(0, 0, 0)
+      rotateX(0deg);
+  }
+
+  50% {
+    transform:
+      translate3d(0, -18px, 10px)
+      rotateX(1.5deg);
+  }
+}
+
+@keyframes nfFloatFast {
+  0%,
+  100% {
+    transform:
+      translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform:
+      translate3d(0, -8px, 0);
+  }
+}
+
+/* =========================================================
+   AI ORB — WARM FIRE
+   ========================================================= */
+
+.nf-orb {
+  position: relative;
+
+  width: 180px;
+  aspect-ratio: 1;
+
+  border-radius: 50%;
+  isolation: isolate;
+
+  background:
+    radial-gradient(
+      circle at 33% 23%,
+      rgba(255, 255, 255, 0.98) 0%,
+      rgba(255, 242, 190, 0.95) 6%,
+      rgba(255, 211, 88, 0.88) 18%,
+      rgba(255, 170, 0, 0.72) 36%,
+      rgba(255, 105, 0, 0.38) 57%,
+      rgba(6, 6, 6, 0.08) 78%
+    );
+
+  box-shadow:
+    inset -30px -34px 65px rgba(0, 0, 0, 0.52),
+    inset 18px 15px 38px rgba(255, 255, 255, 0.15),
+    0 0 50px rgba(255, 174, 0, 0.24),
+    0 0 130px rgba(255, 115, 0, 0.08);
+
+  animation:
+    nfOrbPulse 5s ease-in-out infinite;
+}
+
+.nf-orb::before {
+  content: "";
+
+  position: absolute;
+  inset: -18%;
+  z-index: -1;
+
+  border-radius: inherit;
+
+  background:
+    conic-gradient(
+      from 0deg,
+      transparent,
+      rgba(255, 214, 80, 0.7),
+      rgba(255, 145, 0, 0.28),
+      transparent 72%
+    );
+
+  filter: blur(21px);
+
+  animation:
+    nfOrbRotate 9s linear infinite;
+}
+
+.nf-orb::after {
+  content: "";
+
+  position: absolute;
+  inset: 9%;
+
+  border-radius: 50%;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.17);
+
+  box-shadow:
+    inset 0 0 30px rgba(255, 255, 255, 0.06),
+    0 0 22px rgba(255, 183, 45, 0.12);
+}
+
+@keyframes nfOrbPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.03);
+  }
+}
+
+@keyframes nfOrbRotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================================================
+   ORB RINGS
+   ========================================================= */
+
+.nf-orb-ring {
+  position: absolute;
+
+  border:
+    1px solid rgba(255, 197, 65, 0.22);
+
+  border-radius: 50%;
+
+  transform-style: preserve-3d;
+  pointer-events: none;
+}
+
+.nf-orb-ring-1 {
+  inset: -16%;
+
+  transform:
+    rotateX(68deg)
+    rotateZ(18deg);
+
+  animation:
+    nfRingOne 12s linear infinite;
+}
+
+.nf-orb-ring-2 {
+  inset: -26%;
+
+  border-color:
+    rgba(255, 150, 0, 0.13);
+
+  transform:
+    rotateY(65deg)
+    rotateZ(-20deg);
+
+  animation:
+    nfRingTwo 15s linear infinite reverse;
+}
+
+.nf-orb-ring-3 {
+  inset: -36%;
+
+  border-color:
+    rgba(255, 220, 105, 0.08);
+
+  transform:
+    rotateX(74deg)
+    rotateY(16deg);
+
+  animation:
+    nfRingThree 18s linear infinite;
+}
+
+@keyframes nfRingOne {
+  to {
+    transform:
+      rotateX(68deg)
+      rotateZ(378deg);
+  }
+}
+
+@keyframes nfRingTwo {
+  to {
+    transform:
+      rotateY(65deg)
+      rotateZ(-380deg);
+  }
+}
+
+@keyframes nfRingThree {
+  to {
+    transform:
+      rotateX(74deg)
+      rotateY(376deg);
+  }
+}
+
+/* =========================================================
+   ENERGY RING
+   ========================================================= */
+
+.nf-energy-ring {
+  position: relative;
+  isolation: isolate;
+}
+
+.nf-energy-ring::before {
+  content: "";
+
+  position: absolute;
+  inset: -2px;
+
+  border-radius: inherit;
+
+  background:
+    conic-gradient(
+      from 0deg,
+      transparent 0deg,
+      rgba(255, 219, 100, 0.92) 48deg,
+      transparent 96deg,
+      rgba(255, 151, 0, 0.62) 190deg,
+      transparent 260deg,
+      rgba(255, 184, 35, 0.72) 320deg,
+      transparent 360deg
+    );
+
+  z-index: -1;
+
+  animation:
+    nfEnergySpin 5s linear infinite;
+
+  filter: blur(0.5px);
+}
+
+@keyframes nfEnergySpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================================================
+   FIRE GLOWS
+   ========================================================= */
+
+.nf-glow-red {
+  box-shadow:
+    0 0 0 1px rgba(255, 190, 45, 0.045),
+    0 0 35px rgba(255, 175, 0, 0.085),
+    0 0 90px rgba(255, 110, 0, 0.035);
+}
+
+.nf-glow-red-strong {
+  box-shadow:
+    0 0 0 1px rgba(255, 201, 65, 0.085),
+    0 0 42px rgba(255, 180, 0, 0.16),
+    0 0 115px rgba(255, 105, 0, 0.055);
+}
+
+/* Legacy names — visually converted to warm fire */
+
+.nf-glow-violet,
+.nf-glow-blue,
+.nf-glow-cyan,
+.nf-glow-pink {
+  box-shadow: var(--nf-shadow-fire);
+}
+
+/* =========================================================
+   GRADIENT BORDER
+   ========================================================= */
+
+.nf-gradient-border {
+  position: relative;
+  isolation: isolate;
+
+  border: 1px solid transparent;
+
+  background:
+    linear-gradient(
+      var(--nf-surface-strong),
+      var(--nf-surface-strong)
+    )
+    padding-box,
+
+    linear-gradient(
+      120deg,
+      rgba(255, 215, 100, 0.62),
+      rgba(255, 180, 30, 0.12),
+      rgba(255, 125, 0, 0.32),
+      rgba(217, 74, 22, 0.22)
+    )
+    border-box;
+}
+
+/* =========================================================
+   SHIMMER
+   ========================================================= */
+
+.nf-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.nf-shimmer::after {
+  content: "";
+
+  position: absolute;
+  top: 0;
+  left: -120%;
+
+  width: 70%;
+  height: 100%;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      110deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.02) 40%,
+      rgba(255, 220, 130, 0.1) 50%,
+      rgba(255, 255, 255, 0.02) 60%,
+      transparent 100%
+    );
+
+  transform: skewX(-20deg);
+
+  animation:
+    nfShimmer 4.8s ease-in-out infinite;
+}
+
+@keyframes nfShimmer {
+  0% {
+    left: -120%;
+  }
+
+  35%,
+  100% {
+    left: 150%;
+  }
+}
+
+/* =========================================================
+   SCAN LINE
+   ========================================================= */
+
+.nf-scan {
+  position: relative;
+  overflow: hidden;
+}
+
+.nf-scan::after {
+  content: "";
+
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -100%;
+
+  height: 45%;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      to bottom,
+      transparent,
+      rgba(255, 185, 40, 0.055),
+      transparent
+    );
+
+  animation:
+    nfScan 6s ease-in-out infinite;
+}
+
+@keyframes nfScan {
+  0%,
+  35% {
+    top: -50%;
+  }
+
+  70%,
+  100% {
+    top: 120%;
+  }
+}
+
+/* =========================================================
+   PARTICLE
+   ========================================================= */
+
+.nf-particle {
+  position: absolute;
+
+  width: 3px;
+  height: 3px;
+
+  border-radius: 50%;
+
+  background:
+    rgba(255, 211, 88, 0.78);
+
+  box-shadow:
+    0 0 12px rgba(255, 173, 0, 0.58);
+
+  animation:
+    nfParticleFloat 8s ease-in-out infinite;
+}
+
+.nf-particle:nth-child(2) {
+  animation-delay: -2s;
+}
+
+.nf-particle:nth-child(3) {
+  animation-delay: -4s;
+}
+
+.nf-particle:nth-child(4) {
+  animation-delay: -6s;
+}
+
+@keyframes nfParticleFloat {
+  0%,
+  100% {
+    transform:
+      translate3d(0, 0, 0)
+      scale(0.8);
+
+    opacity: 0.22;
+  }
+
+  50% {
+    transform:
+      translate3d(0, -30px, 15px)
+      scale(1.12);
+
+    opacity: 0.88;
+  }
+}
+
+/* =========================================================
+   PARTICLE FIELD
+   ========================================================= */
+
+.nf-particle-field {
+  position: absolute;
+  inset: 0;
+
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.nf-particle-field::before {
+  content: "";
+
+  position: absolute;
+  inset: -30%;
+
+  background-image:
+    radial-gradient(
+      circle,
+      rgba(255, 193, 55, 0.38) 1px,
+      transparent 1.5px
+    );
+
+  background-size: 72px 72px;
+
+  opacity: 0.13;
+
+  animation:
+    nfParticleFieldMove 20s linear infinite;
+}
+
+@keyframes nfParticleFieldMove {
+  from {
+    transform:
+      translate3d(0, 0, 0);
+  }
+
+  to {
+    transform:
+      translate3d(-72px, -72px, 0);
+  }
+}
+
+/* =========================================================
+   PREMIUM FIRE BUTTON
+   ========================================================= */
+
+.nf-button-red {
+  position: relative;
+  isolation: isolate;
+
+  border:
+    1px solid rgba(255, 222, 126, 0.22);
+
+  background:
+    linear-gradient(
+      135deg,
+      #ffd96a 0%,
+      #ffc13a 34%,
+      #ff9a00 67%,
+      #f06a00 100%
+    );
+
+  color: #17130b;
+
+  box-shadow:
+    0 12px 35px rgba(255, 156, 0, 0.17),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease,
+    filter 220ms ease;
+}
+
+.nf-button-red:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 18px 52px rgba(255, 156, 0, 0.27),
+    0 0 38px rgba(255, 188, 40, 0.09),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+
+  filter: brightness(1.05);
+}
+
+.nf-button-red:active {
+  transform:
+    translateY(0)
+    scale(0.98);
+}
+
+/* =========================================================
+   BUTTON SHINE
+   ========================================================= */
+
+.nf-button-shine {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.nf-button-shine::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+
+  background:
+    linear-gradient(
+      115deg,
+      transparent 20%,
+      rgba(255, 255, 255, 0.22) 48%,
+      transparent 72%
+    );
+
+  transform:
+    translateX(-130%);
+
+  transition:
+    transform 650ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.nf-button-shine:hover::before {
+  transform:
+    translateX(130%);
+}
+
+/* =========================================================
+   HOVER LIFT
+   ========================================================= */
+
+.nf-hover-lift {
+  transition:
+    transform var(--nf-transition),
+    border-color var(--nf-transition),
+    box-shadow var(--nf-transition);
+}
+
+.nf-hover-lift:hover {
+  transform:
+    translateY(-6px);
+
+  border-color:
+    rgba(255, 190, 45, 0.22);
+
+  box-shadow:
+    0 24px 65px rgba(0, 0, 0, 0.34),
+    0 0 32px rgba(255, 165, 0, 0.045);
+}
+
+/* =========================================================
+   ICON BOX
+   ========================================================= */
+
+.nf-icon-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border:
+    1px solid rgba(255, 193, 55, 0.14);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 181, 30, 0.09),
+      rgba(255, 255, 255, 0.018)
+    ),
+    rgba(255, 255, 255, 0.02);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 10px 30px rgba(0, 0, 0, 0.22);
+
+  backdrop-filter: blur(12px);
+}
+
+/* =========================================================
+   STATUS DOT
+   ========================================================= */
+
+.nf-status-dot {
+  position: relative;
+
+  display: inline-block;
+
+  width: 8px;
+  height: 8px;
+
+  border-radius: 50%;
+
+  background: var(--nf-success);
+
+  box-shadow:
+    0 0 12px rgba(74, 222, 128, 0.62);
+}
+
+.nf-status-dot::after {
+  content: "";
+
+  position: absolute;
+  inset: -4px;
+
+  border:
+    1px solid rgba(74, 222, 128, 0.32);
+
+  border-radius: inherit;
+
+  animation:
+    nfStatusPulse 2s ease-out infinite;
+}
+
+@keyframes nfStatusPulse {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+/* =========================================================
+   CHART
+   ========================================================= */
+
+.nf-chart-bar {
+  position: relative;
+  overflow: hidden;
+
+  border-radius:
+    999px 999px 5px 5px;
+
+  background:
+    linear-gradient(
+      to top,
+      #d87800,
+      #f5a900 55%,
+      #ffd45c
+    );
+
+  box-shadow:
+    0 0 20px rgba(255, 164, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.nf-chart-bar::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.18),
+      transparent
+    );
+
+  transform:
+    translateX(-100%);
+
+  animation:
+    nfChartShine 3.5s ease-in-out infinite;
+}
+
+@keyframes nfChartShine {
+  50%,
+  100% {
+    transform:
+      translateX(130%);
+  }
+}
+
+/* =========================================================
+   AI THINKING
+   ========================================================= */
+
+.nf-thinking {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.nf-thinking span {
+  width: 6px;
+  height: 6px;
+
+  border-radius: 50%;
+
+  background:
+    var(--nf-primary-bright);
+
+  box-shadow:
+    0 0 10px rgba(255, 184, 35, 0.5);
+
+  animation:
+    nfThinking 1.4s ease-in-out infinite;
+}
+
+.nf-thinking span:nth-child(2) {
+  animation-delay: 150ms;
+}
+
+.nf-thinking span:nth-child(3) {
+  animation-delay: 300ms;
+}
+
+@keyframes nfThinking {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.45;
+  }
+
+  30% {
+    transform: translateY(-5px);
+    opacity: 1;
+  }
+}
+
+/* =========================================================
+   WORKFLOW CONNECTOR
+   ========================================================= */
+
+.nf-workflow-line {
+  position: relative;
+}
+
+.nf-workflow-line::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  bottom: 0;
+  left: 50%;
+
+  width: 1px;
+
+  transform:
+    translateX(-50%);
+
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(255, 190, 45, 0),
+      rgba(255, 185, 35, 0.4),
+      rgba(255, 130, 0, 0)
+    );
+}
+
+.nf-workflow-node {
+  position: relative;
+  z-index: 1;
+
+  box-shadow:
+    0 0 0 5px rgba(6, 6, 6, 0.94),
+    0 0 24px rgba(255, 168, 0, 0.16);
+}
+
+/* =========================================================
+   WORKFLOW ENERGY
+   ========================================================= */
+
+.nf-workflow-energy {
+  position: relative;
+  overflow: hidden;
+}
+
+.nf-workflow-energy::after {
+  content: "";
+
+  position: absolute;
+
+  left: 50%;
+  top: -20%;
+
+  width: 2px;
+  height: 40%;
+
+  transform:
+    translateX(-50%);
+
+  background:
+    linear-gradient(
+      to bottom,
+      transparent,
+      #ffc83d,
+      transparent
+    );
+
+  filter:
+    drop-shadow(0 0 7px rgba(255, 166, 0, 0.65));
+
+  animation:
+    nfWorkflowEnergy 2.8s linear infinite;
+}
+
+@keyframes nfWorkflowEnergy {
+  from {
+    top: -30%;
+  }
+
+  to {
+    top: 110%;
+  }
+}
+
+/* =========================================================
+   INPUT
+   ========================================================= */
+
+.nf-input {
+  border:
+    1px solid rgba(255, 255, 255, 0.09);
+
+  background:
+    rgba(255, 255, 255, 0.032);
+
+  color:
+    #f8f7f2;
+
+  transition:
+    border-color 200ms ease,
+    background 200ms ease,
+    box-shadow 200ms ease;
+}
+
+.nf-input::placeholder {
+  color:
+    rgba(150, 148, 140, 0.62);
+}
+
+.nf-input:hover {
+  border-color:
+    rgba(255, 255, 255, 0.15);
+}
+
+.nf-input:focus {
+  border-color:
+    rgba(255, 194, 55, 0.54);
+
+  background:
+    rgba(255, 183, 30, 0.035);
+
+  box-shadow:
+    0 0 0 3px rgba(255, 183, 30, 0.065),
+    0 0 30px rgba(255, 150, 0, 0.04);
+
+  outline: none;
+}
+
+/* =========================================================
+   MODAL
+   ========================================================= */
+
+.nf-overlay {
+  background:
+    rgba(2, 2, 2, 0.82);
+
+  backdrop-filter:
+    blur(17px);
+
+  -webkit-backdrop-filter:
+    blur(17px);
+}
+
+.nf-modal {
+  border:
+    1px solid rgba(255, 255, 255, 0.1);
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(255, 180, 25, 0.075),
+      transparent 42%
+    ),
+    rgba(11, 11, 10, 0.96);
+
+  box-shadow:
+    0 45px 130px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.055);
+
+  backdrop-filter:
+    blur(30px);
+
+  -webkit-backdrop-filter:
+    blur(30px);
+}
+
+/* =========================================================
+   PAGE REVEAL
+   ========================================================= */
+
+.nf-page-reveal {
+  animation:
+    nfPageReveal
+    700ms
+    cubic-bezier(0.22, 1, 0.36, 1)
+    both;
+}
+
+@keyframes nfPageReveal {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(14px)
+      scale(0.99);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+.nf-reveal-up {
+  animation:
+    nfRevealUp
+    800ms
+    cubic-bezier(0.22, 1, 0.36, 1)
+    both;
+}
+
+@keyframes nfRevealUp {
+  from {
+    opacity: 0;
+
+    transform:
+      translate3d(0, 34px, 0)
+      scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translate3d(0, 0, 0)
+      scale(1);
+  }
+}
+
+.nf-delay-1 {
+  animation-delay: 100ms;
+}
+
+.nf-delay-2 {
+  animation-delay: 200ms;
+}
+
+.nf-delay-3 {
+  animation-delay: 300ms;
+}
+
+.nf-delay-4 {
+  animation-delay: 400ms;
+}
+
+.nf-delay-5 {
+  animation-delay: 500ms;
+}
+
+/* =========================================================
+   ROTATING FIRE GRADIENT
+   ========================================================= */
+
+.nf-rotate-gradient {
+  background:
+    conic-gradient(
+      from 0deg,
+      rgba(255, 220, 105, 0.88),
+      rgba(255, 169, 0, 0.38),
+      rgba(255, 120, 0, 0.68),
+      rgba(217, 74, 22, 0.18),
+      rgba(255, 220, 105, 0.88)
+    );
+
+  animation:
+    nfRotateGradient 8s linear infinite;
+}
+
+@keyframes nfRotateGradient {
+  to {
+    transform:
+      rotate(360deg);
+  }
+}
+
+/* =========================================================
+   LIGHT BEAM
+   ========================================================= */
+
+.nf-light-beam {
+  position: absolute;
+
+  width: 2px;
+  height: 280px;
+
+  background:
+    linear-gradient(
+      to bottom,
+      transparent,
+      rgba(255, 192, 55, 0.48),
+      transparent
+    );
+
+  filter: blur(1px);
+
+  transform:
+    rotate(32deg);
+
+  opacity: 0.26;
+
+  animation:
+    nfBeam 8s ease-in-out infinite;
+}
+
+@keyframes nfBeam {
+  0%,
+  100% {
+    transform:
+      translate3d(-100px, -30px, 0)
+      rotate(32deg);
+
+    opacity: 0;
+  }
+
+  40% {
+    opacity: 0.32;
+  }
+
+  70% {
+    transform:
+      translate3d(140px, 40px, 0)
+      rotate(32deg);
+
+    opacity: 0;
+  }
+}
+
+/* =========================================================
+   NOISE
+   ========================================================= */
+
+.nf-noise {
+  position: relative;
+}
+
+.nf-noise::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  pointer-events: none;
+
+  opacity: 0.018;
+
+  mix-blend-mode: screen;
+
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.8'/%3E%3C/svg%3E");
+}
+
+/* =========================================================
+   SECTION DIVIDER
+   ========================================================= */
+
+.nf-section-divider {
+  position: relative;
+}
+
+.nf-section-divider::after {
+  content: "";
+
+  position: absolute;
+
+  left: 50%;
+  bottom: 0;
+
+  width: min(760px, 75%);
+  height: 1px;
+
+  transform:
+    translateX(-50%);
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 193, 55, 0.28),
+      rgba(255, 135, 0, 0.16),
+      transparent
+    );
+}
+
+/* =========================================================
+   HERO AURA
+   ========================================================= */
+
+.nf-hero-aura {
+  position: absolute;
+
+  left: 50%;
+  top: 20%;
+
+  width: min(920px, 95vw);
+  height: min(680px, 70vw);
+
+  transform:
+    translate(-50%, -50%);
+
+  pointer-events: none;
+
+  background:
+    radial-gradient(
+      ellipse,
+      rgba(255, 195, 55, 0.105) 0%,
+      rgba(255, 147, 0, 0.035) 34%,
+      transparent 68%
+    );
+
+  filter:
+    blur(52px);
+
+  animation:
+    nfHeroAuraPulse
+    8s
+    ease-in-out
+    infinite
+    alternate;
+}
+
+@keyframes nfHeroAuraPulse {
+  from {
+    transform:
+      translate(-50%, -50%)
+      scale(0.92);
+
+    opacity: 0.58;
+  }
+
+  to {
+    transform:
+      translate(-50%, -50%)
+      scale(1.1);
+
+    opacity: 0.9;
+  }
+}
+
+/* =========================================================
+   3D DASHBOARD
+   ========================================================= */
+
+.nf-dashboard-3d {
+  transform-style: preserve-3d;
+
+  transform:
+    perspective(1500px)
+    rotateX(8deg)
+    rotateY(-5deg)
+    rotateZ(0deg);
+
+  transition:
+    transform 700ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 500ms ease;
+
+  box-shadow:
+    30px 55px 110px rgba(0, 0, 0, 0.54),
+    -10px 0 75px rgba(255, 165, 0, 0.055);
+}
+
+.nf-dashboard-3d:hover {
+  transform:
+    perspective(1500px)
+    rotateX(3deg)
+    rotateY(-2deg)
+    translateY(-10px);
+
+  box-shadow:
+    25px 65px 130px rgba(0, 0, 0, 0.58),
+    -10px 0 100px rgba(255, 160, 0, 0.08);
+}
+
+/* =========================================================
+   DASHBOARD DEPTH
+   ========================================================= */
+
+.nf-dashboard-depth {
+  position: relative;
+  transform-style:
+    preserve-3d;
+}
+
+.nf-dashboard-depth::before {
+  content: "";
+
+  position: absolute;
+
+  inset:
+    14px -14px -24px;
+
+  z-index: -1;
+
+  border-radius:
+    inherit;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 175, 20, 0.13),
+      rgba(255, 110, 0, 0.012)
+    );
+
+  filter:
+    blur(24px);
+
+  transform:
+    translateZ(-35px)
+    scale(0.94);
+
+  opacity: 0.72;
+}
+
+/* =========================================================
+   DEPTH SHADOW
+   ========================================================= */
+
+.nf-depth {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.05) inset,
+    0 20px 40px rgba(0, 0, 0, 0.3),
+    0 40px 100px rgba(0, 0, 0, 0.2);
+}
+
+/* =========================================================
+   GLOW PULSE
+   ========================================================= */
+
+.nf-pulse-glow {
+  animation:
+    nfPulseGlow
+    3.5s
+    ease-in-out
+    infinite;
+}
+
+@keyframes nfPulseGlow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 rgba(255, 170, 0, 0),
+      0 0 20px rgba(255, 170, 0, 0.025);
+  }
+
+  50% {
+    box-shadow:
+      0 0 45px rgba(255, 175, 0, 0.11),
+      0 0 100px rgba(255, 120, 0, 0.04);
+  }
+}
+
+/* =========================================================
+   FIRE PULSE BORDER
+   ========================================================= */
+
+.nf-red-pulse {
+  animation:
+    nfRedPulse
+    3.4s
+    ease-in-out
+    infinite;
+}
+
+@keyframes nfRedPulse {
+  0%,
+  100% {
+    border-color:
+      rgba(255, 190, 45, 0.09);
+  }
+
+  50% {
+    border-color:
+      rgba(255, 193, 55, 0.28);
+  }
+}
+
+/* =========================================================
+   TOOLTIP
+   ========================================================= */
+
+.nf-tooltip {
+  position: relative;
+}
+
+.nf-tooltip::after {
+  content: attr(data-tooltip);
+
+  position: absolute;
+
+  left: 50%;
+  bottom: calc(100% + 9px);
+
+  z-index: 100;
+
+  padding:
+    7px 10px;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.1);
+
+  border-radius:
+    8px;
+
+  background:
+    rgba(12, 12, 11, 0.96);
+
+  color:
+    #e4e2da;
+
+  font-size:
+    11px;
+
+  font-weight:
+    500;
+
+  white-space:
+    nowrap;
+
+  opacity:
+    0;
+
+  pointer-events:
+    none;
+
+  transform:
+    translateX(-50%)
+    translateY(4px);
+
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.34);
+
+  backdrop-filter:
+    blur(16px);
+}
+
+.nf-tooltip:hover::after {
+  opacity: 1;
+
+  transform:
+    translateX(-50%)
+    translateY(0);
+}
+
+/* =========================================================
+   HORIZONTAL MOTION
+   ========================================================= */
+
+.nf-horizontal-motion {
+  animation:
+    nfHorizontalMotion linear both;
+
+  animation-timeline:
+    view();
+
+  animation-range:
+    entry 0% cover 100%;
+}
+
+@keyframes nfHorizontalMotion {
+  from {
+    transform:
+      translate3d(60px, 0, 0);
+  }
+
+  to {
+    transform:
+      translate3d(-60px, 0, 0);
+  }
+}
+
+/* =========================================================
+   CINEMATIC SCALE
+   ========================================================= */
+
+.nf-cinematic-scale {
+  animation:
+    nfCinematicScale linear both;
+
+  animation-timeline:
+    view();
+
+  animation-range:
+    entry 0% exit 100%;
+}
+
+@keyframes nfCinematicScale {
+  from {
+    transform:
+      scale(0.94);
+  }
+
+  50% {
+    transform:
+      scale(1.025);
+  }
+
+  to {
+    transform:
+      scale(1.06);
+  }
+}
+
+/* =========================================================
+   STICKY 3D STAGE
+   ========================================================= */
+
+.nf-sticky-stage {
+  position: relative;
+
+  min-height:
+    180vh;
+}
+
+.nf-sticky-object {
+  position: sticky;
+
+  top:
+    15vh;
+
+  transform-style:
+    preserve-3d;
+}
+
+/* =========================================================
+   FIRE SIGNAL
+   ========================================================= */
+
+.nf-signal {
+  position: relative;
+  overflow: hidden;
+}
+
+.nf-signal::before {
+  content: "";
+
+  position: absolute;
+
+  left: -10%;
+  top: 50%;
+
+  width: 35%;
+  height: 1px;
+
+  transform:
+    translateY(-50%);
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      #ffc83d,
+      transparent
+    );
+
+  box-shadow:
+    0 0 12px rgba(255, 177, 0, 0.48);
+
+  animation:
+    nfSignalMove
+    3.2s
+    linear
+    infinite;
+}
+
+@keyframes nfSignalMove {
+  from {
+    left: -35%;
+  }
+
+  to {
+    left: 110%;
+  }
+}
+
+/* =========================================================
+   SCROLL REVEAL
+   ========================================================= */
+
+.nf-scroll-reveal {
+  animation:
+    nfScrollReveal linear both;
+
+  animation-timeline:
+    view();
+
+  animation-range:
+    entry 5% cover 32%;
+}
+
+@keyframes nfScrollReveal {
+  from {
+    opacity: 0;
+
+    transform:
+      translate3d(0, 55px, -70px)
+      scale(0.96);
+
+    filter:
+      blur(5px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translate3d(0, 0, 0)
+      scale(1);
+
+    filter:
+      blur(0);
+  }
+}
+
+/* =========================================================
+   SCROLL ZOOM
+   ========================================================= */
+
+.nf-scroll-zoom {
+  animation:
+    nfScrollZoom linear both;
+
+  animation-timeline:
+    view();
+
+  animation-range:
+    entry 0% cover 75%;
+}
+
+@keyframes nfScrollZoom {
+  from {
+    transform:
+      scale(0.9)
+      translate3d(0, 25px, 0);
+
+    opacity: 0.55;
+  }
+
+  to {
+    transform:
+      scale(1.045)
+      translate3d(0, -8px, 0);
+
+    opacity: 1;
+  }
+}
+
+/* =========================================================
+   SCROLL PARALLAX
+   ========================================================= */
+
+.nf-scroll-parallax {
+  animation:
+    nfScrollParallax linear both;
+
+  animation-timeline:
+    view();
+
+  animation-range:
+    cover 0% cover 100%;
+}
+
+@keyframes nfScrollParallax {
+  from {
+    transform:
+      translate3d(0, 55px, 0)
+      scale(1.04);
+  }
+
+  to {
+    transform:
+      translate3d(0, -55px, 0)
+      scale(1);
+  }
+}
+
+/* =========================================================
+   SCROLL DEPTH
+   ========================================================= */
+
+.nf-scroll-depth {
+  transform-style:
+    preserve-3d;
+
+  animation:
+    nfScrollDepth linear both;
+
+  animation-timeline:
+    view();
+
+  animation-range:
+    entry 0% cover 70%;
+}
+
+@keyframes nfScrollDepth {
+  from {
+    opacity: 0;
+
+    transform:
+      perspective(1200px)
+      translateY(65px)
+      rotateX(6deg)
+      scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      perspective(1200px)
+      translateY(0)
+      rotateX(0)
+      scale(1);
+  }
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1024px) {
+  .nf-dashboard-3d {
+    transform:
+      perspective(1200px)
+      rotateX(5deg)
+      rotateY(-2deg);
+  }
+
+  .nf-orb {
+    width: 150px;
+  }
+
+  .nf-scroll-parallax {
+    animation-range:
+      entry 0% cover 75%;
+  }
+}
+
+@media (max-width: 768px) {
+  .nf-grid-bg::before {
+    background-size:
+      38px 38px;
+
+    opacity:
+      0.5;
+  }
+
+  .nf-dashboard-3d {
+    transform:
+      none;
+  }
+
+  .nf-dashboard-3d:hover {
+    transform:
+      translateY(-4px);
+  }
+
+  .nf-3d-card:hover {
+    transform:
+      translateY(-5px);
+  }
+
+  .nf-orb {
+    width:
+      125px;
+  }
+
+  .nf-orb-ring-2 {
+    inset:
+      -22%;
+  }
+
+  .nf-orb-ring-3 {
+    inset:
+      -30%;
+  }
+
+  .nf-hero-aura {
+    width:
+      120vw;
+
+    height:
+      100vw;
+  }
+
+  .nf-bg-visual::before {
+    width:
+      115vw;
+
+    height:
+      115vw;
+  }
+
+  .nf-scroll-depth {
+    animation-range:
+      entry 0% cover 45%;
+  }
+
+  .nf-cinematic-scale {
+    animation-range:
+      entry 0% cover 75%;
+  }
+}
+
+@media (max-width: 480px) {
+  .nf-orb {
+    width:
+      105px;
+  }
+
+  .nf-grid-bg::before {
+    opacity:
+      0.4;
+  }
+
+  .nf-glass,
+  .nf-glass-strong,
+  .nf-red-glass {
+    backdrop-filter:
+      blur(16px);
+
+    -webkit-backdrop-filter:
+      blur(16px);
+  }
+
+  .nf-bg-visual::before {
+    filter:
+      blur(18px);
+  }
+}
+
+/* =========================================================
+   REDUCE MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior:
+      auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration:
+      0.001ms !important;
+
+    animation-iteration-count:
+      1 !important;
+
+    transition-duration:
+      0.001ms !important;
+
+    scroll-behavior:
+      auto !important;
+  }
+
+  .nf-scroll-reveal,
+  .nf-scroll-zoom,
+  .nf-scroll-parallax,
+  .nf-scroll-depth,
+  .nf-horizontal-motion,
+  .nf-cinematic-scale {
+    animation:
+      none !important;
+
+    transform:
+      none !important;
+
+    opacity:
+      1 !important;
+
+    filter:
+      none !important;
+  }
+}
+
+/* =========================================================
+   PRINT
+   ========================================================= */
+
+@media print {
+  body {
+    background:
+      #ffffff;
+
+    color:
+      #000000;
+  }
+
+  .nf-grid-bg::before,
+  .nf-grid-bg::after,
+  .nf-hero-aura,
+  .nf-orb::before,
+  .nf-orb-ring,
+  .nf-bg-visual,
+  .nf-particle-field {
+    display:
+      none !important;
+  }
+}
+
+/* =========================================================
+   OLD PURPLE / BLUE / VIOLET SAFETY OVERRIDES
+   ---------------------------------------------------------
+   Existing JSX classes won't visually introduce old colors.
+   They are redirected into the new warm fire system.
+   ========================================================= */
+
+.text-purple-300,
+.text-purple-400,
+.text-purple-500,
+.text-purple-600,
+.text-purple-700,
+.text-violet-300,
+.text-violet-400,
+.text-violet-500,
+.text-violet-600,
+.text-violet-700,
+.text-indigo-300,
+.text-indigo-400,
+.text-indigo-500,
+.text-indigo-600,
+.text-blue-300,
+.text-blue-400,
+.text-blue-500,
+.text-blue-600 {
+  color:
+    #ffc83d !important;
+}
+
+.bg-purple-500,
+.bg-purple-600,
+.bg-purple-700,
+.bg-violet-500,
+.bg-violet-600,
+.bg-violet-700,
+.bg-indigo-500,
+.bg-indigo-600,
+.bg-indigo-700,
+.bg-blue-500,
+.bg-blue-600,
+.bg-blue-700 {
+  background-color:
+    #f5a900 !important;
+}
+
+.bg-purple-500\/10,
+.bg-purple-500\/20,
+.bg-violet-500\/10,
+.bg-violet-500\/20,
+.bg-indigo-500\/10,
+.bg-indigo-500\/20,
+.bg-blue-500\/10,
+.bg-blue-500\/20 {
+  background-color:
+    rgba(255, 177, 0, 0.08) !important;
+}
+
+.border-purple-400,
+.border-purple-500,
+.border-purple-600,
+.border-violet-400,
+.border-violet-500,
+.border-violet-600,
+.border-indigo-400,
+.border-indigo-500,
+.border-indigo-600,
+.border-blue-400,
+.border-blue-500,
+.border-blue-600 {
+  border-color:
+    rgba(255, 184, 35, 0.32) !important;
+}
+
+.shadow-purple-500,
+.shadow-purple-600,
+.shadow-violet-500,
+.shadow-violet-600,
+.shadow-indigo-500,
+.shadow-indigo-600,
+.shadow-blue-500,
+.shadow-blue-600 {
+  --tw-shadow-color:
+    rgba(255, 160, 0, 0.18) !important;
+}
+
+.ring-purple-500,
+.ring-purple-600,
+.ring-violet-500,
+.ring-violet-600,
+.ring-indigo-500,
+.ring-indigo-600,
+.ring-blue-500,
+.ring-blue-600 {
+  --tw-ring-color:
+    rgba(255, 184, 35, 0.3) !important;
+}
+
+.from-purple-500,
+.from-purple-600,
+.from-violet-500,
+.from-violet-600,
+.from-indigo-500,
+.from-indigo-600,
+.from-blue-500,
+.from-blue-600 {
+  --tw-gradient-from:
+    #ffd05a var(--tw-gradient-from-position) !important;
+
+  --tw-gradient-to:
+    rgb(255 208 90 / 0) var(--tw-gradient-to-position) !important;
+}
+
+.via-purple-500,
+.via-purple-600,
+.via-violet-500,
+.via-violet-600,
+.via-indigo-500,
+.via-indigo-600,
+.via-blue-500,
+.via-blue-600 {
+  --tw-gradient-via:
+    #ff9a00 var(--tw-gradient-via-position) !important;
+}
+
+.to-purple-500,
+.to-purple-600,
+.to-violet-500,
+.to-violet-600,
+.to-indigo-500,
+.to-indigo-600,
+.to-blue-500,
+.to-blue-600 {
+  --tw-gradient-to:
+    #e87500 var(--tw-gradient-to-position) !important;
+}
+
+/* =========================================================
+   FINAL FIRE HELPERS
+   ========================================================= */
+
+.nf-red-text {
+  color:
+    var(--nf-primary-bright);
+}
+
+.nf-red-bg {
+  background:
+    var(--nf-primary);
+}
+
+.nf-red-border {
+  border-color:
+    rgba(255, 184, 35, 0.3);
+}
+
+.nf-red-soft-bg {
+  background:
+    rgba(255, 177, 0, 0.065);
+}
+
+.nf-red-soft-border {
+  border-color:
+    rgba(255, 184, 35, 0.14);
+}
+
+.nf-red-shadow {
+  box-shadow:
+    var(--nf-shadow-fire);
+}
+
+.nf-black-surface {
+  background:
+    rgba(10, 10, 9, 0.92);
+}
+
+/* =========================================================
+   EXTRA PREMIUM UTILITIES
+   ========================================================= */
+
+.nf-fire-gradient {
+  background:
+    linear-gradient(
+      135deg,
+      #fff0a8 0%,
+      #ffd45a 25%,
+      #ffb300 50%,
+      #ff8100 75%,
+      #d94a16 100%
+    );
+}
+
+.nf-fire-text {
+  background:
+    linear-gradient(
+      110deg,
+      #fff3bb,
+      #ffd45a 35%,
+      #ffad00 65%,
+      #ff7600
+    );
+
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.nf-gold-line {
+  height: 1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 209, 90, 0.5),
+      rgba(255, 135, 0, 0.2),
+      transparent
+    );
+}
+
+.nf-soft-glow {
+  box-shadow:
+    0 0 45px rgba(255, 183, 30, 0.055);
+}
+
+.nf-premium-border {
+  border:
+    1px solid rgba(255, 255, 255, 0.075);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.nf-hover-fire {
+  transition:
+    border-color 250ms ease,
+    box-shadow 250ms ease,
+    transform 250ms ease;
+}
+
+.nf-hover-fire:hover {
+  transform:
+    translateY(-3px);
+
+  border-color:
+    rgba(255, 193, 55, 0.22);
+
+  box-shadow:
+    0 18px 55px rgba(0, 0, 0, 0.34),
+    0 0 30px rgba(255, 160, 0, 0.045);
+}
+
+/* =========================================================
+   END
+   ========================================================= */
