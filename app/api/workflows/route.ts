@@ -1,58 +1,15 @@
 import { NextResponse } from "next/server";
+import { createWorkflowSchema } from "@/lib/validations/workflow";
 import {
-  createWorkflowSchema,
-} from "@/lib/validations/workflow";
-
-interface Workflow {
-  id: string;
-  name: string;
-  description?: string;
-  status: "draft" | "active" | "paused" | "archived";
-  runs: number;
-  successRate: number;
-  steps: unknown[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-const workflows: Workflow[] = [
-  {
-    id: "workflow-1",
-    name: "Customer Support Automation",
-    description:
-      "Automatically analyze and respond to customer inquiries.",
-    status: "active",
-    runs: 248,
-    successRate: 96,
-    steps: [
-      {
-        id: "step-1",
-        title: "Receive inquiry",
-        description: "Capture customer message.",
-        type: "trigger",
-      },
-      {
-        id: "step-2",
-        title: "Analyze intent",
-        description: "AI classifies the request.",
-        type: "ai",
-      },
-      {
-        id: "step-3",
-        title: "Generate response",
-        description: "AI creates the response.",
-        type: "ai",
-      },
-    ],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-];
+  workflowStore,
+  createWorkflow,
+} from "@/lib/workflows/store";
+import type { Workflow } from "@/types/workflow";
 
 export async function GET() {
   return NextResponse.json({
     success: true,
-    workflows,
+    workflows: workflowStore.workflows,
   });
 }
 
@@ -87,7 +44,7 @@ export async function POST(request: Request) {
       updatedAt: now,
     };
 
-    workflows.unshift(workflow);
+    createWorkflow(workflow);
 
     return NextResponse.json(
       {

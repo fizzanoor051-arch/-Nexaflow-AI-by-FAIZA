@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
 
+import { AIPageContextProvider } from "@/components/ai/AIPageContext";
+import GlobalAIChat from "@/components/ai/GlobalAIChat";
+
 export const metadata: Metadata = {
   title: {
     default: "NexaFlow AI — Intelligent Business Automation",
@@ -50,7 +53,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen bg-[#050816] text-white antialiased">
-        {children}
+        <AIPageContextProvider>
+          {children}
+
+          {/* Global NexaFlow AI shortcut */}
+          <GlobalAIChat />
+        </AIPageContextProvider>
       </body>
     </html>
   );

@@ -21,6 +21,8 @@ export const workflowStepSchema = z.object({
     "notification",
     "delay",
   ]),
+
+  order: z.number().int().nonnegative(),
 });
 
 export const workflowSchema = z.object({

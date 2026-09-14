@@ -1,3 +1,5 @@
+import AmbientParticles from "@/components/landing/AmbientParticles";
+
 const features = [
   {
     number: "01",
@@ -117,51 +119,102 @@ export default function Features() {
   return (
     <section
       id="features"
-      className="relative overflow-hidden bg-[#050816] py-24 sm:py-32"
+      className="relative isolate overflow-hidden border-y border-white/[0.06] bg-[#080806] py-24 sm:py-32"
     >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="max-w-2xl">
-          <div className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-violet-400">
+      {/* Animated mustard pearls */}
+      <AmbientParticles />
+
+      {/* Background atmosphere */}
+      <div className="pointer-events-none absolute inset-0 z-0">
+        {/* Main golden glow */}
+        <div className="absolute left-1/2 top-[-240px] h-[560px] w-[760px] -translate-x-1/2 rounded-full bg-amber-400/[0.055] blur-[160px]" />
+
+        {/* Left soft glow */}
+        <div className="absolute -left-60 top-[25%] h-[520px] w-[520px] rounded-full bg-yellow-500/[0.018] blur-[150px]" />
+
+        {/* Right soft glow */}
+        <div className="absolute -right-60 bottom-[8%] h-[520px] w-[520px] rounded-full bg-amber-300/[0.02] blur-[150px]" />
+
+        {/* Subtle grid */}
+        <div
+          className="absolute inset-0 opacity-[0.035]"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(255,255,255,0.16) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.16) 1px, transparent 1px)",
+            backgroundSize: "72px 72px",
+          }}
+        />
+
+        {/* Center atmosphere */}
+        <div className="absolute left-1/2 top-[48%] h-[520px] w-[900px] -translate-x-1/2 rounded-full bg-amber-200/[0.012] blur-[130px]" />
+      </div>
+
+      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Heading */}
+        <div className="mx-auto max-w-2xl text-center">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-300/[0.12] bg-amber-300/[0.035] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-300/80 shadow-[0_0_30px_rgba(245,158,11,0.04)]">
+            <span className="h-1.5 w-1.5 rounded-full bg-amber-300 shadow-[0_0_10px_rgba(252,211,77,0.8)]" />
             Platform
           </div>
 
-          <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+          <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
             Everything you need to automate
-            <span className="text-violet-300"> repetitive work.</span>
+            <span className="ml-2 text-amber-300">
+              repetitive work.
+            </span>
           </h2>
 
-          <p className="mt-5 max-w-xl text-sm leading-7 text-slate-500 sm:text-base">
+          <p className="mx-auto mt-5 max-w-xl text-sm leading-7 text-slate-500 sm:text-base">
             NexaFlow combines AI reasoning with structured workflows, helping
             teams move from unstructured requests to measurable business
             actions.
           </p>
         </div>
 
-        <div className="mt-14 grid gap-px overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.08] md:grid-cols-2 xl:grid-cols-3">
+        {/* Feature grid */}
+        <div className="relative mt-14 grid gap-px overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.08] md:grid-cols-2 xl:grid-cols-3">
           {features.map((feature) => (
             <article
               key={feature.number}
-              className="group relative bg-[#070b1c] p-7 transition-colors duration-300 hover:bg-[#0a0f24]"
+              className="group relative bg-[#0b0b09]/95 p-7 transition-all duration-500 hover:bg-[#10100c]"
             >
-              <div className="flex items-start justify-between">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-violet-400/15 bg-violet-500/10 text-violet-300 transition-all duration-300 group-hover:border-violet-400/25 group-hover:bg-violet-500/15">
-                  {feature.icon}
+              {/* Top golden light */}
+              <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-amber-300/0 to-transparent transition-all duration-500 group-hover:via-amber-300/35" />
+
+              {/* Soft hover glow */}
+              <div className="pointer-events-none absolute -inset-10 bg-amber-300/[0.018] opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100" />
+
+              <div className="relative">
+                <div className="flex items-start justify-between">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-amber-300/[0.14] bg-amber-300/[0.045] text-amber-300 transition-all duration-300 group-hover:border-amber-300/30 group-hover:bg-amber-300/[0.08] group-hover:shadow-[0_0_25px_rgba(245,158,11,0.08)]">
+                    {feature.icon}
+                  </div>
+
+                  <span className="text-xs font-medium text-slate-700 transition-colors duration-300 group-hover:text-amber-300/45">
+                    {feature.number}
+                  </span>
                 </div>
 
-                <span className="text-xs font-medium text-slate-700">
-                  {feature.number}
-                </span>
+                <h3 className="mt-7 text-base font-semibold text-white transition-colors duration-300 group-hover:text-amber-50">
+                  {feature.title}
+                </h3>
+
+                <p className="mt-3 text-sm leading-6 text-slate-500">
+                  {feature.description}
+                </p>
+
+                {/* Accent line */}
+                <div className="mt-7 h-px w-10 bg-amber-300/30 transition-all duration-500 group-hover:w-20 group-hover:bg-amber-300/60" />
+
+                {/* Bottom status */}
+                <div className="mt-5 flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-amber-300/50 transition-all duration-300 group-hover:bg-amber-300 group-hover:shadow-[0_0_8px_rgba(252,211,77,0.7)]" />
+
+                  <span className="text-[10px] text-slate-700 transition-colors duration-300 group-hover:text-slate-600">
+                    AI-powered capability
+                  </span>
+                </div>
               </div>
-
-              <h3 className="mt-7 text-base font-semibold text-white">
-                {feature.title}
-              </h3>
-
-              <p className="mt-3 text-sm leading-6 text-slate-500">
-                {feature.description}
-              </p>
-
-              <div className="mt-7 h-px w-10 bg-violet-500/30 transition-all duration-300 group-hover:w-20" />
             </article>
           ))}
         </div>

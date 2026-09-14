@@ -2873,3 +2873,43 @@ video {
 /* =========================================================
    END
    ========================================================= */
+
+
+   @keyframes nexaParticle {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.75);
+    opacity: 0.12;
+  }
+
+  25% {
+    opacity: 0.65;
+  }
+
+  50% {
+    transform: translate3d(
+      var(--particle-x),
+      var(--particle-y),
+      0
+    ) scale(1);
+    opacity: 0.9;
+  }
+
+  75% {
+    opacity: 0.35;
+  }
+
+  100% {
+    transform: translate3d(
+      calc(var(--particle-x) * -0.7),
+      calc(var(--particle-y) * -0.7),
+      0
+    ) scale(0.8);
+    opacity: 0.18;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nexa-particle {
+    animation: none;
+  }
+}

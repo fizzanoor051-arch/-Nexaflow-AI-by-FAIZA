@@ -1,18 +1,21 @@
-
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ChatMessage, {
   ChatMessageData,
 } from "@/components/ai/ChatMessage";
 import ChatInput from "@/components/ai/ChatInput";
 import AIThinking from "@/components/ai/AIThinking";
+import type { AIPageContextData } from "@/components/ai/AIPageContext";
 
 interface AIChatProps {
   initialMessages?: ChatMessageData[];
   title?: string;
   subtitle?: string;
-  onWorkflowCreated?: (workflow: unknown) => void;
+  onMessagesChange?: (
+    messages: ChatMessageData[]
+  ) => void;
+  pageContext?: AIPageContextData;
 }
 
 const defaultMessages: ChatMessageData[] = [
@@ -20,7 +23,7 @@ const defaultMessages: ChatMessageData[] = [
     id: "welcome",
     role: "assistant",
     content:
-      "Hi! I'm NexaFlow AI. Tell me what you'd like to automate, and I'll turn your request into an actionable workflow.",
+      "Hi! I'm NexaFlow AI. Ask me anything about your business, leads, tasks, workflows, or automation ideas.",
     timestamp: "Just now",
   },
 ];
@@ -28,8 +31,9 @@ const defaultMessages: ChatMessageData[] = [
 export default function AIChat({
   initialMessages = defaultMessages,
   title = "NexaFlow AI",
-  subtitle = "Turn business requests into automated workflows",
-  onWorkflowCreated,
+  subtitle = "Your AI business assistant",
+  onMessagesChange,
+  pageContext,
 }: AIChatProps) {
   const [messages, setMessages] =
     useState<ChatMessageData[]>(initialMessages);
@@ -37,6 +41,10 @@ export default function AIChat({
   const [isThinking, setIsThinking] = useState(false);
 
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    onMessagesChange?.(messages);
+  }, [messages, onMessagesChange]);
 
   const handleSend = async (message: string) => {
     const trimmedMessage = message.trim();
@@ -52,9 +60,16 @@ export default function AIChat({
       timestamp: "Just now",
     };
 
-    const conversationMessages = [...messages, userMessage];
+    const conversationMessages = [
+      ...messages,
+      userMessage,
+    ];
 
-    setMessages((current) => [...current, userMessage]);
+    setMessages((current) => [
+      ...current,
+      userMessage,
+    ]);
+
     setIsThinking(true);
 
     try {
@@ -66,6 +81,20 @@ export default function AIChat({
         body: JSON.stringify({
           message: trimmedMessage,
           messages: conversationMessages,
+
+          /*
+           * Current page context is now sent to the AI API.
+           */
+          pageContext: pageContext
+            ? {
+                pageName: pageContext.pageName,
+                pageDescription:
+                  pageContext.pageDescription,
+                route: pageContext.route,
+                entityId: pageContext.entityId,
+                details: pageContext.details,
+              }
+            : undefined,
         }),
       });
 
@@ -75,14 +104,14 @@ export default function AIChat({
         reply?: string;
         response?: string;
         error?: string;
-        workflow?: unknown;
       } = {};
 
       try {
         data = await response.json();
       } catch {
         data = {
-          error: "The AI server returned an invalid response.",
+          error:
+            "The AI server returned an invalid response.",
         };
       }
 
@@ -110,26 +139,24 @@ export default function AIChat({
         role: "assistant",
         content: aiReply,
         timestamp: "Just now",
-        workflow: data.workflow,
       };
 
       setMessages((current) => [
         ...current,
         assistantMessage,
       ]);
-
-      if (data.workflow && onWorkflowCreated) {
-        onWorkflowCreated(data.workflow);
-      }
     } catch (err) {
-      console.error("NexaFlow AI chat error:", err);
+      console.error(
+        "NexaFlow AI chat error:",
+        err
+      );
 
-      const message =
+      const errorMessage =
         err instanceof Error
           ? err.message
           : "Unable to connect to the AI service right now.";
 
-      setError(message);
+      setError(errorMessage);
     } finally {
       setIsThinking(false);
     }
@@ -140,7 +167,7 @@ export default function AIChat({
   };
 
   return (
-    <section className="flex h-full min-h-[600px] flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-[#080d1a]">
+    <section className="flex h-full min-h-0 flex-col overflow-hidden rounded-none border-0 bg-[#080d1a]">
       {/* Header */}
       <div className="relative flex items-center gap-3 border-b border-white/[0.07] px-5 py-4">
         <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-violet-400/20 bg-violet-500/10">
@@ -199,7 +226,11 @@ export default function AIChat({
                   stroke="currentColor"
                   strokeWidth="2"
                 >
-                  <circle cx="12" cy="12" r="9" />
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="9"
+                  />
                   <path d="M12 8v4" />
                   <path d="M12 16h.01" />
                 </svg>
@@ -217,34 +248,57 @@ export default function AIChat({
             </div>
           )}
 
-          {messages.length === 1 && !isThinking && (
-            <div className="pt-2">
-              <p className="mb-3 text-[10px] font-medium uppercase tracking-[0.14em] text-slate-600">
-                Try asking
-              </p>
+          {messages.length === 0 &&
+            !isThinking && (
+              <div className="pt-8">
+                <div className="mb-5 text-center">
+                  <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl border border-violet-400/15 bg-violet-500/[0.06]">
+                    <svg
+                      className="h-7 w-7 text-violet-300"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                    >
+                      <path d="m12 3 1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3Z" />
+                    </svg>
+                  </div>
 
-              <div className="grid gap-2 sm:grid-cols-2">
-                {[
-                  "Automate customer support inquiries",
-                  "Create a lead follow-up workflow",
-                  "Prioritize my new leads",
-                  "Summarize today's business activity",
-                ].map((suggestion) => (
-                  <button
-                    key={suggestion}
-                    type="button"
-                    onClick={() =>
-                      handleSuggestion(suggestion)
-                    }
-                    disabled={isThinking}
-                    className="rounded-xl border border-white/[0.07] bg-white/[0.02] px-3 py-3 text-left text-xs text-slate-400 transition-all duration-200 hover:border-violet-400/15 hover:bg-violet-500/[0.04] hover:text-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    {suggestion}
-                  </button>
-                ))}
+                  <p className="text-sm font-semibold text-slate-300">
+                    Start a new conversation
+                  </p>
+
+                  <p className="mt-1 text-xs text-slate-600">
+                    Ask NexaFlow AI anything about your business.
+                  </p>
+                </div>
+
+                <p className="mb-3 text-[10px] font-medium uppercase tracking-[0.14em] text-slate-600">
+                  Try asking
+                </p>
+
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {[
+                    "How can I improve my customer support?",
+                    "Help me organize my leads",
+                    "How can I automate repetitive tasks?",
+                    "Summarize today's business activity",
+                  ].map((suggestion) => (
+                    <button
+                      key={suggestion}
+                      type="button"
+                      onClick={() =>
+                        handleSuggestion(suggestion)
+                      }
+                      disabled={isThinking}
+                      className="rounded-xl border border-white/[0.07] bg-white/[0.02] px-3 py-3 text-left text-xs text-slate-400 transition-all duration-200 hover:border-violet-400/15 hover:bg-violet-500/[0.04] hover:text-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
         </div>
       </div>
 
@@ -254,11 +308,11 @@ export default function AIChat({
           <ChatInput
             onSend={handleSend}
             disabled={isThinking}
-            placeholder="Tell NexaFlow what you want to automate..."
+            placeholder="Ask NexaFlow anything..."
           />
 
           <p className="mt-2 text-center text-[9px] text-slate-700">
-            AI can make mistakes. Review important actions before execution.
+            AI can make mistakes. Review important information before acting on it.
           </p>
         </div>
       </div>

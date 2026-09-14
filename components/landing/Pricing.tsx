@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import AmbientParticles from "@/components/landing/AmbientParticles";
 
 const plans = [
   {
@@ -70,45 +71,82 @@ export default function Pricing() {
   return (
     <section
       id="pricing"
-      className="relative overflow-hidden border-y border-white/[0.05] bg-[#06091a] py-24 sm:py-32"
+      className="relative isolate overflow-hidden border-y border-white/[0.06] bg-[#080806] py-24 sm:py-32"
     >
-      <div className="pointer-events-none absolute left-1/2 top-0 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-violet-600/[0.06] blur-[130px]" />
+      {/* Animated mustard pearls */}
+      <AmbientParticles />
 
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      {/* Background atmosphere */}
+      <div className="pointer-events-none absolute inset-0 z-0">
+        <div className="absolute left-1/2 top-[-240px] h-[560px] w-[760px] -translate-x-1/2 rounded-full bg-amber-400/[0.055] blur-[160px]" />
+
+        <div className="absolute -left-60 top-[35%] h-[520px] w-[520px] rounded-full bg-yellow-500/[0.018] blur-[150px]" />
+
+        <div className="absolute -right-60 bottom-[5%] h-[520px] w-[520px] rounded-full bg-amber-300/[0.02] blur-[150px]" />
+
+        <div
+          className="absolute inset-0 opacity-[0.035]"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(255,255,255,0.16) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.16) 1px, transparent 1px)",
+            backgroundSize: "72px 72px",
+          }}
+        />
+
+        <div className="absolute left-1/2 top-[45%] h-[500px] w-[900px] -translate-x-1/2 rounded-full bg-amber-200/[0.012] blur-[130px]" />
+      </div>
+
+      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Heading */}
         <div className="mx-auto max-w-2xl text-center">
-          <div className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-violet-400">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-300/[0.12] bg-amber-300/[0.035] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-300/80">
+            <span className="h-1.5 w-1.5 rounded-full bg-amber-300 shadow-[0_0_10px_rgba(252,211,77,0.8)]" />
             Pricing
           </div>
 
-          <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+          <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
             Start small.
-            <span className="text-violet-300"> Scale when ready.</span>
+            <span className="ml-2 text-amber-300">
+              Scale when ready.
+            </span>
           </h2>
 
-          <p className="mt-5 text-sm leading-7 text-slate-500 sm:text-base">
+          <p className="mx-auto mt-5 max-w-xl text-sm leading-7 text-slate-500 sm:text-base">
             Simple plans for experimenting with AI automation and growing into
             more powerful workflows.
           </p>
         </div>
 
-        <div className="mt-14 grid gap-4 lg:grid-cols-3">
+        {/* Pricing cards */}
+        <div className="mt-14 grid gap-5 lg:grid-cols-3 lg:gap-6">
           {plans.map((plan) => (
             <div
               key={plan.name}
-              className={`relative rounded-2xl border p-6 sm:p-7 ${
+              className={`group relative rounded-2xl border p-6 transition-all duration-500 sm:p-7 ${
                 plan.featured
-                  ? "border-violet-400/25 bg-violet-500/[0.06] shadow-2xl shadow-violet-950/20"
-                  : "border-white/[0.08] bg-white/[0.025]"
+                  ? "border-amber-300/[0.22] bg-amber-300/[0.035] shadow-[0_30px_90px_rgba(0,0,0,0.5)] hover:-translate-y-1 hover:border-amber-300/30 hover:bg-amber-300/[0.045]"
+                  : "border-white/[0.075] bg-white/[0.018] hover:-translate-y-1 hover:border-amber-300/[0.16] hover:bg-white/[0.025]"
               }`}
             >
               {plan.featured && (
-                <div className="absolute right-5 top-5 rounded-full border border-violet-400/20 bg-violet-500/10 px-3 py-1 text-[9px] font-bold uppercase tracking-wider text-violet-300">
+                <div className="pointer-events-none absolute -inset-px rounded-2xl bg-gradient-to-b from-amber-300/[0.08] via-transparent to-transparent opacity-80" />
+              )}
+
+              <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-amber-300/30 to-transparent" />
+
+              {plan.featured && (
+                <div className="absolute right-5 top-5 flex items-center gap-1.5 rounded-full border border-amber-300/[0.18] bg-amber-300/[0.07] px-3 py-1 text-[9px] font-bold uppercase tracking-[0.14em] text-amber-300">
+                  <span className="h-1.5 w-1.5 rounded-full bg-amber-300 shadow-[0_0_8px_rgba(252,211,77,0.8)]" />
                   Popular
                 </div>
               )}
 
-              <div>
-                <h3 className="text-lg font-semibold text-white">
+              <div className="relative">
+                <h3
+                  className={`text-lg font-semibold ${
+                    plan.featured ? "text-amber-50" : "text-white"
+                  }`}
+                >
                   {plan.name}
                 </h3>
 
@@ -117,7 +155,7 @@ export default function Pricing() {
                 </p>
               </div>
 
-              <div className="mt-7">
+              <div className="relative mt-7 flex items-baseline">
                 <span className="text-4xl font-bold tracking-tight text-white">
                   {plan.price}
                 </span>
@@ -129,16 +167,16 @@ export default function Pricing() {
 
               <Link
                 href="/register"
-                className={`mt-7 flex w-full items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold transition ${
+                className={`relative mt-7 flex w-full items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-300 ${
                   plan.featured
-                    ? "bg-violet-600 text-white shadow-lg shadow-violet-950/30 hover:bg-violet-500"
-                    : "border border-white/[0.09] bg-white/[0.03] text-slate-200 hover:bg-white/[0.07]"
+                    ? "border border-amber-200/20 bg-amber-300 text-[#17130a] shadow-[0_10px_30px_rgba(245,158,11,0.12)] hover:bg-amber-200 hover:shadow-[0_14px_40px_rgba(245,158,11,0.2)]"
+                    : "border border-white/[0.09] bg-white/[0.025] text-slate-200 hover:border-amber-300/[0.2] hover:bg-amber-300/[0.05] hover:text-amber-100"
                 }`}
               >
                 {plan.button}
               </Link>
 
-              <div className="my-7 h-px bg-white/[0.07]" />
+              <div className="my-7 h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
 
               <p className="text-xs font-semibold text-slate-400">
                 Includes:
@@ -148,15 +186,36 @@ export default function Pricing() {
                 {plan.features.map((feature) => (
                   <li
                     key={feature}
-                    className="flex items-start gap-3 text-sm text-slate-500"
+                    className="group/item flex items-start gap-3 text-sm text-slate-500 transition-colors duration-200 hover:text-slate-300"
                   >
-                    <span className="mt-0.5 text-violet-400">
+                    <span
+                      className={`mt-0.5 ${
+                        plan.featured
+                          ? "text-amber-300"
+                          : "text-amber-300/60"
+                      }`}
+                    >
                       <CheckIcon />
                     </span>
+
                     {feature}
                   </li>
                 ))}
               </ul>
+
+              <div className="mt-7 flex items-center gap-2 border-t border-white/[0.045] pt-5">
+                <span
+                  className={`h-1.5 w-1.5 rounded-full ${
+                    plan.featured
+                      ? "bg-amber-300 shadow-[0_0_8px_rgba(252,211,77,0.7)]"
+                      : "bg-slate-700"
+                  }`}
+                />
+
+                <span className="text-[10px] text-slate-600">
+                  Ready when you are
+                </span>
+              </div>
             </div>
           ))}
         </div>

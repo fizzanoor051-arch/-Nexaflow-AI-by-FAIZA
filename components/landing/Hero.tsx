@@ -1,8 +1,8 @@
-
 "use client";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import AmbientParticles from "@/components/landing/AmbientParticles";
 
 type MousePosition = {
   x: number;
@@ -63,27 +63,29 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="nf-hero relative min-h-screen overflow-hidden bg-[#070707] pt-28 text-white sm:pt-32">
+    <section className="nf-hero relative min-h-screen overflow-hidden bg-[#080806] pt-28 text-white sm:pt-32">
       {/* =========================================================
           PREMIUM BACKGROUND
       ========================================================== */}
 
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        {/* Soft central light */}
-        <div
-          className="absolute left-1/2 top-[30%] h-[650px] w-[900px] -translate-x-1/2 rounded-full blur-[160px]"
-          style={{
-            background:
-              "radial-gradient(ellipse, rgba(255,255,255,0.045) 0%, rgba(255,255,255,0.018) 32%, transparent 70%)",
-          }}
-        />
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+        {/* Moving golden pearl field */}
+        <AmbientParticles />
 
-        {/* Very subtle warm accent */}
+        {/* Central golden atmosphere */}
+        <div className="absolute left-1/2 top-[27%] h-[680px] w-[900px] -translate-x-1/2 rounded-full bg-amber-400/[0.045] blur-[170px]" />
+
+        {/* Soft secondary atmosphere */}
+        <div className="absolute left-[8%] top-[18%] h-[420px] w-[420px] rounded-full bg-yellow-500/[0.015] blur-[150px]" />
+
+        <div className="absolute right-[-5%] top-[25%] h-[500px] w-[500px] rounded-full bg-amber-300/[0.018] blur-[160px]" />
+
+        {/* Central glow */}
         <div
-          className="absolute right-[8%] top-[20%] h-[420px] w-[420px] rounded-full blur-[150px]"
+          className="absolute left-1/2 top-[34%] h-[520px] w-[760px] -translate-x-1/2 rounded-full blur-[130px]"
           style={{
             background:
-              "radial-gradient(circle, rgba(255,177,55,0.035), transparent 68%)",
+              "radial-gradient(ellipse, rgba(245,185,75,0.035) 0%, rgba(245,185,75,0.012) 35%, transparent 72%)",
           }}
         />
 
@@ -92,7 +94,7 @@ export default function Hero() {
           className="absolute left-[18%] top-0 h-full w-px opacity-30"
           style={{
             background:
-              "linear-gradient(to bottom, transparent, rgba(255,255,255,0.07) 35%, rgba(255,255,255,0.025) 65%, transparent)",
+              "linear-gradient(to bottom, transparent, rgba(245,197,107,0.08) 35%, rgba(255,255,255,0.025) 65%, transparent)",
           }}
         />
 
@@ -100,16 +102,26 @@ export default function Hero() {
           className="absolute right-[18%] top-0 h-full w-px opacity-20"
           style={{
             background:
-              "linear-gradient(to bottom, transparent, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.02) 70%, transparent)",
+              "linear-gradient(to bottom, transparent, rgba(245,197,107,0.06) 25%, rgba(255,255,255,0.02) 70%, transparent)",
           }}
         />
 
-        {/* Minimal horizontal horizon */}
+        {/* Horizontal horizon */}
         <div
           className="absolute left-1/2 top-[56%] h-px w-[90%] -translate-x-1/2"
           style={{
             background:
-              "linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent)",
+              "linear-gradient(90deg, transparent, rgba(245,197,107,0.10), transparent)",
+          }}
+        />
+
+        {/* Fine grid */}
+        <div
+          className="absolute inset-0 opacity-[0.025]"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(255,255,255,0.14) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.14) 1px, transparent 1px)",
+            backgroundSize: "72px 72px",
           }}
         />
 
@@ -141,10 +153,10 @@ export default function Hero() {
 
           <div className="max-w-2xl">
             {/* Eyebrow */}
-            <div className="nf-hero-reveal mb-7 inline-flex items-center gap-2.5 rounded-full border border-white/[0.09] bg-white/[0.025] px-3.5 py-2 text-[11px] font-medium uppercase tracking-[0.14em] text-[#b8b6b0] backdrop-blur-xl">
+            <div className="nf-hero-reveal mb-7 inline-flex items-center gap-2.5 rounded-full border border-amber-300/[0.13] bg-amber-300/[0.035] px-3.5 py-2 text-[11px] font-medium uppercase tracking-[0.14em] text-amber-200/75 shadow-[0_0_35px_rgba(245,158,11,0.035)] backdrop-blur-xl">
               <span className="relative flex h-2 w-2">
-                <span className="absolute inset-0 animate-ping rounded-full bg-[#f5b94b]/50" />
-                <span className="relative h-2 w-2 rounded-full bg-[#f5b94b]" />
+                <span className="absolute inset-0 animate-ping rounded-full bg-amber-300/40" />
+                <span className="relative h-2 w-2 rounded-full bg-amber-300 shadow-[0_0_12px_rgba(252,211,77,0.8)]" />
               </span>
 
               AI-powered business automation
@@ -158,7 +170,7 @@ export default function Hero() {
             </h1>
 
             {/* Description */}
-            <p className="nf-hero-reveal nf-delay-2 mt-7 max-w-xl text-[15px] leading-7 text-[#92918d] sm:text-[17px]">
+            <p className="nf-hero-reveal nf-delay-2 mt-7 max-w-xl text-[15px] leading-7 text-slate-400/80 sm:text-[17px]">
               NexaFlow AI turns everyday business requests into intelligent
               workflows — analyzing conversations, creating leads, assigning
               tasks, and generating responses automatically.
@@ -168,11 +180,11 @@ export default function Hero() {
             <div className="nf-hero-reveal nf-delay-3 mt-9 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/register"
-                className="nf-primary-button group inline-flex min-h-12 items-center justify-center gap-3 rounded-xl bg-[#f5f5f2] px-6 text-sm font-bold text-[#11110f] transition-all duration-300 hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_18px_50px_rgba(255,255,255,0.08)]"
+                className="nf-primary-button group inline-flex min-h-12 items-center justify-center gap-3 rounded-xl border border-amber-200/20 bg-amber-300 px-6 text-sm font-bold text-[#17130a] shadow-[0_14px_45px_rgba(245,158,11,0.10)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-amber-200 hover:shadow-[0_20px_55px_rgba(245,158,11,0.18)]"
               >
                 <span>Start automating</span>
 
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#11110f] text-white transition-transform duration-300 group-hover:translate-x-0.5">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#17130a] text-amber-100 transition-transform duration-300 group-hover:translate-x-0.5">
                   <svg
                     viewBox="0 0 16 16"
                     className="h-3.5 w-3.5"
@@ -188,20 +200,30 @@ export default function Hero() {
 
               <a
                 href="#how-it-works"
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/[0.09] bg-white/[0.025] px-6 text-sm font-semibold text-[#c7c5c0] backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-white/[0.16] hover:bg-white/[0.045]"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/[0.09] bg-white/[0.025] px-6 text-sm font-semibold text-slate-300 backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-amber-300/[0.18] hover:bg-amber-300/[0.035] hover:text-amber-100"
               >
-                <span className="h-1.5 w-1.5 rounded-full bg-[#77756f]" />
+                <span className="h-1.5 w-1.5 rounded-full bg-amber-300/50 shadow-[0_0_8px_rgba(252,211,77,0.45)]" />
                 See how it works
               </a>
             </div>
 
             {/* Trust line */}
-            <div className="nf-hero-reveal nf-delay-4 mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-[10px] uppercase tracking-[0.15em] text-[#5f5e5a]">
-              <span>AI workflows</span>
-              <span className="h-1 w-1 rounded-full bg-[#353431]" />
-              <span>Lead automation</span>
-              <span className="h-1 w-1 rounded-full bg-[#353431]" />
-              <span>Smart tasks</span>
+            <div className="nf-hero-reveal nf-delay-4 mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-[10px] uppercase tracking-[0.15em] text-slate-600">
+              <span className="transition-colors hover:text-amber-300/60">
+                AI workflows
+              </span>
+
+              <span className="h-1 w-1 rounded-full bg-amber-300/20" />
+
+              <span className="transition-colors hover:text-amber-300/60">
+                Lead automation
+              </span>
+
+              <span className="h-1 w-1 rounded-full bg-amber-300/20" />
+
+              <span className="transition-colors hover:text-amber-300/60">
+                Smart tasks
+              </span>
             </div>
           </div>
 
@@ -210,15 +232,14 @@ export default function Hero() {
           ====================================================== */}
 
           <div className="relative mx-auto w-full max-w-[680px] lg:mx-0 lg:ml-auto">
-            {/* Perspective environment */}
             <div
               className="nf-engine-scene relative h-[500px] sm:h-[570px]"
               style={{
                 perspective: "1500px",
               }}
             >
-              {/* Ambient floor glow */}
-              <div className="pointer-events-none absolute bottom-[3%] left-[10%] right-[10%] h-28 rounded-full bg-white/[0.025] blur-[65px]" />
+              {/* Floor glow */}
+              <div className="pointer-events-none absolute bottom-[3%] left-[10%] right-[10%] h-28 rounded-full bg-amber-300/[0.025] blur-[65px]" />
 
               {/* Main 3D object */}
               <div
@@ -237,39 +258,39 @@ export default function Hero() {
 
                 <div className="absolute left-1/2 top-[47%] z-30 -translate-x-1/2 -translate-y-1/2">
                   {/* Back plate */}
-                  <div className="absolute left-1/2 top-1/2 h-[230px] w-[230px] -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-[32px] border border-white/[0.055] bg-[#10100f]/70 shadow-[0_40px_100px_rgba(0,0,0,0.55)] backdrop-blur-xl" />
+                  <div className="absolute left-1/2 top-1/2 h-[230px] w-[230px] -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-[32px] border border-amber-300/[0.055] bg-[#10100d]/75 shadow-[0_40px_100px_rgba(0,0,0,0.55)] backdrop-blur-xl" />
 
                   {/* Inner plate */}
-                  <div className="absolute left-1/2 top-1/2 h-[175px] w-[175px] -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-[26px] border border-white/[0.07] bg-[#141412]/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]" />
+                  <div className="absolute left-1/2 top-1/2 h-[175px] w-[175px] -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-[26px] border border-amber-300/[0.075] bg-[#14130f]/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]" />
 
                   {/* Core */}
                   <div className="relative flex h-[145px] w-[145px] items-center justify-center">
-                    <div className="absolute inset-0 rounded-[28px] border border-[#f1c36a]/20 bg-[#171612] shadow-[0_20px_60px_rgba(0,0,0,0.65),inset_0_0_45px_rgba(245,185,75,0.025)]" />
+                    <div className="absolute inset-0 rounded-[28px] border border-amber-300/20 bg-[#171612] shadow-[0_20px_60px_rgba(0,0,0,0.65),inset_0_0_45px_rgba(245,185,75,0.025)]" />
 
                     {/* Core light */}
-                    <div className="absolute h-20 w-20 rounded-full bg-[#f5bd54]/[0.055] blur-[25px]" />
+                    <div className="absolute h-20 w-20 rounded-full bg-amber-300/[0.06] blur-[25px]" />
 
                     {/* Core icon */}
-                    <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl border border-[#f5c56b]/25 bg-gradient-to-br from-[#242119] to-[#10100e] shadow-[0_0_40px_rgba(245,185,75,0.08)]">
+                    <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl border border-amber-300/25 bg-gradient-to-br from-[#282318] to-[#10100e] shadow-[0_0_45px_rgba(245,185,75,0.10)]">
                       <div className="relative h-7 w-7">
-                        <span className="absolute left-1/2 top-0 h-3 w-px -translate-x-1/2 bg-[#f5c56b]" />
-                        <span className="absolute bottom-0 left-1/2 h-3 w-px -translate-x-1/2 bg-[#f5c56b]" />
-                        <span className="absolute left-0 top-1/2 h-px w-3 -translate-y-1/2 bg-[#f5c56b]" />
-                        <span className="absolute right-0 top-1/2 h-px w-3 -translate-y-1/2 bg-[#f5c56b]" />
+                        <span className="absolute left-1/2 top-0 h-3 w-px -translate-x-1/2 bg-amber-300" />
+                        <span className="absolute bottom-0 left-1/2 h-3 w-px -translate-x-1/2 bg-amber-300" />
+                        <span className="absolute left-0 top-1/2 h-px w-3 -translate-y-1/2 bg-amber-300" />
+                        <span className="absolute right-0 top-1/2 h-px w-3 -translate-y-1/2 bg-amber-300" />
 
-                        <span className="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#f7d68c] shadow-[0_0_14px_rgba(245,195,95,0.45)]" />
+                        <span className="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border border-amber-100 shadow-[0_0_16px_rgba(245,195,95,0.55)]" />
                       </div>
                     </div>
 
-                    <span className="absolute -bottom-10 whitespace-nowrap text-[9px] font-semibold uppercase tracking-[0.28em] text-[#817e76]">
+                    <span className="absolute -bottom-10 whitespace-nowrap text-[9px] font-semibold uppercase tracking-[0.28em] text-amber-200/40">
                       NexaFlow Engine
                     </span>
                   </div>
 
-                  {/* Rotating technical ring */}
-                  <div className="nf-engine-ring absolute left-1/2 top-1/2 h-[250px] w-[250px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-white/[0.08]" />
+                  {/* Rotating technical rings */}
+                  <div className="nf-engine-ring absolute left-1/2 top-1/2 h-[250px] w-[250px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-amber-300/[0.10] border-dashed" />
 
-                  <div className="nf-engine-ring-reverse absolute left-1/2 top-1/2 h-[205px] w-[205px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#f5c56b]/[0.08]" />
+                  <div className="nf-engine-ring-reverse absolute left-1/2 top-1/2 h-[205px] w-[205px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-amber-300/[0.09]" />
                 </div>
 
                 {/* =================================================
@@ -284,38 +305,37 @@ export default function Hero() {
                     }px, 35px)`,
                   }}
                 >
-                  <div className="rounded-2xl border border-white/[0.09] bg-[#111110]/90 p-4 shadow-[0_25px_70px_rgba(0,0,0,0.5)] backdrop-blur-2xl">
+                  <div className="rounded-2xl border border-amber-300/[0.10] bg-[#11110f]/92 p-4 shadow-[0_25px_70px_rgba(0,0,0,0.5)] backdrop-blur-2xl">
                     <div className="mb-3 flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="flex h-6 w-6 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.04] text-[10px] text-[#b8b5ae]">
+                        <span className="flex h-6 w-6 items-center justify-center rounded-lg border border-amber-300/[0.10] bg-amber-300/[0.035] text-[10px] text-amber-200/70">
                           AI
                         </span>
 
-                        <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#77756f]">
+                        <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
                           Incoming
                         </span>
                       </div>
 
-                      <span className="h-1.5 w-1.5 rounded-full bg-[#8e8c86]" />
+                      <span className="h-1.5 w-1.5 rounded-full bg-amber-300 shadow-[0_0_9px_rgba(252,211,77,0.55)]" />
                     </div>
 
-                    <p className="text-[11px] leading-5 text-[#b8b5ae]">
+                    <p className="text-[11px] leading-5 text-slate-400">
                       &ldquo;A customer wants to know if their order can be
                       delivered tomorrow.&rdquo;
                     </p>
 
                     <div className="mt-3 flex items-center gap-2">
-                      <span className="rounded-md border border-white/[0.06] bg-white/[0.025] px-2 py-1 text-[8px] uppercase tracking-wider text-[#65635e]">
+                      <span className="rounded-md border border-white/[0.06] bg-white/[0.025] px-2 py-1 text-[8px] uppercase tracking-wider text-slate-600">
                         Customer inquiry
                       </span>
 
-                      <span className="rounded-md border border-[#f5c56b]/10 bg-[#f5c56b]/[0.035] px-2 py-1 text-[8px] text-[#b9a16e]">
+                      <span className="rounded-md border border-amber-300/10 bg-amber-300/[0.035] px-2 py-1 text-[8px] text-amber-200/55">
                         New
                       </span>
                     </div>
                   </div>
 
-                  {/* Connector */}
                   <div className="nf-connector-horizontal absolute -bottom-7 right-[-30px] h-px w-[75px]" />
                 </div>
 
@@ -353,7 +373,9 @@ export default function Hero() {
 
                       <div className="min-w-0">
                         <div className="nf-node-label">{node.label}</div>
+
                         <div className="nf-node-title">{node.title}</div>
+
                         <div className="nf-node-description">
                           {node.description}
                         </div>
@@ -397,16 +419,16 @@ export default function Hero() {
                     }px, 25px)`,
                   }}
                 >
-                  <div className="flex items-center gap-3 rounded-full border border-white/[0.08] bg-[#111110]/90 px-4 py-2.5 shadow-[0_20px_50px_rgba(0,0,0,0.45)] backdrop-blur-xl">
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full border border-[#d8d6cf]/20 bg-[#d8d6cf]/[0.06] text-[9px] text-[#d8d6cf]">
+                  <div className="flex items-center gap-3 rounded-full border border-amber-300/[0.10] bg-[#11110f]/90 px-4 py-2.5 shadow-[0_20px_50px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full border border-amber-300/20 bg-amber-300/[0.055] text-[9px] text-amber-200">
                       ✓
                     </span>
 
-                    <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-[#85827b]">
+                    <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-slate-500">
                       Workflow completed
                     </span>
 
-                    <span className="h-1.5 w-1.5 rounded-full bg-[#c7c4bb]" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-amber-300 shadow-[0_0_9px_rgba(252,211,77,0.55)]" />
                   </div>
                 </div>
               </div>
@@ -415,11 +437,11 @@ export default function Hero() {
                   TECHNICAL LABELS
               ================================================== */}
 
-              <div className="absolute left-0 top-1/2 hidden -translate-y-1/2 -rotate-90 text-[8px] font-medium uppercase tracking-[0.35em] text-[#4e4d49] sm:block">
+              <div className="absolute left-0 top-1/2 hidden -translate-y-1/2 -rotate-90 text-[8px] font-medium uppercase tracking-[0.35em] text-slate-700 sm:block">
                 AUTOMATION / ENGINE
               </div>
 
-              <div className="absolute right-0 top-1/2 hidden translate-x-1/2 -translate-y-1/2 rotate-90 text-[8px] font-medium uppercase tracking-[0.35em] text-[#4e4d49] sm:block">
+              <div className="absolute right-0 top-1/2 hidden translate-x-1/2 -translate-y-1/2 rotate-90 text-[8px] font-medium uppercase tracking-[0.35em] text-slate-700 sm:block">
                 REAL-TIME EXECUTION
               </div>
 
@@ -432,7 +454,7 @@ export default function Hero() {
 
             {/* Caption */}
             <div className="mt-1 text-center">
-              <span className="text-[9px] uppercase tracking-[0.3em] text-[#55534e]">
+              <span className="text-[9px] uppercase tracking-[0.3em] text-amber-200/25">
                 Request → Intelligence → Action
               </span>
             </div>
@@ -443,7 +465,7 @@ export default function Hero() {
             BOTTOM PRODUCT STRIP
         ========================================================== */}
 
-        <div className="nf-hero-reveal nf-delay-4 mt-16 border-y border-white/[0.055] py-5 sm:mt-20">
+        <div className="nf-hero-reveal nf-delay-4 mt-16 border-y border-amber-300/[0.06] py-5 sm:mt-20">
           <div className="grid grid-cols-2 gap-y-5 sm:grid-cols-4 sm:gap-0">
             {[
               ["01", "Understand", "AI classifies business intent"],
@@ -458,18 +480,18 @@ export default function Hero() {
                 }`}
               >
                 <div className="mb-2 flex items-center gap-2">
-                  <span className="text-[9px] font-semibold tracking-[0.2em] text-[#6d6b65]">
+                  <span className="text-[9px] font-semibold tracking-[0.2em] text-amber-300/45">
                     {number}
                   </span>
 
-                  <span className="h-px w-5 bg-white/[0.08]" />
+                  <span className="h-px w-5 bg-amber-300/15" />
                 </div>
 
-                <div className="text-xs font-semibold text-[#b8b6b0]">
+                <div className="text-xs font-semibold text-slate-300">
                   {title}
                 </div>
 
-                <div className="mt-1 text-[9px] leading-4 text-[#5f5d58]">
+                <div className="mt-1 text-[9px] leading-4 text-slate-600">
                   {description}
                 </div>
               </div>
@@ -482,7 +504,7 @@ export default function Hero() {
           BOTTOM FADE
       ========================================================== */}
 
-      <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-36 bg-gradient-to-t from-[#070707] to-transparent" />
+      <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-36 bg-gradient-to-t from-[#080806] to-transparent" />
 
       {/* =========================================================
           HERO-SPECIFIC CSS
@@ -533,14 +555,16 @@ export default function Hero() {
 
         .nf-heading-accent {
           background: linear-gradient(
-            100deg,
-            #ffffff 0%,
-            #e7e5df 48%,
-            #d0a451 100%
+            105deg,
+            #fffdf6 0%,
+            #f5d78c 42%,
+            #d6a94f 78%,
+            #b8872e 100%
           );
           -webkit-background-clip: text;
           background-clip: text;
           color: transparent;
+          text-shadow: 0 0 45px rgba(245, 185, 75, 0.06);
         }
 
         /* -------------------------------------------------------
@@ -552,8 +576,8 @@ export default function Hero() {
           width: 3px;
           height: 3px;
           border-radius: 999px;
-          background: rgba(255, 255, 255, 0.35);
-          box-shadow: 0 0 16px rgba(255, 255, 255, 0.18);
+          background: rgba(252, 211, 77, 0.5);
+          box-shadow: 0 0 18px rgba(252, 211, 77, 0.25);
           animation: ambientFloat 7s ease-in-out infinite;
         }
 
@@ -588,7 +612,7 @@ export default function Hero() {
           }
 
           50% {
-            opacity: 0.55;
+            opacity: 0.65;
             transform: translate3d(0, -14px, 0);
           }
         }
@@ -669,9 +693,9 @@ export default function Hero() {
           min-width: 205px;
           align-items: center;
           gap: 10px;
-          border: 1px solid rgba(255, 255, 255, 0.075);
+          border: 1px solid rgba(245, 197, 107, 0.09);
           border-radius: 14px;
-          background: rgba(17, 17, 16, 0.92);
+          background: rgba(17, 17, 15, 0.94);
           padding: 10px 11px;
           box-shadow:
             0 20px 50px rgba(0, 0, 0, 0.42),
@@ -680,12 +704,16 @@ export default function Hero() {
           transition:
             border-color 300ms ease,
             transform 300ms ease,
-            background 300ms ease;
+            background 300ms ease,
+            box-shadow 300ms ease;
         }
 
         .nf-node-card:hover {
-          border-color: rgba(255, 255, 255, 0.13);
-          background: rgba(21, 21, 20, 0.96);
+          border-color: rgba(245, 197, 107, 0.20);
+          background: rgba(21, 20, 17, 0.97);
+          box-shadow:
+            0 24px 60px rgba(0, 0, 0, 0.5),
+            0 0 30px rgba(245, 185, 75, 0.035);
           transform: translateY(-2px);
         }
 
@@ -696,11 +724,12 @@ export default function Hero() {
           flex-shrink: 0;
           align-items: center;
           justify-content: center;
-          border: 1px solid rgba(255, 255, 255, 0.075);
+          border: 1px solid rgba(245, 197, 107, 0.10);
           border-radius: 10px;
-          background: rgba(255, 255, 255, 0.035);
-          color: #d4d1c9;
+          background: rgba(245, 197, 107, 0.035);
+          color: #e6c77e;
           font-size: 13px;
+          box-shadow: inset 0 0 18px rgba(245, 185, 75, 0.02);
         }
 
         .nf-node-label {
@@ -708,21 +737,21 @@ export default function Hero() {
           font-size: 7px;
           font-weight: 700;
           letter-spacing: 0.2em;
-          color: #77756f;
+          color: #8b7955;
         }
 
         .nf-node-title {
           white-space: nowrap;
           font-size: 10px;
           font-weight: 600;
-          color: #c7c5bf;
+          color: #d0cec6;
         }
 
         .nf-node-description {
           margin-top: 2px;
           white-space: nowrap;
           font-size: 8px;
-          color: #5f5d58;
+          color: #66635c;
         }
 
         .nf-node-status {
@@ -731,15 +760,15 @@ export default function Hero() {
           width: 5px;
           flex-shrink: 0;
           border-radius: 999px;
-          background: #aaa79e;
-          box-shadow: 0 0 10px rgba(210, 207, 196, 0.25);
+          background: #e7c77f;
+          box-shadow: 0 0 10px rgba(210, 178, 95, 0.35);
           animation: nodeStatus 2.8s ease-in-out infinite;
         }
 
         @keyframes nodeStatus {
           0%,
           100% {
-            opacity: 0.35;
+            opacity: 0.25;
           }
 
           50% {
@@ -775,9 +804,9 @@ export default function Hero() {
         .nf-connector-output {
           background: linear-gradient(
             90deg,
-            rgba(255, 255, 255, 0.03),
-            rgba(245, 197, 107, 0.32),
-            rgba(255, 255, 255, 0.025)
+            rgba(255, 255, 255, 0.025),
+            rgba(245, 197, 107, 0.34),
+            rgba(255, 255, 255, 0.02)
           );
         }
 
@@ -807,22 +836,22 @@ export default function Hero() {
         @keyframes flowPulseLeft {
           0%,
           100% {
-            opacity: 0.15;
+            opacity: 0.12;
           }
 
           50% {
-            opacity: 0.7;
+            opacity: 0.75;
           }
         }
 
         @keyframes flowPulseRight {
           0%,
           100% {
-            opacity: 0.12;
+            opacity: 0.10;
           }
 
           50% {
-            opacity: 0.65;
+            opacity: 0.7;
           }
         }
 
@@ -836,8 +865,10 @@ export default function Hero() {
           height: 4px;
           width: 4px;
           border-radius: 999px;
-          background: #e7c77f;
-          box-shadow: 0 0 12px rgba(231, 199, 127, 0.65);
+          background: #f5c56b;
+          box-shadow:
+            0 0 8px rgba(245, 197, 107, 0.8),
+            0 0 18px rgba(245, 185, 75, 0.35);
         }
 
         .nf-packet-1 {
@@ -926,7 +957,7 @@ export default function Hero() {
           position: absolute;
           height: 16px;
           width: 16px;
-          border-color: rgba(255, 255, 255, 0.1);
+          border-color: rgba(245, 197, 107, 0.12);
         }
 
         .nf-corner-tl {

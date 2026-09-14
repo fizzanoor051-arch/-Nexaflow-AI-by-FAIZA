@@ -16,26 +16,29 @@ export default function Navbar() {
   return (
     <header className="fixed inset-x-0 top-0 z-50">
       <div className="mx-auto max-w-7xl px-4 pt-4 sm:px-6 lg:px-8">
-        <nav className="rounded-2xl border border-white/[0.08] bg-[#070b1c]/80 px-4 py-3 shadow-2xl shadow-black/20 backdrop-blur-xl">
+        <nav className="rounded-2xl border border-[#F5D98B]/[0.08] bg-[#121410]/[0.90] px-4 py-3 shadow-2xl shadow-black/30 backdrop-blur-xl">
           <div className="flex items-center justify-between">
             <Link
               href="/"
               className="group flex items-center gap-3"
               onClick={() => setMobileOpen(false)}
             >
-              <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border border-violet-400/20 bg-gradient-to-br from-violet-600/20 to-indigo-500/10">
-                <div className="absolute inset-0 bg-violet-500/10 blur-xl" />
+              <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border border-[#E7B84B]/25 bg-[#252A22] shadow-[0_0_24px_rgba(231,184,75,0.08)]">
+                <div className="absolute inset-0 bg-[#E7B84B]/[0.07] blur-xl" />
 
-                <span className="relative text-sm font-black text-violet-200">
+                <span className="relative text-sm font-black text-[#F5D98B]">
                   N
                 </span>
+
+                <div className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-[#E7B84B] shadow-[0_0_8px_rgba(231,184,75,0.7)]" />
               </div>
 
               <div>
-                <div className="text-sm font-bold tracking-tight text-white">
+                <div className="text-sm font-bold tracking-tight text-[#F4F0E6]">
                   NexaFlow
                 </div>
-                <div className="text-[9px] font-medium uppercase tracking-[0.2em] text-violet-300/60">
+
+                <div className="text-[9px] font-medium uppercase tracking-[0.2em] text-[#BFAF7A]">
                   AI Automation
                 </div>
               </div>
@@ -46,7 +49,7 @@ export default function Navbar() {
                 <a
                   key={link.href}
                   href={link.href}
-                  className="text-sm font-medium text-slate-400 transition-colors hover:text-white"
+                  className="text-sm font-medium text-[#9A9D94] transition-colors hover:text-[#F5D98B]"
                 >
                   {link.label}
                 </a>
@@ -56,14 +59,14 @@ export default function Navbar() {
             <div className="hidden items-center gap-3 lg:flex">
               <Link
                 href="/login"
-                className="rounded-xl px-4 py-2.5 text-sm font-medium text-slate-300 transition-colors hover:text-white"
+                className="rounded-xl px-4 py-2.5 text-sm font-medium text-[#9A9D94] transition-colors hover:text-[#F4F0E6]"
               >
                 Sign in
               </Link>
 
               <Link
                 href="/register"
-                className="rounded-xl border border-violet-400/20 bg-violet-500/10 px-4 py-2.5 text-sm font-semibold text-violet-200 shadow-lg shadow-violet-950/20 transition-all hover:border-violet-300/30 hover:bg-violet-500/20"
+                className="rounded-xl border border-[#E7B84B]/25 bg-[#E7B84B]/[0.09] px-4 py-2.5 text-sm font-semibold text-[#F5D98B] shadow-lg shadow-black/20 transition-all hover:border-[#E7B84B]/40 hover:bg-[#E7B84B]/[0.15] hover:shadow-[0_0_24px_rgba(231,184,75,0.10)]"
               >
                 Get started
               </Link>
@@ -74,7 +77,7 @@ export default function Navbar() {
               aria-label="Toggle menu"
               aria-expanded={mobileOpen}
               onClick={() => setMobileOpen((value) => !value)}
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.03] text-slate-300 transition hover:bg-white/[0.06] lg:hidden"
+              className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#F5D98B]/[0.08] bg-[#20241D]/70 text-[#D8D4C8] transition hover:border-[#E7B84B]/20 hover:bg-[#252A22] hover:text-[#F5D98B] lg:hidden"
             >
               {mobileOpen ? (
                 <svg
@@ -101,25 +104,25 @@ export default function Navbar() {
           </div>
 
           {mobileOpen && (
-            <div className="mt-4 border-t border-white/[0.07] pt-4 lg:hidden">
+            <div className="mt-4 border-t border-[#F5D98B]/[0.07] pt-4 lg:hidden">
               <div className="flex flex-col gap-1">
                 {links.map((link) => (
                   <a
                     key={link.href}
                     href={link.href}
                     onClick={() => setMobileOpen(false)}
-                    className="rounded-xl px-3 py-3 text-sm font-medium text-slate-400 transition hover:bg-white/[0.04] hover:text-white"
+                    className="rounded-xl px-3 py-3 text-sm font-medium text-[#9A9D94] transition hover:bg-[#F4F0E6]/[0.035] hover:text-[#F5D98B]"
                   >
                     {link.label}
                   </a>
                 ))}
               </div>
 
-              <div className="mt-3 grid grid-cols-2 gap-2 border-t border-white/[0.07] pt-3">
+              <div className="mt-3 grid grid-cols-2 gap-2 border-t border-[#F5D98B]/[0.07] pt-3">
                 <Link
                   href="/login"
                   onClick={() => setMobileOpen(false)}
-                  className="rounded-xl border border-white/[0.08] px-4 py-3 text-center text-sm font-medium text-slate-300"
+                  className="rounded-xl border border-[#F5D98B]/[0.08] bg-[#20241D]/50 px-4 py-3 text-center text-sm font-medium text-[#D8D4C8] transition hover:border-[#E7B84B]/20 hover:bg-[#252A22] hover:text-[#F4F0E6]"
                 >
                   Sign in
                 </Link>
@@ -127,7 +130,7 @@ export default function Navbar() {
                 <Link
                   href="/register"
                   onClick={() => setMobileOpen(false)}
-                  className="rounded-xl bg-violet-600 px-4 py-3 text-center text-sm font-semibold text-white"
+                  className="rounded-xl border border-[#E7B84B]/25 bg-[#E7B84B]/[0.12] px-4 py-3 text-center text-sm font-semibold text-[#F5D98B] transition hover:border-[#E7B84B]/40 hover:bg-[#E7B84B]/[0.18]"
                 >
                   Get started
                 </Link>
