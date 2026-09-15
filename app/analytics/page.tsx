@@ -524,9 +524,9 @@ export default function AnalyticsPage() {
     };
   }, []);
 
-  const topWorkflow = useMemo(() => {
-    return data.workflowPerformance[0];
-  }, [data.workflowPerformance]);
+const topWorkflow = useMemo(() => {
+  return data.workflowPerformance?.[0] ?? null;
+}, [data.workflowPerformance]);
 
   const funnelConversion =
     data.metrics.totalLeads === 0

@@ -4,6 +4,10 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
+import LightTheme from "@/components/theme/LightTheme";
+import DarkTheme from "@/components/theme/DarkTheme";
+import ThemeProvider from "@/components/theme/ThemeProvider";
+
 interface TopbarProps {
   title?: string;
   subtitle?: string;
@@ -28,6 +32,8 @@ type SearchItem = {
     | "analytics"
     | "settings";
 };
+
+type Theme = "light" | "dark" | "normal";
 
 function SearchIcon() {
   return (
@@ -118,6 +124,53 @@ function SparkIcon() {
       aria-hidden="true"
     >
       <path d="m12 3 1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3Z" />
+    </svg>
+  );
+}
+
+function SunIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      className="h-[16px] w-[16px]"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="3.5" />
+      <path d="M12 2.5v2M12 19.5v2M4.5 4.5l1.4 1.4M18.1 18.1l1.4 1.4M2.5 12h2M19.5 12h2M4.5 19.5l1.4-1.4M18.1 5.9l1.4-1.4" />
+    </svg>
+  );
+}
+
+function MoonIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      className="h-[16px] w-[16px]"
+      aria-hidden="true"
+    >
+      <path d="M20 15.2A8.5 8.5 0 0 1 8.8 4a8.5 8.5 0 1 0 11.2 11.2Z" />
+    </svg>
+  );
+}
+
+function NormalThemeIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      className="h-[16px] w-[16px]"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="8" />
+      <path d="M12 4a8 8 0 0 1 0 16Z" />
     </svg>
   );
 }
@@ -402,10 +455,16 @@ export default function Topbar({
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
 
+  const [theme, setTheme] = useState<Theme>("normal");
+  const [themeMenuOpen, setThemeMenuOpen] = useState(false);
+
   const searchInputRef =
     useRef<HTMLInputElement>(null);
 
   const searchContainerRef =
+    useRef<HTMLDivElement>(null);
+
+  const themeContainerRef =
     useRef<HTMLDivElement>(null);
 
   const isDashboard = pathname === "/dashboard";
@@ -479,6 +538,60 @@ export default function Topbar({
     router.push("/dashboard");
   }
 
+  /*
+   * THEME CONTROL
+   *
+   * Topbar does not apply any visual theme itself.
+   *
+   * Each theme is handled by its own component:
+   *
+   * Light  -> LightTheme.tsx
+   * Dark   -> DarkTheme.tsx
+   * Normal -> ThemeProvider.tsx
+   */
+  function applyTheme(nextTheme: Theme) {
+    setTheme(nextTheme);
+    setThemeMenuOpen(false);
+
+    window.localStorage.setItem(
+      "nexaflow-theme",
+      nextTheme,
+    );
+  }
+
+  function getThemeLabel() {
+    if (theme === "light") {
+      return "Light";
+    }
+
+    if (theme === "dark") {
+      return "Dark";
+    }
+
+    return "Normal";
+  }
+
+  /*
+   * LOAD SAVED THEME
+   *
+   * No classes are manually added here.
+   * The selected theme component handles the
+   * actual visual state.
+   */
+  useEffect(() => {
+    const savedTheme =
+      window.localStorage.getItem("nexaflow-theme");
+
+    const nextTheme: Theme =
+      savedTheme === "light" ||
+      savedTheme === "dark" ||
+      savedTheme === "normal"
+        ? savedTheme
+        : "normal";
+
+    setTheme(nextTheme);
+  }, []);
+
   useEffect(() => {
     function handleKeyboard(event: KeyboardEvent) {
       const isSearchShortcut =
@@ -497,13 +610,21 @@ export default function Topbar({
         return;
       }
 
-      if (!searchOpen) {
-        return;
+      if (event.key === "Escape") {
+        if (themeMenuOpen) {
+          event.preventDefault();
+          setThemeMenuOpen(false);
+          return;
+        }
+
+        if (searchOpen) {
+          event.preventDefault();
+          closeSearch();
+          return;
+        }
       }
 
-      if (event.key === "Escape") {
-        event.preventDefault();
-        closeSearch();
+      if (!searchOpen) {
         return;
       }
 
@@ -517,7 +638,7 @@ export default function Topbar({
         setSelectedIndex((current) =>
           current >= filteredResults.length - 1
             ? 0
-            : current + 1
+            : current + 1,
         );
 
         return;
@@ -533,7 +654,7 @@ export default function Topbar({
         setSelectedIndex((current) =>
           current <= 0
             ? filteredResults.length - 1
-            : current - 1
+            : current - 1,
         );
 
         return;
@@ -553,28 +674,36 @@ export default function Topbar({
 
     window.addEventListener(
       "keydown",
-      handleKeyboard
+      handleKeyboard,
     );
 
     return () => {
       window.removeEventListener(
         "keydown",
-        handleKeyboard
+        handleKeyboard,
       );
     };
   }, [
     searchOpen,
+    themeMenuOpen,
     filteredResults,
     selectedIndex,
   ]);
 
   useEffect(() => {
     function handleOutsideClick(event: MouseEvent) {
+      const target = event.target as Node;
+
+      if (
+        themeContainerRef.current &&
+        !themeContainerRef.current.contains(target)
+      ) {
+        setThemeMenuOpen(false);
+      }
+
       if (!searchOpen) {
         return;
       }
-
-      const target = event.target as Node;
 
       if (
         searchContainerRef.current &&
@@ -586,13 +715,13 @@ export default function Topbar({
 
     document.addEventListener(
       "mousedown",
-      handleOutsideClick
+      handleOutsideClick,
     );
 
     return () => {
       document.removeEventListener(
         "mousedown",
-        handleOutsideClick
+        handleOutsideClick,
       );
     };
   }, [searchOpen]);
@@ -604,332 +733,511 @@ export default function Topbar({
   }, [filteredResults.length, selectedIndex]);
 
   return (
-    <header className="sticky top-0 z-30 border-b border-[#F5D98B]/[0.08] bg-[#1B1F19]/[0.94] text-[#F4F0E6] shadow-[0_12px_35px_rgba(0,0,0,0.24)] backdrop-blur-2xl">
-      {/* TOP GOLD MICRO-LINE */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#E7B84B]/45 to-transparent" />
+    <>
+      {/* =====================================================
+          THEME COMPONENT CONNECTIONS
+          ===================================================== */}
 
-      {/* ATMOSPHERIC GLOW */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-[radial-gradient(circle_at_50%_-80%,rgba(231,184,75,0.08),transparent_65%)]" />
+      {/* LIGHT BUTTON -> LightTheme.tsx */}
+      {theme === "light" && <LightTheme active />}
 
-      {/* INNER BOTTOM LINE */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#F5D98B]/[0.07] to-transparent" />
+      {/* DARK BUTTON -> DarkTheme.tsx */}
+      {theme === "dark" && <DarkTheme />}
 
-      <div className="relative flex h-[72px] items-center gap-4 px-4 sm:px-6 lg:px-8">
-        {/* LEFT SIDE */}
-        <div className="flex min-w-0 flex-1 items-center gap-3">
-          {showBack && !isDashboard && (
-            <button
-              type="button"
-              onClick={handleBack}
-              aria-label="Go back"
-              className="group flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#F5D98B]/[0.09] bg-[#20241D]/80 text-[#9A9D94] shadow-[inset_0_1px_0_rgba(245,217,139,0.03)] transition-all duration-200 hover:border-[#E7B84B]/30 hover:bg-[#252A22] hover:text-[#F5D98B] hover:shadow-[0_0_18px_rgba(231,184,75,0.08)]"
-            >
-              <ChevronLeftIcon />
-            </button>
-          )}
+      {/* NORMAL BUTTON -> ThemeProvider.tsx */}
+      {theme === "normal" && <ThemeProvider />}
 
-          <div className="min-w-0">
-            <div className="flex items-center gap-2.5">
-              <h1 className="truncate text-[15px] font-semibold tracking-[-0.01em] text-[#F4F0E6] sm:text-[16px]">
-                {resolvedTitle}
-              </h1>
+      <header className="sticky top-0 z-30 border-b border-[#F5D98B]/[0.08] bg-[#1B1F19]/[0.94] text-[#F4F0E6] shadow-[0_12px_35px_rgba(0,0,0,0.24)] backdrop-blur-2xl">
+        {/* TOP GOLD MICRO-LINE */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#E7B84B]/45 to-transparent" />
 
-              <span className="hidden items-center gap-1.5 rounded-full border border-[#5ED6A0]/20 bg-[#5ED6A0]/[0.07] px-2 py-0.5 text-[8px] font-bold uppercase tracking-[0.12em] text-[#79DDAE] sm:inline-flex">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#5ED6A0] shadow-[0_0_7px_rgba(94,214,160,0.7)]" />
-                Live
-              </span>
-            </div>
+        {/* ATMOSPHERIC GLOW */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-[radial-gradient(circle_at_50%_-80%,rgba(231,184,75,0.08),transparent_65%)]" />
 
-            <p className="mt-0.5 hidden max-w-[520px] truncate text-[10px] font-medium text-[#9A9D94] sm:block">
-              {resolvedSubtitle}
-            </p>
-          </div>
-        </div>
+        {/* INNER BOTTOM LINE */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#F5D98B]/[0.07] to-transparent" />
 
-        {/* GLOBAL SEARCH */}
-        {showSearch && (
-          <div
-            ref={searchContainerRef}
-            className="relative hidden items-center md:flex"
-          >
-            {!searchOpen ? (
+        <div className="relative flex h-[72px] items-center gap-4 px-4 sm:px-6 lg:px-8">
+          {/* LEFT SIDE */}
+          <div className="flex min-w-0 flex-1 items-center gap-3">
+            {showBack && !isDashboard && (
               <button
                 type="button"
-                onClick={handleSearchClick}
-                aria-label="Search workspace"
-                className="group flex h-9 w-[190px] items-center gap-2.5 rounded-xl border border-[#F5D98B]/[0.09] bg-[#20241D]/75 px-3 text-left shadow-[inset_0_1px_0_rgba(245,217,139,0.025)] transition-all duration-200 hover:w-[230px] hover:border-[#E7B84B]/30 hover:bg-[#252A22] hover:shadow-[0_5px_22px_rgba(0,0,0,0.18)]"
+                onClick={handleBack}
+                aria-label="Go back"
+                className="group flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#F5D98B]/[0.09] bg-[#20241D]/80 text-[#9A9D94] shadow-[inset_0_1px_0_rgba(245,217,139,0.03)] transition-all duration-200 hover:border-[#E7B84B]/30 hover:bg-[#252A22] hover:text-[#F5D98B] hover:shadow-[0_0_18px_rgba(231,184,75,0.08)]"
               >
-                <span className="text-[#777D70] transition-colors group-hover:text-[#E7B84B]">
-                  <SearchIcon />
-                </span>
-
-                <span className="flex-1 text-[10px] font-medium text-[#8F9389] transition-colors group-hover:text-[#B6B9AE]">
-                  Search workspace...
-                </span>
-
-                <span className="hidden items-center gap-1 rounded-md border border-[#F5D98B]/[0.08] bg-[#151713]/70 px-1.5 py-0.5 text-[8px] font-semibold text-[#777D70] lg:flex">
-                  <CommandIcon />
-                  K
-                </span>
+                <ChevronLeftIcon />
               </button>
-            ) : (
-              <>
-                <div className="flex h-10 w-[320px] items-center gap-2.5 rounded-xl border border-[#E7B84B]/35 bg-[#20241D] px-3 shadow-[0_12px_35px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(245,217,139,0.04)]">
-                  <span className="shrink-0 text-[#E7B84B]">
+            )}
+
+            <div className="min-w-0">
+              <div className="flex items-center gap-2.5">
+                <h1 className="truncate text-[15px] font-semibold tracking-[-0.01em] text-[#F4F0E6] sm:text-[16px]">
+                  {resolvedTitle}
+                </h1>
+
+                <span className="hidden items-center gap-1.5 rounded-full border border-[#5ED6A0]/20 bg-[#5ED6A0]/[0.07] px-2 py-0.5 text-[8px] font-bold uppercase tracking-[0.12em] text-[#79DDAE] sm:inline-flex">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#5ED6A0] shadow-[0_0_7px_rgba(94,214,160,0.7)]" />
+                  Live
+                </span>
+              </div>
+
+              <p className="mt-0.5 hidden max-w-[520px] truncate text-[10px] font-medium text-[#9A9D94] sm:block">
+                {resolvedSubtitle}
+              </p>
+            </div>
+          </div>
+
+          {/* GLOBAL SEARCH */}
+          {showSearch && (
+            <div
+              ref={searchContainerRef}
+              className="relative hidden items-center md:flex"
+            >
+              {!searchOpen ? (
+                <button
+                  type="button"
+                  onClick={handleSearchClick}
+                  aria-label="Search workspace"
+                  className="group flex h-9 w-[190px] items-center gap-2.5 rounded-xl border border-[#F5D98B]/[0.09] bg-[#20241D]/75 px-3 text-left shadow-[inset_0_1px_0_rgba(245,217,139,0.025)] transition-all duration-200 hover:w-[230px] hover:border-[#E7B84B]/30 hover:bg-[#252A22] hover:shadow-[0_5px_22px_rgba(0,0,0,0.18)]"
+                >
+                  <span className="text-[#777D70] transition-colors group-hover:text-[#E7B84B]">
                     <SearchIcon />
                   </span>
 
-                  <input
-                    ref={searchInputRef}
-                    type="text"
-                    value={searchQuery}
-                    onChange={(event) =>
-                      setSearchQuery(event.target.value)
-                    }
-                    placeholder="Search workspace..."
-                    autoComplete="off"
-                    className="min-w-0 flex-1 bg-transparent text-[11px] font-medium text-[#F4F0E6] outline-none placeholder:text-[#777D70]"
-                    aria-label="Search workspace"
-                  />
+                  <span className="flex-1 text-[10px] font-medium text-[#8F9389] transition-colors group-hover:text-[#B6B9AE]">
+                    Search workspace...
+                  </span>
 
-                  {searchQuery && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSearchQuery("");
-                        searchInputRef.current?.focus();
-                      }}
-                      aria-label="Clear search"
-                      className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-[#777D70] transition-colors hover:bg-[#F4F0E6]/[0.05] hover:text-[#F5D98B]"
-                    >
-                      <CloseIcon />
-                    </button>
-                  )}
-
-                  <button
-                    type="button"
-                    onClick={closeSearch}
-                    aria-label="Close search"
-                    className="hidden h-6 w-6 shrink-0 items-center justify-center rounded-md text-[#777D70] transition-colors hover:bg-[#F4F0E6]/[0.05] hover:text-[#F5D98B] lg:flex"
-                  >
-                    <CloseIcon />
-                  </button>
-                </div>
-
-                {/* SEARCH RESULTS */}
-                <div className="absolute right-0 top-[48px] w-[360px] overflow-hidden rounded-2xl border border-[#F5D98B]/[0.10] bg-[#20241D]/[0.98] shadow-[0_30px_80px_rgba(0,0,0,0.48)] backdrop-blur-2xl">
-                  <div className="flex items-center justify-between border-b border-[#F5D98B]/[0.07] px-4 py-3">
-                    <div>
-                      <p className="text-[10px] font-semibold text-[#F4F0E6]">
-                        {searchQuery
-                          ? "Search results"
-                          : "Quick navigation"}
-                      </p>
-
-                      <p className="mt-0.5 text-[8px] text-[#777D70]">
-                        {filteredResults.length}{" "}
-                        {filteredResults.length === 1
-                          ? "result"
-                          : "results"}
-                      </p>
-                    </div>
-
-                    <div className="hidden items-center gap-1 text-[7px] text-[#777D70] sm:flex">
-                      <span className="rounded border border-[#F5D98B]/[0.08] bg-[#151713] px-1.5 py-0.5">
-                        ↑
-                      </span>
-
-                      <span className="rounded border border-[#F5D98B]/[0.08] bg-[#151713] px-1.5 py-0.5">
-                        ↓
-                      </span>
-
-                      <span className="ml-1">
-                        Navigate
-                      </span>
-                    </div>
-                  </div>
-
-                  {filteredResults.length > 0 ? (
-                    <div className="max-h-[390px] overflow-y-auto p-2">
-                      {filteredResults.map(
-                        (item, index) => {
-                          const isSelected =
-                            index === selectedIndex;
-
-                          return (
-                            <button
-                              key={item.href}
-                              type="button"
-                              onMouseEnter={() =>
-                                setSelectedIndex(index)
-                              }
-                              onClick={() =>
-                                handleResultClick(item.href)
-                              }
-                              className={`group relative flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition-all duration-150 ${
-                                isSelected
-                                  ? "bg-[#E7B84B]/[0.09]"
-                                  : "hover:bg-[#F4F0E6]/[0.025]"
-                              }`}
-                            >
-                              {isSelected && (
-                                <span className="absolute left-0 top-1/2 h-7 w-[2px] -translate-y-1/2 rounded-r-full bg-[#E7B84B] shadow-[0_0_8px_rgba(231,184,75,0.45)]" />
-                              )}
-
-                              <span
-                                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border transition-all ${
-                                  isSelected
-                                    ? "border-[#E7B84B]/25 bg-[#E7B84B]/[0.09] text-[#E7B84B]"
-                                    : "border-[#F5D98B]/[0.07] bg-[#151713]/60 text-[#777D70] group-hover:border-[#E7B84B]/15 group-hover:text-[#B6B9AE]"
-                                }`}
-                              >
-                                <SearchResultIcon
-                                  type={item.icon}
-                                />
-                              </span>
-
-                              <span className="min-w-0 flex-1">
-                                <span className="flex items-center gap-2">
-                                  <span
-                                    className={`truncate text-[10px] font-semibold ${
-                                      isSelected
-                                        ? "text-[#F4F0E6]"
-                                        : "text-[#C4C6BE]"
-                                    }`}
-                                  >
-                                    {item.title}
-                                  </span>
-
-                                  <span className="shrink-0 rounded-full border border-[#F5D98B]/[0.07] bg-[#151713]/55 px-1.5 py-0.5 text-[7px] font-medium text-[#777D70]">
-                                    {item.category}
-                                  </span>
-                                </span>
-
-                                <span className="mt-1 block truncate text-[8px] leading-4 text-[#777D70]">
-                                  {item.description}
-                                </span>
-                              </span>
-
-                              <span
-                                className={`shrink-0 text-[12px] transition-all ${
-                                  isSelected
-                                    ? "translate-x-0 text-[#E7B84B] opacity-100"
-                                    : "-translate-x-1 text-[#777D70] opacity-0 group-hover:translate-x-0 group-hover:opacity-100"
-                                }`}
-                              >
-                                →
-                              </span>
-                            </button>
-                          );
-                        }
-                      )}
-                    </div>
-                  ) : (
-                    <div className="px-5 py-10 text-center">
-                      <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl border border-[#F5D98B]/[0.07] bg-[#151713]/60 text-[#777D70]">
-                        <SearchIcon />
-                      </div>
-
-                      <p className="mt-3 text-[10px] font-semibold text-[#C4C6BE]">
-                        No results found
-                      </p>
-
-                      <p className="mt-1 text-[8px] text-[#777D70]">
-                        Try Dashboard, Workflows, Leads
-                        or Settings.
-                      </p>
-                    </div>
-                  )}
-
-                  <div className="flex items-center justify-between border-t border-[#F5D98B]/[0.07] px-4 py-2.5">
-                    <span className="text-[7px] text-[#777D70]">
-                      Press Enter to open
+                  <span className="hidden items-center gap-1 rounded-md border border-[#F5D98B]/[0.08] bg-[#151713]/70 px-1.5 py-0.5 text-[8px] font-semibold text-[#777D70] lg:flex">
+                    <CommandIcon />
+                    K
+                  </span>
+                </button>
+              ) : (
+                <>
+                  <div className="flex h-10 w-[320px] items-center gap-2.5 rounded-xl border border-[#E7B84B]/35 bg-[#20241D] px-3 shadow-[0_12px_35px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(245,217,139,0.04)]">
+                    <span className="shrink-0 text-[#E7B84B]">
+                      <SearchIcon />
                     </span>
+
+                    <input
+                      ref={searchInputRef}
+                      type="text"
+                      value={searchQuery}
+                      onChange={(event) =>
+                        setSearchQuery(event.target.value)
+                      }
+                      placeholder="Search workspace..."
+                      autoComplete="off"
+                      className="min-w-0 flex-1 bg-transparent text-[11px] font-medium text-[#F4F0E6] outline-none placeholder:text-[#777D70]"
+                      aria-label="Search workspace"
+                    />
+
+                    {searchQuery && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSearchQuery("");
+                          searchInputRef.current?.focus();
+                        }}
+                        aria-label="Clear search"
+                        className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-[#777D70] transition-colors hover:bg-[#F4F0E6]/[0.05] hover:text-[#F5D98B]"
+                      >
+                        <CloseIcon />
+                      </button>
+                    )}
 
                     <button
                       type="button"
                       onClick={closeSearch}
-                      className="text-[7px] font-medium text-[#8F9389] transition-colors hover:text-[#F5D98B]"
+                      aria-label="Close search"
+                      className="hidden h-6 w-6 shrink-0 items-center justify-center rounded-md text-[#777D70] transition-colors hover:bg-[#F4F0E6]/[0.05] hover:text-[#F5D98B] lg:flex"
                     >
-                      Esc to close
+                      <CloseIcon />
                     </button>
                   </div>
-                </div>
-              </>
-            )}
-          </div>
-        )}
 
-        {/* RIGHT SIDE */}
-        <div className="flex shrink-0 items-center gap-2">
-          {/* AI STATUS */}
-          <div className="hidden items-center gap-2 rounded-xl border border-[#E7B84B]/20 bg-[#E7B84B]/[0.06] px-3 py-2 shadow-[inset_0_1px_0_rgba(245,217,139,0.03)] sm:flex">
-            <span className="relative flex h-4 w-4 items-center justify-center text-[#E7B84B]">
-              <span className="absolute h-2 w-2 animate-pulse rounded-full bg-[#E7B84B]/45 blur-[3px]" />
-              <SparkIcon />
-            </span>
+                  {/* SEARCH RESULTS */}
+                  <div className="absolute right-0 top-[48px] w-[360px] overflow-hidden rounded-2xl border border-[#F5D98B]/[0.10] bg-[#20241D]/[0.98] shadow-[0_30px_80px_rgba(0,0,0,0.48)] backdrop-blur-2xl">
+                    <div className="flex items-center justify-between border-b border-[#F5D98B]/[0.07] px-4 py-3">
+                      <div>
+                        <p className="text-[10px] font-semibold text-[#F4F0E6]">
+                          {searchQuery
+                            ? "Search results"
+                            : "Quick navigation"}
+                        </p>
 
-            <span className="text-[9px] font-semibold tracking-wide text-[#DDB55A]">
-              AI online
-            </span>
-          </div>
+                        <p className="mt-0.5 text-[8px] text-[#777D70]">
+                          {filteredResults.length}{" "}
+                          {filteredResults.length === 1
+                            ? "result"
+                            : "results"}
+                        </p>
+                      </div>
 
-          {/* NOTIFICATIONS */}
-          {showNotifications && (
-            <button
-              type="button"
-              aria-label="Notifications"
-              className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-[#F5D98B]/[0.08] bg-[#20241D]/75 text-[#8F9389] shadow-[inset_0_1px_0_rgba(245,217,139,0.025)] transition-all duration-200 hover:border-[#E7B84B]/25 hover:bg-[#252A22] hover:text-[#F5D98B] hover:shadow-[0_0_18px_rgba(231,184,75,0.07)]"
-            >
-              <BellIcon />
+                      <div className="hidden items-center gap-1 text-[7px] text-[#777D70] sm:flex">
+                        <span className="rounded border border-[#F5D98B]/[0.08] bg-[#151713] px-1.5 py-0.5">
+                          ↑
+                        </span>
 
-              <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-[#E7B84B] shadow-[0_0_8px_rgba(231,184,75,0.7)]" />
-            </button>
+                        <span className="rounded border border-[#F5D98B]/[0.08] bg-[#151713] px-1.5 py-0.5">
+                          ↓
+                        </span>
+
+                        <span className="ml-1">
+                          Navigate
+                        </span>
+                      </div>
+                    </div>
+
+                    {filteredResults.length > 0 ? (
+                      <div className="max-h-[390px] overflow-y-auto p-2">
+                        {filteredResults.map(
+                          (item, index) => {
+                            const isSelected =
+                              index === selectedIndex;
+
+                            return (
+                              <button
+                                key={item.href}
+                                type="button"
+                                onMouseEnter={() =>
+                                  setSelectedIndex(index)
+                                }
+                                onClick={() =>
+                                  handleResultClick(item.href)
+                                }
+                                className={`group relative flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition-all duration-150 ${
+                                  isSelected
+                                    ? "bg-[#E7B84B]/[0.09]"
+                                    : "hover:bg-[#F4F0E6]/[0.025]"
+                                }`}
+                              >
+                                {isSelected && (
+                                  <span className="absolute left-0 top-1/2 h-7 w-[2px] -translate-y-1/2 rounded-r-full bg-[#E7B84B] shadow-[0_0_8px_rgba(231,184,75,0.45)]" />
+                                )}
+
+                                <span
+                                  className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border transition-all ${
+                                    isSelected
+                                      ? "border-[#E7B84B]/25 bg-[#E7B84B]/[0.09] text-[#E7B84B]"
+                                      : "border-[#F5D98B]/[0.07] bg-[#151713]/60 text-[#777D70] group-hover:border-[#E7B84B]/15 group-hover:text-[#B6B9AE]"
+                                  }`}
+                                >
+                                  <SearchResultIcon
+                                    type={item.icon}
+                                  />
+                                </span>
+
+                                <span className="min-w-0 flex-1">
+                                  <span className="flex items-center gap-2">
+                                    <span
+                                      className={`truncate text-[10px] font-semibold ${
+                                        isSelected
+                                          ? "text-[#F4F0E6]"
+                                          : "text-[#C4C6BE]"
+                                      }`}
+                                    >
+                                      {item.title}
+                                    </span>
+
+                                    <span className="shrink-0 rounded-full border border-[#F5D98B]/[0.07] bg-[#151713]/55 px-1.5 py-0.5 text-[7px] font-medium text-[#777D70]">
+                                      {item.category}
+                                    </span>
+                                  </span>
+
+                                  <span className="mt-1 block truncate text-[8px] leading-4 text-[#777D70]">
+                                    {item.description}
+                                  </span>
+                                </span>
+
+                                <span
+                                  className={`shrink-0 text-[12px] transition-all ${
+                                    isSelected
+                                      ? "translate-x-0 text-[#E7B84B] opacity-100"
+                                      : "-translate-x-1 text-[#777D70] opacity-0 group-hover:translate-x-0 group-hover:opacity-100"
+                                  }`}
+                                >
+                                  →
+                                </span>
+                              </button>
+                            );
+                          },
+                        )}
+                      </div>
+                    ) : (
+                      <div className="px-5 py-10 text-center">
+                        <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl border border-[#F5D98B]/[0.07] bg-[#151713]/60 text-[#777D70]">
+                          <SearchIcon />
+                        </div>
+
+                        <p className="mt-3 text-[10px] font-semibold text-[#C4C6BE]">
+                          No results found
+                        </p>
+
+                        <p className="mt-1 text-[8px] text-[#777D70]">
+                          Try Dashboard, Workflows, Leads
+                          or Settings.
+                        </p>
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-between border-t border-[#F5D98B]/[0.07] px-4 py-2.5">
+                      <span className="text-[7px] text-[#777D70]">
+                        Press Enter to open
+                      </span>
+
+                      <button
+                        type="button"
+                        onClick={closeSearch}
+                        className="text-[7px] font-medium text-[#8F9389] transition-colors hover:text-[#F5D98B]"
+                      >
+                        Esc to close
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
           )}
 
-          {/* HOME BUTTON */}
-          <Link
-            href="/"
-            aria-label="Go to Home"
-            className="group flex h-9 items-center gap-2 rounded-xl border border-[#F5D98B]/[0.08] bg-[#20241D]/75 px-3 text-[#8F9389] shadow-[inset_0_1px_0_rgba(245,217,139,0.025)] transition-all duration-200 hover:border-[#E7B84B]/25 hover:bg-[#252A22] hover:text-[#F5D98B]"
-          >
-            <HomeIcon />
-
-            <span className="hidden text-[10px] font-semibold sm:block">
-              Home
-            </span>
-          </Link>
-
-          {/* PROFILE */}
-          {showProfile && (
-            <Link
-              href="/settings"
-              aria-label="Open settings"
-              className="group flex h-9 items-center gap-2 rounded-xl border border-[#F5D98B]/[0.08] bg-[#20241D]/75 px-2 shadow-[inset_0_1px_0_rgba(245,217,139,0.025)] transition-all duration-200 hover:border-[#E7B84B]/25 hover:bg-[#252A22]"
+          {/* RIGHT SIDE */}
+          <div className="flex shrink-0 items-center gap-2">
+            {/* THEME MENU */}
+            <div
+              ref={themeContainerRef}
+              className="relative"
             >
-              <span className="flex h-6 w-6 items-center justify-center rounded-lg border border-[#E7B84B]/25 bg-[#E7B84B]/[0.08] text-[9px] font-bold text-[#E7B84B]">
-                F
+              <button
+                type="button"
+                onClick={() =>
+                  setThemeMenuOpen((current) => !current)
+                }
+                aria-label="Choose theme"
+                aria-haspopup="menu"
+                aria-expanded={themeMenuOpen}
+                title={`Theme: ${getThemeLabel()}`}
+                className={`group flex h-9 w-9 items-center justify-center rounded-xl border transition-all duration-200 ${
+                  themeMenuOpen
+                    ? "border-[#E7B84B]/35 bg-[#E7B84B]/[0.10] text-[#F5D98B] shadow-[0_0_20px_rgba(231,184,75,0.10)]"
+                    : "border-[#F5D98B]/[0.08] bg-[#20241D]/75 text-[#8F9389] shadow-[inset_0_1px_0_rgba(245,217,139,0.025)] hover:border-[#E7B84B]/30 hover:bg-[#252A22] hover:text-[#F5D98B] hover:shadow-[0_0_18px_rgba(231,184,75,0.09)]"
+                }`}
+              >
+                {theme === "light" ? (
+                  <SunIcon />
+                ) : theme === "dark" ? (
+                  <MoonIcon />
+                ) : (
+                  <NormalThemeIcon />
+                )}
+              </button>
+
+              {themeMenuOpen && (
+                <div
+                  role="menu"
+                  aria-label="Theme options"
+                  className="absolute right-0 top-[46px] w-[168px] overflow-hidden rounded-2xl border border-[#F5D98B]/[0.10] bg-[#20241D]/[0.98] p-1.5 shadow-[0_24px_70px_rgba(0,0,0,0.48)] backdrop-blur-2xl"
+                >
+                  <div className="px-2.5 pb-1.5 pt-2">
+                    <p className="text-[8px] font-bold uppercase tracking-[0.14em] text-[#777D70]">
+                      Appearance
+                    </p>
+                  </div>
+
+                  {/* LIGHT */}
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() =>
+                      applyTheme("light")
+                    }
+                    className={`flex w-full items-center gap-3 rounded-xl px-2.5 py-2.5 text-left transition-all ${
+                      theme === "light"
+                        ? "bg-[#E7B84B]/[0.10] text-[#F5D98B]"
+                        : "text-[#A5A89F] hover:bg-[#F4F0E6]/[0.035] hover:text-[#F4F0E6]"
+                    }`}
+                  >
+                    <span
+                      className={`flex h-7 w-7 items-center justify-center rounded-lg border ${
+                        theme === "light"
+                          ? "border-[#E7B84B]/25 bg-[#E7B84B]/[0.10] text-[#E7B84B]"
+                          : "border-[#F5D98B]/[0.07] bg-[#151713]/60 text-[#777D70]"
+                      }`}
+                    >
+                      <SunIcon />
+                    </span>
+
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[10px] font-semibold">
+                        Light
+                      </span>
+
+                      <span className="mt-0.5 block text-[7px] text-[#777D70]">
+                        Bright workspace
+                      </span>
+                    </span>
+
+                    {theme === "light" && (
+                      <span className="text-[10px] text-[#E7B84B]">
+                        ✓
+                      </span>
+                    )}
+                  </button>
+
+                  {/* DARK */}
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() =>
+                      applyTheme("dark")
+                    }
+                    className={`flex w-full items-center gap-3 rounded-xl px-2.5 py-2.5 text-left transition-all ${
+                      theme === "dark"
+                        ? "bg-[#E7B84B]/[0.10] text-[#F5D98B]"
+                        : "text-[#A5A89F] hover:bg-[#F4F0E6]/[0.035] hover:text-[#F4F0E6]"
+                    }`}
+                  >
+                    <span
+                      className={`flex h-7 w-7 items-center justify-center rounded-lg border ${
+                        theme === "dark"
+                          ? "border-[#E7B84B]/25 bg-[#E7B84B]/[0.10] text-[#E7B84B]"
+                          : "border-[#F5D98B]/[0.07] bg-[#151713]/60 text-[#777D70]"
+                      }`}
+                    >
+                      <MoonIcon />
+                    </span>
+
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[10px] font-semibold">
+                        Dark
+                      </span>
+
+                      <span className="mt-0.5 block text-[7px] text-[#777D70]">
+                        Deep dark workspace
+                      </span>
+                    </span>
+
+                    {theme === "dark" && (
+                      <span className="text-[10px] text-[#E7B84B]">
+                        ✓
+                      </span>
+                    )}
+                  </button>
+
+                  {/* NORMAL */}
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() =>
+                      applyTheme("normal")
+                    }
+                    className={`flex w-full items-center gap-3 rounded-xl px-2.5 py-2.5 text-left transition-all ${
+                      theme === "normal"
+                        ? "bg-[#E7B84B]/[0.10] text-[#F5D98B]"
+                        : "text-[#A5A89F] hover:bg-[#F4F0E6]/[0.035] hover:text-[#F4F0E6]"
+                    }`}
+                  >
+                    <span
+                      className={`flex h-7 w-7 items-center justify-center rounded-lg border ${
+                        theme === "normal"
+                          ? "border-[#E7B84B]/25 bg-[#E7B84B]/[0.10] text-[#E7B84B]"
+                          : "border-[#F5D98B]/[0.07] bg-[#151713]/60 text-[#777D70]"
+                      }`}
+                    >
+                      <NormalThemeIcon />
+                    </span>
+
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[10px] font-semibold">
+                        Normal
+                      </span>
+
+                      <span className="mt-0.5 block text-[7px] text-[#777D70]">
+                        NexaFlow default
+                      </span>
+                    </span>
+
+                    {theme === "normal" && (
+                      <span className="text-[10px] text-[#E7B84B]">
+                        ✓
+                      </span>
+                    )}
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* AI STATUS */}
+            <div className="hidden items-center gap-2 rounded-xl border border-[#E7B84B]/20 bg-[#E7B84B]/[0.06] px-3 py-2 shadow-[inset_0_1px_0_rgba(245,217,139,0.03)] sm:flex">
+              <span className="relative flex h-4 w-4 items-center justify-center text-[#E7B84B]">
+                <span className="absolute h-2 w-2 animate-pulse rounded-full bg-[#E7B84B]/45 blur-[3px]" />
+                <SparkIcon />
               </span>
 
-              <span className="hidden text-[10px] font-semibold text-[#A5A89F] transition-colors group-hover:text-[#F4F0E6] lg:block">
-                Faiza
+              <span className="text-[9px] font-semibold tracking-wide text-[#DDB55A]">
+                AI online
               </span>
+            </div>
 
-              <span className="hidden text-[#777D70] transition-colors group-hover:text-[#D0D2C9] lg:block">
-                <SettingsIcon />
-              </span>
+            {/* NOTIFICATIONS */}
+            {showNotifications && (
+              <button
+                type="button"
+                aria-label="Notifications"
+                className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-[#F5D98B]/[0.08] bg-[#20241D]/75 text-[#8F9389] shadow-[inset_0_1px_0_rgba(245,217,139,0.025)] transition-all duration-200 hover:border-[#E7B84B]/25 hover:bg-[#252A22] hover:text-[#F5D98B] hover:shadow-[0_0_18px_rgba(231,184,75,0.07)]"
+              >
+                <BellIcon />
 
-              <span className="sr-only">
-                Open settings
-              </span>
+                <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-[#E7B84B] shadow-[0_0_8px_rgba(231,184,75,0.7)]" />
+              </button>
+            )}
 
-              <span className="text-[#777D70] transition-colors group-hover:text-[#F5D98B]">
-                <UserIcon />
+            {/* HOME BUTTON */}
+            <Link
+              href="/"
+              aria-label="Go to Home"
+              className="group flex h-9 items-center gap-2 rounded-xl border border-[#F5D98B]/[0.08] bg-[#20241D]/75 px-3 text-[#8F9389] shadow-[inset_0_1px_0_rgba(245,217,139,0.025)] transition-all duration-200 hover:border-[#E7B84B]/25 hover:bg-[#252A22] hover:text-[#F5D98B]"
+            >
+              <HomeIcon />
+
+              <span className="hidden text-[10px] font-semibold sm:block">
+                Home
               </span>
             </Link>
-          )}
+
+            {/* PROFILE */}
+            {showProfile && (
+              <Link
+                href="/settings"
+                aria-label="Open settings"
+                className="group flex h-9 items-center gap-2 rounded-xl border border-[#F5D98B]/[0.08] bg-[#20241D]/75 px-2 shadow-[inset_0_1px_0_rgba(245,217,139,0.025)] transition-all duration-200 hover:border-[#E7B84B]/25 hover:bg-[#252A22]"
+              >
+                <span className="flex h-6 w-6 items-center justify-center rounded-lg border border-[#E7B84B]/25 bg-[#E7B84B]/[0.08] text-[9px] font-bold text-[#E7B84B]">
+                  F
+                </span>
+
+                <span className="hidden text-[10px] font-semibold text-[#A5A89F] transition-colors group-hover:text-[#F4F0E6] lg:block">
+                  Faiza
+                </span>
+
+                <span className="hidden text-[#777D70] transition-colors group-hover:text-[#D0D2C9] lg:block">
+                  <SettingsIcon />
+                </span>
+
+                <span className="sr-only">
+                  Open settings
+                </span>
+
+                <span className="text-[#777D70] transition-colors group-hover:text-[#F5D98B]">
+                  <UserIcon />
+                </span>
+              </Link>
+            )}
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+    </>
   );
 }

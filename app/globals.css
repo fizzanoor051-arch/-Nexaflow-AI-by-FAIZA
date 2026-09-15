@@ -26,7 +26,318 @@
   --nf-surface: rgba(18, 17, 14, 0.76);
   --nf-surface-strong: rgba(20, 19, 16, 0.94);
   --nf-surface-soft: rgba(255, 255, 255, 0.035);
+/* =========================================================
+   LIGHT MODE
+   ---------------------------------------------------------
+   Dark mode remains the default.
+   Add class="light" to <html> to activate.
+   ========================================================= */
 
+html.light {
+  --nf-bg: #f7f5ef;
+  --nf-bg-soft: #efede5;
+  --nf-bg-elevated: #ffffff;
+  --nf-bg-panel: #ffffff;
+
+  --nf-surface: rgba(255, 255, 255, 0.76);
+  --nf-surface-strong: rgba(255, 255, 255, 0.94);
+  --nf-surface-soft: rgba(20, 18, 12, 0.035);
+
+  --nf-border: rgba(20, 18, 12, 0.10);
+  --nf-border-soft: rgba(20, 18, 12, 0.06);
+  --nf-border-strong: rgba(20, 18, 12, 0.15);
+
+  --nf-text: #171611;
+  --nf-text-soft: #403e36;
+  --nf-text-muted: #716e64;
+  --nf-text-faint: #9a978d;
+
+  --nf-shadow-sm:
+    0 10px 30px rgba(30, 26, 15, 0.10);
+
+  --nf-shadow-md:
+    0 20px 65px rgba(30, 26, 15, 0.13);
+
+  --nf-shadow-lg:
+    0 40px 120px rgba(30, 26, 15, 0.18);
+
+  --nf-fire-glow:
+    rgba(255, 168, 0, 0.13);
+
+  --nf-fire-glow-soft:
+    rgba(255, 168, 0, 0.055);
+
+  --nf-fire-glow-strong:
+    rgba(255, 145, 0, 0.16);
+}
+
+
+/* =========================================================
+   LIGHT MODE — BASE
+   ========================================================= */
+
+html.light {
+  background: var(--nf-bg);
+
+  scrollbar-color:
+    rgba(218, 143, 0, 0.72)
+    #eeeae0;
+}
+
+html.light body {
+  background:
+    radial-gradient(
+      circle at 50% -12%,
+      rgba(255, 190, 45, 0.16),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 8% 28%,
+      rgba(255, 125, 0, 0.055),
+      transparent 27%
+    ),
+    radial-gradient(
+      circle at 92% 72%,
+      rgba(217, 74, 22, 0.035),
+      transparent 25%
+    ),
+    #f7f5ef;
+
+  color: var(--nf-text);
+}
+
+
+/* =========================================================
+   LIGHT MODE — SCROLLBAR
+   ========================================================= */
+
+html.light ::-webkit-scrollbar-track {
+  background: #eeeae0;
+}
+
+html.light ::-webkit-scrollbar-thumb {
+  border-color: #eeeae0;
+}
+
+
+/* =========================================================
+   LIGHT MODE — GLASS
+   ========================================================= */
+
+html.light .nf-glass {
+  border-color: rgba(20, 18, 12, 0.09);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.82),
+      rgba(255, 255, 255, 0.55)
+    ),
+    rgba(255, 255, 255, 0.76);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 18px 60px rgba(30, 26, 15, 0.10);
+
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+
+html.light .nf-glass-strong {
+  border-color: rgba(20, 18, 12, 0.10);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.92),
+      rgba(255, 255, 255, 0.68)
+    ),
+    #ffffff;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 25px 85px rgba(30, 26, 15, 0.14);
+
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+}
+
+html.light .nf-red-glass {
+  border-color: rgba(218, 143, 0, 0.20);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 190, 35, 0.12),
+      rgba(255, 255, 255, 0.62)
+    ),
+    rgba(255, 252, 242, 0.82);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 22px 75px rgba(30, 26, 15, 0.12),
+    0 0 55px rgba(255, 155, 0, 0.035);
+}
+
+
+/* =========================================================
+   LIGHT MODE — INPUT
+   ========================================================= */
+
+html.light .nf-input {
+  border-color: rgba(20, 18, 12, 0.12);
+  background: rgba(255, 255, 255, 0.72);
+  color: #171611;
+}
+
+html.light .nf-input::placeholder {
+  color: rgba(90, 87, 78, 0.58);
+}
+
+html.light .nf-input:hover {
+  border-color: rgba(20, 18, 12, 0.18);
+}
+
+html.light .nf-input:focus {
+  border-color: rgba(218, 143, 0, 0.55);
+
+  background: rgba(255, 255, 255, 0.92);
+
+  box-shadow:
+    0 0 0 3px rgba(255, 183, 30, 0.08),
+    0 0 30px rgba(255, 150, 0, 0.035);
+}
+
+
+/* =========================================================
+   LIGHT MODE — MODAL
+   ========================================================= */
+
+html.light .nf-overlay {
+  background: rgba(30, 28, 22, 0.42);
+}
+
+html.light .nf-modal {
+  border-color: rgba(20, 18, 12, 0.10);
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(255, 180, 25, 0.10),
+      transparent 44%
+    ),
+    rgba(255, 255, 252, 0.96);
+
+  box-shadow:
+    0 45px 130px rgba(30, 26, 15, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+
+/* =========================================================
+   LIGHT MODE — CINEMATIC BACKGROUND
+   ========================================================= */
+
+html.light .nf-cinematic-bg {
+  background:
+    radial-gradient(
+      ellipse at 50% 12%,
+      rgba(255, 190, 45, 0.13),
+      transparent 36%
+    ),
+    radial-gradient(
+      ellipse at 15% 45%,
+      rgba(255, 120, 0, 0.035),
+      transparent 30%
+    ),
+    #f7f5ef;
+}
+
+html.light .nf-grid-bg::before {
+  background-image:
+    linear-gradient(
+      rgba(40, 37, 27, 0.035) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(40, 37, 27, 0.035) 1px,
+      transparent 1px
+    );
+}
+
+html.light .nf-grid-bg::after {
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(255, 190, 40, 0.13),
+      transparent 33%
+    ),
+    radial-gradient(
+      circle at 0% 55%,
+      rgba(255, 130, 0, 0.035),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 100% 55%,
+      rgba(255, 180, 40, 0.03),
+      transparent 28%
+    );
+}
+
+
+/* =========================================================
+   LIGHT MODE — 3D DEPTH
+   ========================================================= */
+
+html.light .nf-depth {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.95) inset,
+    0 20px 40px rgba(30, 26, 15, 0.10),
+    0 40px 100px rgba(30, 26, 15, 0.08);
+}
+
+html.light .nf-dashboard-3d {
+  box-shadow:
+    30px 55px 110px rgba(30, 26, 15, 0.14),
+    -10px 0 75px rgba(255, 165, 0, 0.035);
+}
+
+
+/* =========================================================
+   LIGHT MODE — TOOLTIP
+   ========================================================= */
+
+html.light .nf-tooltip::after {
+  border-color: rgba(20, 18, 12, 0.10);
+  background: rgba(30, 28, 22, 0.94);
+  color: #fffdf5;
+
+  box-shadow:
+    0 12px 30px rgba(30, 26, 15, 0.18);
+}
+
+
+/* =========================================================
+   LIGHT MODE — BLACK SURFACE
+   ========================================================= */
+
+html.light .nf-black-surface {
+  background: rgba(255, 255, 255, 0.82);
+}
+
+
+/* =========================================================
+   LIGHT MODE — FIRE HELPERS
+   ========================================================= */
+
+html.light .nf-red-soft-bg {
+  background: rgba(255, 177, 0, 0.075);
+}
+
+html.light .nf-red-soft-border {
+  border-color: rgba(218, 143, 0, 0.18);
+}
   /* =======================================================
      FIRE PALETTE
      ======================================================= */

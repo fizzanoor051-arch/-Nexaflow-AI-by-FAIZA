@@ -4,7 +4,8 @@ export type LeadStatus =
   | "contacted"
   | "qualified"
   | "converted"
-  | "lost";
+  | "lost"
+  | "inactive";
 
 export type LeadPriority = "low" | "medium" | "high";
 
