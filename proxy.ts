@@ -1,3 +1,4 @@
+
 import { NextRequest, NextResponse } from "next/server";
 import {
   getSessionCookieName,
@@ -14,21 +15,12 @@ const protectedRoutes = [
   "/settings",
 ];
 
-const authRoutes = [
-  "/login",
-  "/register",
-];
-
 function isProtectedRoute(pathname: string) {
   return protectedRoutes.some(
     (route) =>
       pathname === route ||
       pathname.startsWith(`${route}/`)
   );
-}
-
-function isAuthRoute(pathname: string) {
-  return authRoutes.includes(pathname);
 }
 
 export function proxy(request: NextRequest) {
@@ -50,8 +42,6 @@ export function proxy(request: NextRequest) {
 
     return NextResponse.redirect(loginUrl);
   }
-
- 
 
   return NextResponse.next();
 }

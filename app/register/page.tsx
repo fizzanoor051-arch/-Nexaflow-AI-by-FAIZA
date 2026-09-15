@@ -48,26 +48,15 @@ export default function RegisterPage() {
       setError("Please enter a valid email address.");
       return;
     }
+     if (password.length < 6) {
+  setError("Password must be at least 6 characters.");
+  return;
+}
 
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters.");
-      return;
-    }
-
-    if (!/[A-Z]/.test(password)) {
-      setError("Password must contain at least one uppercase letter.");
-      return;
-    }
-
-    if (!/[a-z]/.test(password)) {
-      setError("Password must contain at least one lowercase letter.");
-      return;
-    }
-
-    if (!/[0-9]/.test(password)) {
-      setError("Password must contain at least one number.");
-      return;
-    }
+if (!/[0-9]/.test(password)) {
+  setError("Password must contain at least one number.");
+  return;
+}
 
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
@@ -355,7 +344,7 @@ export default function RegisterPage() {
         className="group absolute left-5 top-5 z-30 inline-flex items-center gap-3 rounded-full border border-[#F5D98B]/10 bg-[#151713]/65 px-4 py-2.5 text-xs font-medium text-[#9A9D94] shadow-[0_10px_35px_rgba(0,0,0,0.22)] backdrop-blur-xl transition-all duration-300 hover:-translate-x-1 hover:border-[#E7B84B]/35 hover:bg-[#20241D]/90 hover:text-[#F5D98B] sm:left-8 sm:top-6 lg:left-3 lg:top-7"
       >
         <span className="flex h-6 w-6 items-center justify-center rounded-full border border-[#E7B84B]/15 bg-[#20241D] transition-transform duration-300 group-hover:-translate-x-0.5">
-          â†
+         🏠
         </span>
 
         <span>Back to home</span>
@@ -497,71 +486,149 @@ export default function RegisterPage() {
                 />
               </label>
 
-              <label className="block">
-                <span className="mb-1.5 block text-sm font-medium text-[#D8D4C8]">
-                  Password
-                </span>
+              
+<label className="block">
+  <span className="mb-1.5 block text-sm font-medium text-[#D8D4C8]">
+    Password
+  </span>
 
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(event) => {
-                    setPassword(event.target.value);
-                    setError("");
-                  }}
-                  placeholder="Minimum 8 characters"
-                  disabled={loading || guestLoading}
-                  className="w-full rounded-xl border border-[#F5D98B]/[0.10] bg-[#20241D]/80 px-4 py-2.5 text-sm text-[#F4F0E6] outline-none transition-all duration-300 placeholder:text-[#73776F] focus:border-[#E7B84B]/50 focus:bg-[#252A22] focus:shadow-[0_0_25px_rgba(231,184,75,0.06)] focus:ring-1 focus:ring-[#E7B84B]/15 disabled:cursor-not-allowed disabled:opacity-60"
-                />
+  <div className="relative">
+    <input
+      type={showPassword ? "text" : "password"}
+      required
+      value={password}
+      onFocus={() => setError("")}
+      onChange={(event) => {
+        setPassword(event.target.value);
+        setError("");
+      }}
+      placeholder="Create your password"
+      disabled={loading || guestLoading}
+      className="w-full rounded-xl border border-[#F5D98B]/[0.10] bg-[#20241D]/80 px-4 py-2.5 pr-12 text-sm text-[#F4F0E6] outline-none transition-all duration-300 placeholder:text-[#73776F] focus:border-[#E7B84B]/50 focus:bg-[#252A22] focus:shadow-[0_0_25px_rgba(231,184,75,0.06)] focus:ring-1 focus:ring-[#E7B84B]/15 disabled:cursor-not-allowed disabled:opacity-60"
+    />
 
-                <div className="mt-1 flex justify-end">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setShowPassword((value) => !value)
-                    }
-                    disabled={loading || guestLoading}
-                    className="text-[11px] font-medium text-[#73776F] transition-colors duration-300 hover:text-[#F5D98B] disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    {showPassword ? "Hide password" : "Show password"}
-                  </button>
-                </div>
-              </label>
+    <button
+      type="button"
+      aria-label={showPassword ? "Hide password" : "Show password"}
+      onClick={() => setShowPassword((value) => !value)}
+      disabled={loading || guestLoading}
+      className="absolute right-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-[#73776F] transition-colors duration-300 hover:bg-[#E7B84B]/[0.06] hover:text-[#F5D98B] disabled:cursor-not-allowed disabled:opacity-50"
+    >
+      {showPassword ? (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          className="h-4.5 w-4.5"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M3 3l18 18M10.58 10.58a2 2 0 102.83 2.83M9.88 4.24A10.7 10.7 0 0112 4c5.05 0 8.94 3.28 10.5 8a11.8 11.8 0 01-2.07 3.54M6.61 6.61C4.95 7.77 3.66 9.46 3 12c1.56 4.72 5.45 8 10.5 8 1.4 0 2.72-.26 3.92-.74"
+          />
+        </svg>
+      ) : (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          className="h-4.5 w-4.5"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6z"
+          />
+          <circle cx="12" cy="12" r="2.5" />
+        </svg>
+      )}
+    </button>
+  </div>
 
-              <label className="block">
-                <span className="mb-1.5 block text-sm font-medium text-[#D8D4C8]">
-                  Confirm password
-                </span>
+  <p className="mt-1.5 text-[10px] leading-4 text-[#73776F]">
+    Minimum 6 characters and 1 number.
+  </p>
+</label>
 
-                <input
-                  type="password"
-                  required
-                  value={confirmPassword}
-                  onChange={(event) => {
-                    setConfirmPassword(event.target.value);
-                    setError("");
-                  }}
-                  placeholder="Repeat your password"
-                  disabled={loading || guestLoading}
-                  className="w-full rounded-xl border border-[#F5D98B]/[0.10] bg-[#20241D]/80 px-4 py-2.5 text-sm text-[#F4F0E6] outline-none transition-all duration-300 placeholder:text-[#73776F] focus:border-[#E7B84B]/50 focus:bg-[#252A22] focus:shadow-[0_0_25px_rgba(231,184,75,0.06)] focus:ring-1 focus:ring-[#E7B84B]/15 disabled:cursor-not-allowed disabled:opacity-60"
-                />
+<label className="block">
+  <span className="mb-1.5 block text-sm font-medium text-[#D8D4C8]">
+    Confirm password
+  </span>
 
-                <div className="mt-1 flex justify-end">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setShowConfirmPassword((value) => !value)
-                    }
-                    disabled={loading || guestLoading}
-                    className="text-[11px] font-medium text-[#73776F] transition-colors duration-300 hover:text-[#F5D98B] disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    {showConfirmPassword
-                      ? "Hide password"
-                      : "Show password"}
-                  </button>
-                </div>
-              </label>
+  <div className="relative">
+    <input
+      type={showConfirmPassword ? "text" : "password"}
+      required
+      value={confirmPassword}
+      onChange={(event) => {
+        setConfirmPassword(event.target.value);
+        setError("");
+      }}
+      placeholder="Confirm your password"
+      disabled={loading || guestLoading}
+      className="w-full rounded-xl border border-[#F5D98B]/[0.10] bg-[#20241D]/80 px-4 py-2.5 pr-12 text-sm text-[#F4F0E6] outline-none transition-all duration-300 placeholder:text-[#73776F] focus:border-[#E7B84B]/50 focus:bg-[#252A22] focus:shadow-[0_0_25px_rgba(231,184,75,0.06)] focus:ring-1 focus:ring-[#E7B84B]/15 disabled:cursor-not-allowed disabled:opacity-60"
+    />
+
+    <button
+      type="button"
+      aria-label={
+        showConfirmPassword
+          ? "Hide password"
+          : "Show password"
+      }
+      onClick={() =>
+        setShowConfirmPassword((value) => !value)
+      }
+      disabled={loading || guestLoading}
+      className="absolute right-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-[#73776F] transition-colors duration-300 hover:bg-[#E7B84B]/[0.06] hover:text-[#F5D98B] disabled:cursor-not-allowed disabled:opacity-50"
+    >
+      {showConfirmPassword ? (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          className="h-4.5 w-4.5"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M3 3l18 18M10.58 10.58a2 2 0 102.83 2.83M9.88 4.24A10.7 10.7 0 0112 4c5.05 0 8.94 3.28 10.5 8a11.8 11.8 0 01-2.07 3.54M6.61 6.61C4.95 7.77 3.66 9.46 3 12c1.56 4.72 5.45 8 10.5 8 1.4 0 2.72-.26 3.92-.74"
+          />
+        </svg>
+      ) : (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          className="h-4.5 w-4.5"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6z"
+          />
+          <circle cx="12" cy="12" r="2.5" />
+        </svg>
+      )}
+    </button>
+  </div>
+
+  <p className="mt-1.5 text-[10px] leading-4 text-[#73776F]">
+    Re-enter your password to confirm.
+  </p>
+</label>
+
+              
+
+               
 
               <button
                 type="submit"
