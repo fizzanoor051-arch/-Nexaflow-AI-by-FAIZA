@@ -2,44 +2,11 @@
 import { NextResponse } from "next/server";
 import { createLeadSchema } from "@/lib/validations/lead";
 import type { Lead } from "@/types/lead";
-
-const leads: Lead[] = [
-  {
-    id: "lead-1",
-    name: "Sarah Khan",
-    email: "sarah@example.com",
-    company: "Khan Fashion",
-    phone: "+92 300 1234567",
-    status: "qualified",
-    priority: "high",
-    notes: "Interested in automation services.",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: "lead-2",
-    name: "Ali Raza",
-    email: "ali@example.com",
-    company: "Raza Digital",
-    phone: "+92 301 7654321",
-    status: "contacted",
-    priority: "medium",
-    notes: "Follow up next week.",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: "lead-3",
-    name: "Emma Wilson",
-    email: "emma@example.com",
-    company: "Wilson Studio",
-    status: "new",
-    priority: "low",
-    notes: "New inbound lead.",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-];
+import {
+  createLead as createSharedLead,
+  getLeads as getSharedLeads,
+} from "@/lib/workflows/store";
+ const leads: Lead[] = getSharedLeads();
 
 export async function GET() {
   return NextResponse.json({
@@ -76,7 +43,7 @@ export async function POST(request: Request) {
       updatedAt: now,
     };
 
-    leads.unshift(lead);
+    createSharedLead(lead);
 
     return NextResponse.json(
       {

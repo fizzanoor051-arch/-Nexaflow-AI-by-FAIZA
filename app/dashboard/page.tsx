@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
+import RealSaaSStats from "@/components/dashboard/RealSaaSStats";
 
 import ActivityFeed, {
   type Activity,
@@ -1419,71 +1420,8 @@ export default function DashboardPage() {
         <PerformanceDistribution />
       </div>
 
-      {/* KPI cards */}
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <div className="group relative">
-          <div className="pointer-events-none absolute -inset-px rounded-2xl bg-gradient-to-br from-[#E7B84B]/10 via-transparent to-transparent opacity-0 blur-xl transition-opacity duration-500 group-hover:opacity-100" />
-
-          <div className="relative">
-            <StatsCard
-              title="Active workflows"
-              value={activeWorkflows}
-              change="+12%"
-              trend="up"
-              description="Compared with last period"
-              accent="violet"
-              icon={<Icon name="workflow" size={18} />}
-              href="/workflows"
-            />
-          </div>
-        </div>
-
-        <div className="group relative">
-          <div className="pointer-events-none absolute -inset-px rounded-2xl bg-gradient-to-br from-[#E7B84B]/10 via-transparent to-transparent opacity-0 blur-xl transition-opacity duration-500 group-hover:opacity-100" />
-          <div className="relative">
-            <StatsCard
-              title="Automation runs"
-              value={totalRuns.toLocaleString()}
-              change="+18%"
-              trend="up"
-              description="Total workflow executions"
-              accent="blue"
-              icon={<Icon name="activity" size={18} />}
-            />
-          </div>
-        </div>
-
-        <div className="group relative">
-          <div className="pointer-events-none absolute -inset-px rounded-2xl bg-gradient-to-br from-[#5ED6A0]/10 via-transparent to-transparent opacity-0 blur-xl transition-opacity duration-500 group-hover:opacity-100" />
-          <div className="relative">
-            <StatsCard
-              title="Success rate"
-              value={`${averageSuccess}%`}
-              change="+2.4%"
-              trend="up"
-              description="Average workflow success"
-              accent="emerald"
-              icon={<Icon name="check" size={18} />}
-            />
-          </div>
-        </div>
-
-        <div className="group relative">
-          <div className="pointer-events-none absolute -inset-px rounded-2xl bg-gradient-to-br from-[#E7B84B]/10 via-transparent to-transparent opacity-0 blur-xl transition-opacity duration-500 group-hover:opacity-100" />
-          <div className="relative">
-            <StatsCard
-              title="Pending tasks"
-              value="24"
-              change="-8%"
-              trend="down"
-              description="Tasks waiting for action"
-              accent="amber"
-              icon={<Icon name="tasks" size={18} />}
-              href="/tasks"
-            />
-          </div>
-        </div>
-      </section>
+        {/* Real SaaS performance metrics */}
+<RealSaaSStats />
 
       {/* Operations intelligence strip */}
       <section className="grid gap-4 md:grid-cols-3">

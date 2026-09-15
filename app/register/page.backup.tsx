@@ -1,48 +1,72 @@
+
 "use client";
 
-import { FormEvent, useState } from "react";
-import { useEffect } from "react";
+import { FormEvent, useEffect, useState } from "react";
+
 import Link from "next/link";
+
 import { useRouter } from "next/navigation";
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const router = useRouter();
 
-  const [email, setEmail] = useState("fizzanoor051@gmail.com");
-  const [password, setPassword] = useState("Password123");
+  const [name, setName] = useState("");
+
+  const [email, setEmail] = useState("");
+
+  const [password, setPassword] = useState("");
+
+  const [confirmPassword, setConfirmPassword] = useState("");
+
   const [loading, setLoading] = useState(false);
+
   const [guestLoading, setGuestLoading] = useState(false);
+
   const [error, setError] = useState("");
-    const [passwordVisible, setPasswordVisible] = useState(false);
+
   const [success, setSuccess] = useState("");
 
+  const [showPassword, setShowPassword] = useState(false);
+
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   useEffect(() => {
-    const passwordInput = document.querySelector(
-      'input[data-nexaflow-password="login"]'
-    ) as HTMLInputElement | null;
+    const passwordInputs =
+      document.querySelectorAll<HTMLInputElement>("input");
+
+    const passwordInput = Array.from(passwordInputs).find(
+      (input) => input.placeholder === "Minimum 8 characters"
+    );
+
+    const confirmInput = Array.from(passwordInputs).find(
+      (input) => input.placeholder === "Repeat your password"
+    );
 
     if (passwordInput) {
-      passwordInput.type = passwordVisible ? "text" : "password";
+      passwordInput.type = showPassword ? "text" : "password";
     }
-  }, [passwordVisible]);
+
+    if (confirmInput) {
+      confirmInput.type = showConfirmPassword ? "text" : "password";
+    }
+  }, [showPassword, showConfirmPassword]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
     setError("");
-        setSuccess("");
+    setSuccess("");
 
-    if (!email.trim()) {
-      setError("Please enter your email address.");
+    const normalizedName = name.trim();
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (normalizedName.length < 2) {
+      setError("Please enter your full name.");
       return;
     }
 
-    if (!email.includes("@") || !email.includes(".")) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
       setError("Please enter a valid email address.");
-      return;
-    }
-
-    if (!password) {
-      setError("Please enter your password.");
       return;
     }
 
@@ -50,30 +74,59 @@ export default function LoginPage() {
       setError("Password must be at least 8 characters.");
       return;
     }
+
+    if (!/[A-Z]/.test(password)) {
+      setError("Password must contain at least one uppercase letter.");
+      return;
+    }
+
+    if (!/[a-z]/.test(password)) {
+      setError("Password must contain at least one lowercase letter.");
+      return;
+    }
+
+    if (!/[0-9]/.test(password)) {
+      setError("Password must contain at least one number.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const response = await fetch("/api/auth/login", {
+      const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email,
+          name: normalizedName,
+          email: normalizedEmail,
           password,
+          confirmPassword,
         }),
       });
 
       const data = await response.json();
 
       if (!response.ok || !data.success) {
-        setError(data.error || "Unable to sign in.");
+        setError(data.error || "Unable to create account.");
         return;
       }
 
       localStorage.removeItem("nexaflow_guest");
 
-      router.push("/dashboard");
+      setSuccess(
+        data.message || "Account created successfully. Opening workspace..."
+      );
+
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 700);
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
@@ -81,13 +134,35 @@ export default function LoginPage() {
     }
   }
 
-  function handleGuestContinue() {
+  async function handleGuestContinue() {
     setError("");
+    setSuccess("");
     setGuestLoading(true);
 
-    localStorage.setItem("nexaflow_guest", "true");
+    try {
+      const response = await fetch("/api/auth/guest", {
+        method: "POST",
+      });
 
-    router.push("/dashboard");
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        setError(data.error || "Unable to open guest workspace.");
+        return;
+      }
+
+      localStorage.setItem("nexaflow_guest", "true");
+
+      setSuccess("Guest workspace ready. Opening dashboard...");
+
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 400);
+    } catch {
+      setError("Unable to open guest workspace. Please try again.");
+    } finally {
+      setGuestLoading(false);
+    }
   }
 
   return (
@@ -95,7 +170,6 @@ export default function LoginPage() {
       {/* =========================================================
           ORIGINAL BACKGROUND ARTWORK — UNCHANGED
       ========================================================= */}
-
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
@@ -110,28 +184,27 @@ export default function LoginPage() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(21,23,19,0.16),rgba(21,23,19,0.88)_70%)]" />
 
       {/* Subtle champagne atmosphere */}
-      <div className="absolute left-[22%] top-1/2 h-[34rem] w-[34rem] -translate-y-1/2 rounded-full bg-[#E7B84B]/[0.025] blur-3xl" />
+      <div className="absolute left-[22%] top-1/2 h-[36rem] w-[36rem] -translate-y-1/2 rounded-full bg-[#E7B84B]/[0.025] blur-3xl" />
 
       {/* =========================================================
-          NEW — CINEMATIC 3D SAAS WORLD
-          Background only. Existing UI remains untouched.
+          CINEMATIC 3D SAAS WORLD
+          BACKGROUND ONLY
       ========================================================= */}
-
       <div
         className="cinematic-world pointer-events-none absolute inset-0 z-[1]"
         aria-hidden="true"
       >
-        {/* Deep moving atmospheric glow */}
+        {/* Atmospheric floating lights */}
         <div className="world-glow world-glow-one" />
         <div className="world-glow world-glow-two" />
         <div className="world-glow world-glow-three" />
 
-        {/* Perspective floor / digital space */}
+        {/* Perspective digital floor */}
         <div className="perspective-floor">
           <div className="floor-grid" />
         </div>
 
-        {/* Large cinematic orbit rings */}
+        {/* Large 3D orbit */}
         <div className="orbit-system orbit-one">
           <div className="orbit-ring orbit-ring-a" />
           <div className="orbit-ring orbit-ring-b" />
@@ -142,6 +215,7 @@ export default function LoginPage() {
           <div className="orbit-node node-c" />
         </div>
 
+        {/* Secondary orbit */}
         <div className="orbit-system orbit-two">
           <div className="orbit-ring orbit-ring-a" />
           <div className="orbit-ring orbit-ring-b" />
@@ -155,21 +229,29 @@ export default function LoginPage() {
         <div className="holo-ring holo-two" />
         <div className="holo-ring holo-three" />
 
-        {/* Neural network */}
+        {/* =====================================================
+            NEURAL NETWORK / AI CONNECTIONS
+        ===================================================== */}
         <svg
           className="neural-network"
           viewBox="0 0 1600 900"
           preserveAspectRatio="none"
         >
           <defs>
-            <linearGradient id="neuralGold" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient
+              id="registerNeuralGold"
+              x1="0%"
+              y1="0%"
+              x2="100%"
+              y2="100%"
+            >
               <stop offset="0%" stopColor="rgba(231,184,75,0)" />
-              <stop offset="45%" stopColor="rgba(231,184,75,.32)" />
-              <stop offset="75%" stopColor="rgba(245,217,139,.6)" />
+              <stop offset="42%" stopColor="rgba(231,184,75,.28)" />
+              <stop offset="72%" stopColor="rgba(245,217,139,.58)" />
               <stop offset="100%" stopColor="rgba(231,184,75,0)" />
             </linearGradient>
 
-            <filter id="networkGlow">
+            <filter id="registerNetworkGlow">
               <feGaussianBlur stdDeviation="2.5" result="blur" />
               <feMerge>
                 <feMergeNode in="blur" />
@@ -181,21 +263,23 @@ export default function LoginPage() {
           <g
             className="network-lines"
             fill="none"
-            stroke="url(#neuralGold)"
+            stroke="url(#registerNeuralGold)"
             strokeWidth="1"
-            filter="url(#networkGlow)"
+            filter="url(#registerNetworkGlow)"
           >
-            <path d="M0 180 C180 120 250 280 430 220 S690 120 820 240 S1100 330 1260 190 S1450 100 1600 170" />
-            <path d="M0 390 C160 310 260 460 410 380 S650 280 810 410 S1050 520 1210 360 S1450 280 1600 350" />
-            <path d="M0 650 C190 560 280 720 470 610 S720 500 900 650 S1120 760 1300 590 S1460 520 1600 600" />
-            <path d="M180 0 C250 160 200 280 330 420 S500 590 430 900" />
+            <path d="M0 160 C180 90 260 280 430 210 S690 100 820 230 S1100 320 1260 180 S1450 80 1600 160" />
+            <path d="M0 380 C160 290 260 450 410 370 S650 270 810 400 S1050 510 1210 350 S1450 270 1600 340" />
+            <path d="M0 650 C190 550 280 710 470 600 S720 490 900 640 S1120 750 1300 580 S1460 510 1600 590" />
+            <path d="M180 0 C250 150 200 290 330 420 S500 590 430 900" />
             <path d="M520 0 C600 150 540 270 650 390 S820 610 760 900" />
             <path d="M1050 0 C980 180 1080 310 960 450 S850 680 930 900" />
             <path d="M1390 0 C1300 170 1410 300 1290 440 S1190 650 1260 900" />
           </g>
         </svg>
 
-        {/* Moving energy paths */}
+        {/* =====================================================
+            MOVING ENERGY BEAMS
+        ===================================================== */}
         <div className="energy-path energy-path-one">
           <span />
         </div>
@@ -208,7 +292,9 @@ export default function LoginPage() {
           <span />
         </div>
 
-        {/* Floating data particles */}
+        {/* =====================================================
+            FLOATING AI PARTICLES
+        ===================================================== */}
         <div className="particle-field">
           <span className="particle p01" />
           <span className="particle p02" />
@@ -232,13 +318,17 @@ export default function LoginPage() {
           <span className="particle p20" />
         </div>
 
-        {/* Floating 3D glass fragments */}
+        {/* =====================================================
+            FLOATING 3D GLASS FRAGMENTS
+        ===================================================== */}
         <div className="glass-fragment fragment-one" />
         <div className="glass-fragment fragment-two" />
         <div className="glass-fragment fragment-three" />
         <div className="glass-fragment fragment-four" />
 
-        {/* Small holographic system panels */}
+        {/* =====================================================
+            HOLOGRAPHIC MICRO PANELS
+        ===================================================== */}
         <div className="holo-panel panel-one">
           <span />
           <span />
@@ -257,17 +347,16 @@ export default function LoginPage() {
           <span />
         </div>
 
-        {/* Scanner beam */}
+        {/* Global scanner */}
         <div className="scanner-beam" />
 
-        {/* Vignette for cinematic depth */}
+        {/* Cinematic vignette */}
         <div className="cinematic-vignette" />
       </div>
 
       {/* =========================================================
           ARCHITECTURAL GRID — ORIGINAL
       ========================================================= */}
-
       <div
         className="absolute inset-0 z-[2] opacity-[0.035]"
         style={{
@@ -281,7 +370,7 @@ export default function LoginPage() {
           TOP NAV / BRAND
       ========================================================= */}
 
-      {/* Back button — approx. 2cm from top */}
+      {/* Back button */}
       <Link
         href="/"
         className="group absolute left-5 top-5 z-30 inline-flex items-center gap-3 rounded-full border border-[#F5D98B]/10 bg-[#151713]/65 px-4 py-2.5 text-xs font-medium text-[#9A9D94] shadow-[0_10px_35px_rgba(0,0,0,0.22)] backdrop-blur-xl transition-all duration-300 hover:-translate-x-1 hover:border-[#E7B84B]/35 hover:bg-[#20241D]/90 hover:text-[#F5D98B] sm:left-8 sm:top-6 lg:left-3 lg:top-7"
@@ -295,7 +384,7 @@ export default function LoginPage() {
         <span className="h-px w-0 bg-[#E7B84B]/70 transition-all duration-300 group-hover:w-5" />
       </Link>
 
-      {/* Large NexaFlow brand — positioned beside the back button */}
+      {/* Large NexaFlow brand */}
       <Link
         href="/"
         className="group absolute left-[9rem] top-[4.35rem] z-30 inline-flex items-center gap-4 sm:left-[11rem] sm:top-[4.25rem] lg:left-[13rem] lg:top-[1rem]"
@@ -324,25 +413,24 @@ export default function LoginPage() {
       {/* =========================================================
           LEFT AUTH AREA
       ========================================================= */}
-
       <div className="relative z-10 w-full max-w-xl pt-[9.5rem] sm:pt-[9rem] lg:ml-[3vw] lg:pt-[8.5rem] xl:ml-[6vw]">
         {/* Header */}
-        <div className="mb-5">
-          <div className="mb-2.5 flex items-center gap-2">
+        <div className="mb-4">
+          <div className="mb-2 flex items-center gap-2">
             <span className="h-px w-8 bg-[#E7B84B]/50" />
 
             <span className="text-[9px] font-semibold uppercase tracking-[0.28em] text-[#BFAF7A]">
-              Secure workspace access
+              New automation workspace
             </span>
           </div>
 
           <h1 className="text-3xl font-bold tracking-tight text-[#F4F0E6] sm:text-4xl">
-            Welcome back.
+            Build something intelligent.
           </h1>
 
           <p className="mt-1.5 max-w-md text-sm leading-5 text-[#9A9D94]">
-            Sign in and continue orchestrating your intelligent business
-            workflows.
+            Create your workspace and turn everyday business operations into
+            intelligent automated workflows.
           </p>
         </div>
 
@@ -365,91 +453,148 @@ export default function LoginPage() {
             <div className="auth-scan pointer-events-none absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-[#F5D98B]/35 to-transparent" />
 
             {/* Tiny system label */}
-            <div className="mb-5 flex items-center justify-between border-b border-[#F5D98B]/[0.07] pb-3.5">
+            <div className="mb-4 flex items-center justify-between border-b border-[#F5D98B]/[0.07] pb-3.5">
               <div className="flex items-center gap-2">
                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#5ED6A0] shadow-[0_0_8px_rgba(94,214,160,0.5)]" />
 
                 <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#73776F]">
-                  Identity gateway
+                  Workspace generator
                 </span>
               </div>
 
               <span className="font-mono text-[9px] text-[#BFAF7A]">
-                NF / 01
+                NF / 02
               </span>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-3">
               {error && (
                 <div className="rounded-xl border border-[#E87575]/25 bg-[#E87575]/[0.08] p-3 text-sm text-[#F0A0A0]">
                   {error}
                 </div>
               )}
 
+              {success && (
+                <div className="rounded-xl border border-[#5ED6A0]/25 bg-[#5ED6A0]/[0.08] p-3 text-sm text-[#9BE7BE]">
+                  {success}
+                </div>
+              )}
+
+              <label className="block">
+                <span className="mb-1.5 block text-sm font-medium text-[#D8D4C8]">
+                  Full name
+                </span>
+
+                <input
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(event) => {
+                    setName(event.target.value);
+                    setError("");
+                  }}
+                  placeholder="Your name"
+                  disabled={loading || guestLoading}
+                  className="w-full rounded-xl border border-[#F5D98B]/[0.10] bg-[#20241D]/80 px-4 py-2.5 text-sm text-[#F4F0E6] outline-none transition-all duration-300 placeholder:text-[#73776F] focus:border-[#E7B84B]/50 focus:bg-[#252A22] focus:shadow-[0_0_25px_rgba(231,184,75,0.06)] focus:ring-1 focus:ring-[#E7B84B]/15 disabled:cursor-not-allowed disabled:opacity-60"
+                />
+              </label>
+
               <label className="block">
                 <span className="mb-1.5 block text-sm font-medium text-[#D8D4C8]">
                   Email
                 </span>
 
-                <div className="relative">
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(event) => setEmail(event.target.value)}
-                    className="peer w-full rounded-xl border border-[#F5D98B]/[0.10] bg-[#20241D]/80 px-4 py-3 text-sm text-[#F4F0E6] outline-none transition-all duration-300 placeholder:text-[#73776F] focus:border-[#E7B84B]/50 focus:bg-[#252A22] focus:shadow-[0_0_25px_rgba(231,184,75,0.06)] focus:ring-1 focus:ring-[#E7B84B]/15"
-                  />
-
-                  <span className="pointer-events-none absolute bottom-0 left-4 h-px w-0 bg-[#E7B84B] transition-all duration-500 peer-focus:w-[calc(100%-2rem)]" />
-                </div>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(event) => {
+                    setEmail(event.target.value);
+                    setError("");
+                  }}
+                  placeholder="you@example.com"
+                  disabled={loading || guestLoading}
+                  className="w-full rounded-xl border border-[#F5D98B]/[0.10] bg-[#20241D]/80 px-4 py-2.5 text-sm text-[#F4F0E6] outline-none transition-all duration-300 placeholder:text-[#73776F] focus:border-[#E7B84B]/50 focus:bg-[#252A22] focus:shadow-[0_0_25px_rgba(231,184,75,0.06)] focus:ring-1 focus:ring-[#E7B84B]/15 disabled:cursor-not-allowed disabled:opacity-60"
+                />
               </label>
 
               <label className="block">
-                <div className="mb-1.5 flex items-center justify-between">
-                  <span className="text-sm font-medium text-[#D8D4C8]">
-                    Password
-                  </span>
-
-                  <span className="font-mono text-[9px] uppercase tracking-wider text-[#73776F]">
-                    Demo authentication
-                  </span>
-                </div>
+                <span className="mb-1.5 block text-sm font-medium text-[#D8D4C8]">
+                  Password
+                </span>
 
                 <input
                   type="password"
                   required
                   value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  className="w-full rounded-xl border border-[#F5D98B]/[0.10] bg-[#20241D]/80 px-4 py-3 text-sm text-[#F4F0E6] outline-none transition-all duration-300 placeholder:text-[#73776F] focus:border-[#E7B84B]/50 focus:bg-[#252A22] focus:shadow-[0_0_25px_rgba(231,184,75,0.06)] focus:ring-1 focus:ring-[#E7B84B]/15"
+                  onChange={(event) => {
+                    setPassword(event.target.value);
+                    setError("");
+                  }}
+                  placeholder="Minimum 8 characters"
+                  disabled={loading || guestLoading}
+                  className="w-full rounded-xl border border-[#F5D98B]/[0.10] bg-[#20241D]/80 px-4 py-2.5 text-sm text-[#F4F0E6] outline-none transition-all duration-300 placeholder:text-[#73776F] focus:border-[#E7B84B]/50 focus:bg-[#252A22] focus:shadow-[0_0_25px_rgba(231,184,75,0.06)] focus:ring-1 focus:ring-[#E7B84B]/15 disabled:cursor-not-allowed disabled:opacity-60"
                 />
-                                <div className="mt-2 flex items-center justify-between">
+
+                <div className="mt-1 flex justify-end">
                   <button
                     type="button"
-                    onClick={() => setPasswordVisible((value) => !value)}
+                    onClick={() =>
+                      setShowPassword((value) => !value)
+                    }
                     disabled={loading || guestLoading}
                     className="text-[11px] font-medium text-[#73776F] transition-colors duration-300 hover:text-[#F5D98B] disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    {passwordVisible ? "Hide password" : "Show password"}
+                    {showPassword ? "Hide password" : "Show password"}
                   </button>
+                </div>
+              </label>
 
-                  <Link
-                    href="/forgot-password"
-                    className="text-[11px] font-medium text-[#73776F] transition-colors duration-300 hover:text-[#F5D98B] hover:underline hover:underline-offset-4"
+              <label className="block">
+                <span className="mb-1.5 block text-sm font-medium text-[#D8D4C8]">
+                  Confirm password
+                </span>
+
+                <input
+                  type="password"
+                  required
+                  value={confirmPassword}
+                  onChange={(event) => {
+                    setConfirmPassword(event.target.value);
+                    setError("");
+                  }}
+                  placeholder="Repeat your password"
+                  disabled={loading || guestLoading}
+                  className="w-full rounded-xl border border-[#F5D98B]/[0.10] bg-[#20241D]/80 px-4 py-2.5 text-sm text-[#F4F0E6] outline-none transition-all duration-300 placeholder:text-[#73776F] focus:border-[#E7B84B]/50 focus:bg-[#252A22] focus:shadow-[0_0_25px_rgba(231,184,75,0.06)] focus:ring-1 focus:ring-[#E7B84B]/15 disabled:cursor-not-allowed disabled:opacity-60"
+                />
+
+                <div className="mt-1 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setShowConfirmPassword((value) => !value)
+                    }
+                    disabled={loading || guestLoading}
+                    className="text-[11px] font-medium text-[#73776F] transition-colors duration-300 hover:text-[#F5D98B] disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    Forgot password?
-                  </Link>
+                    {showConfirmPassword
+                      ? "Hide password"
+                      : "Show password"}
+                  </button>
                 </div>
               </label>
 
               <button
                 type="submit"
                 disabled={loading || guestLoading}
-                className="group/button relative w-full overflow-hidden rounded-xl border border-[#E7B84B]/35 bg-[#E7B84B]/[0.12] px-4 py-3 text-sm font-semibold text-[#F5D98B] shadow-[0_12px_35px_rgba(0,0,0,0.24)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#F5D98B]/60 hover:bg-[#E7B84B]/[0.19] hover:shadow-[0_14px_40px_rgba(231,184,75,0.10)] disabled:cursor-not-allowed disabled:opacity-60"
+                className="group/button relative mt-1 w-full overflow-hidden rounded-xl border border-[#E7B84B]/35 bg-[#E7B84B]/[0.12] px-4 py-3 text-sm font-semibold text-[#F5D98B] shadow-[0_12px_35px_rgba(0,0,0,0.24)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#F5D98B]/60 hover:bg-[#E7B84B]/[0.19] hover:shadow-[0_14px_40px_rgba(231,184,75,0.10)] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <span className="absolute inset-y-0 -left-20 w-12 rotate-12 bg-[#F5D98B]/20 blur-md transition-all duration-700 group-hover/button:left-[120%]" />
 
                 <span className="relative flex items-center justify-center gap-2">
-                  {loading ? "Signing in..." : "Sign in"}
+                  {loading
+                    ? "Creating workspace..."
+                    : "Create account"}
 
                   {!loading && (
                     <span className="transition-transform duration-300 group-hover/button:translate-x-1">
@@ -488,12 +633,13 @@ export default function LoginPage() {
             </button>
 
             <p className="mt-4 text-center text-sm text-[#73776F]">
-              Don&apos;t have an account?{" "}
+              Already have an account?{" "}
+
               <Link
-                href="/register"
+                href="/login"
                 className="font-medium text-[#E7B84B] transition-all duration-300 hover:text-[#F5D98B] hover:underline hover:underline-offset-4"
               >
-                Create one
+                Sign in
               </Link>
             </p>
           </div>
@@ -510,14 +656,14 @@ export default function LoginPage() {
           </div>
 
           <span className="font-mono text-[9px] text-[#73776F]">
-            ENCRYPTED SESSION
+            READY TO AUTOMATE
           </span>
         </div>
       </div>
 
       <style jsx>{`
         /* =========================================================
-           ORIGINAL AUTH MOTION
+           EXISTING AUTH MOTION
         ========================================================= */
 
         .auth-float {
@@ -537,12 +683,15 @@ export default function LoginPage() {
             rgba(245, 217, 139, 0.95) 335deg,
             transparent 360deg
           );
+
           animation: borderSpin 7s linear infinite;
           opacity: 0.7;
           padding: 1px;
+
           -webkit-mask:
             linear-gradient(#fff 0 0) content-box,
             linear-gradient(#fff 0 0);
+
           -webkit-mask-composite: xor;
           mask-composite: exclude;
         }
@@ -592,7 +741,7 @@ export default function LoginPage() {
           }
 
           100% {
-            transform: translateY(480px);
+            transform: translateY(520px);
           }
         }
 
@@ -607,7 +756,9 @@ export default function LoginPage() {
           isolation: isolate;
         }
 
-        /* Atmospheric lights */
+        /* =========================================================
+           ATMOSPHERIC LIGHTS
+        ========================================================= */
 
         .world-glow {
           position: absolute;
@@ -678,7 +829,9 @@ export default function LoginPage() {
           }
         }
 
-        /* Perspective floor */
+        /* =========================================================
+           3D PERSPECTIVE FLOOR
+        ========================================================= */
 
         .perspective-floor {
           position: absolute;
@@ -694,6 +847,7 @@ export default function LoginPage() {
         .floor-grid {
           position: absolute;
           inset: 0;
+
           background-image:
             linear-gradient(
               to right,
@@ -705,7 +859,9 @@ export default function LoginPage() {
               rgba(245, 217, 139, 0.25) 1px,
               transparent 1px
             );
+
           background-size: 70px 70px;
+
           mask-image: linear-gradient(
             to bottom,
             transparent,
@@ -713,6 +869,7 @@ export default function LoginPage() {
             black 80%,
             transparent
           );
+
           animation: floorMove 9s linear infinite;
         }
 
@@ -726,7 +883,9 @@ export default function LoginPage() {
           }
         }
 
-        /* Main orbit systems */
+        /* =========================================================
+           ORBIT SYSTEMS
+        ========================================================= */
 
         .orbit-system {
           position: absolute;
@@ -753,12 +912,18 @@ export default function LoginPage() {
         @keyframes orbitWorldOne {
           0%,
           100% {
-            transform: rotateX(58deg) rotateY(-18deg) rotateZ(0deg)
+            transform:
+              rotateX(58deg)
+              rotateY(-18deg)
+              rotateZ(0deg)
               translate3d(0, 0, 0);
           }
 
           50% {
-            transform: rotateX(70deg) rotateY(20deg) rotateZ(180deg)
+            transform:
+              rotateX(70deg)
+              rotateY(20deg)
+              rotateZ(180deg)
               translate3d(-35px, 30px, 80px);
           }
         }
@@ -766,12 +931,18 @@ export default function LoginPage() {
         @keyframes orbitWorldTwo {
           0%,
           100% {
-            transform: rotateX(62deg) rotateY(22deg) rotateZ(0deg)
+            transform:
+              rotateX(62deg)
+              rotateY(22deg)
+              rotateZ(0deg)
               translate3d(0, 0, 0);
           }
 
           50% {
-            transform: rotateX(48deg) rotateY(-20deg) rotateZ(-180deg)
+            transform:
+              rotateX(48deg)
+              rotateY(-20deg)
+              rotateZ(-180deg)
               translate3d(30px, -30px, 50px);
           }
         }
@@ -808,6 +979,7 @@ export default function LoginPage() {
           height: 30px;
           transform: translate(-50%, -50%);
           border-radius: 50%;
+
           background:
             radial-gradient(
               circle,
@@ -816,9 +988,11 @@ export default function LoginPage() {
               rgba(231, 184, 75, 0.12) 45%,
               transparent 72%
             );
+
           box-shadow:
             0 0 20px rgba(231, 184, 75, 0.38),
             0 0 70px rgba(231, 184, 75, 0.15);
+
           animation: corePulse 3s ease-in-out infinite;
         }
 
@@ -841,6 +1015,7 @@ export default function LoginPage() {
           height: 7px;
           border-radius: 50%;
           background: #f5d98b;
+
           box-shadow:
             0 0 7px rgba(245, 217, 139, 0.9),
             0 0 24px rgba(231, 184, 75, 0.6);
@@ -897,12 +1072,15 @@ export default function LoginPage() {
           }
         }
 
-        /* Holographic rings */
+        /* =========================================================
+           HOLOGRAPHIC RINGS
+        ========================================================= */
 
         .holo-ring {
           position: absolute;
           border-radius: 50%;
           border: 1px solid rgba(245, 217, 139, 0.08);
+
           box-shadow:
             0 0 35px rgba(231, 184, 75, 0.025),
             inset 0 0 35px rgba(231, 184, 75, 0.02);
@@ -953,7 +1131,9 @@ export default function LoginPage() {
           }
         }
 
-        /* Neural network */
+        /* =========================================================
+           NEURAL NETWORK
+        ========================================================= */
 
         .neural-network {
           position: absolute;
@@ -975,12 +1155,15 @@ export default function LoginPage() {
           }
         }
 
-        /* Energy paths */
+        /* =========================================================
+           ENERGY BEAMS
+        ========================================================= */
 
         .energy-path {
           position: absolute;
           height: 1px;
           overflow: hidden;
+
           background: linear-gradient(
             90deg,
             transparent,
@@ -989,6 +1172,7 @@ export default function LoginPage() {
             rgba(231, 184, 75, 0.05),
             transparent
           );
+
           filter: blur(0.2px);
           opacity: 0.7;
         }
@@ -1001,9 +1185,11 @@ export default function LoginPage() {
           height: 5px;
           border-radius: 50%;
           background: #f5d98b;
+
           box-shadow:
             0 0 8px rgba(245, 217, 139, 0.9),
             0 0 30px rgba(231, 184, 75, 0.6);
+
           filter: blur(1px);
         }
 
@@ -1072,7 +1258,9 @@ export default function LoginPage() {
           }
         }
 
-        /* Particle field */
+        /* =========================================================
+           PARTICLES
+        ========================================================= */
 
         .particle-field {
           position: absolute;
@@ -1086,9 +1274,11 @@ export default function LoginPage() {
           height: 3px;
           border-radius: 50%;
           background: rgba(245, 217, 139, 0.8);
+
           box-shadow:
             0 0 6px rgba(245, 217, 139, 0.8),
             0 0 18px rgba(231, 184, 75, 0.35);
+
           animation: particleFloat 8s ease-in-out infinite;
         }
 
@@ -1242,20 +1432,26 @@ export default function LoginPage() {
           }
         }
 
-        /* Floating glass fragments */
+        /* =========================================================
+           GLASS FRAGMENTS
+        ========================================================= */
 
         .glass-fragment {
           position: absolute;
           border: 1px solid rgba(245, 217, 139, 0.12);
+
           background: linear-gradient(
             135deg,
             rgba(245, 217, 139, 0.035),
             rgba(255, 255, 255, 0.008)
           );
+
           backdrop-filter: blur(5px);
+
           box-shadow:
             inset 0 0 25px rgba(245, 217, 139, 0.025),
             0 0 25px rgba(0, 0, 0, 0.12);
+
           transform-style: preserve-3d;
         }
 
@@ -1339,17 +1535,25 @@ export default function LoginPage() {
           }
         }
 
-        /* Holographic micro panels */
+        /* =========================================================
+           HOLOGRAPHIC DATA PANELS
+        ========================================================= */
 
         .holo-panel {
           position: absolute;
           width: 90px;
           height: 42px;
           padding: 9px;
+
           border: 1px solid rgba(231, 184, 75, 0.1);
           background: rgba(21, 23, 19, 0.16);
           backdrop-filter: blur(5px);
-          transform: perspective(500px) rotateY(-18deg) rotateX(8deg);
+
+          transform:
+            perspective(500px)
+            rotateY(-18deg)
+            rotateX(8deg);
+
           opacity: 0.4;
         }
 
@@ -1394,13 +1598,19 @@ export default function LoginPage() {
         @keyframes panelFloatOne {
           0%,
           100% {
-            transform: perspective(500px) rotateY(-18deg) rotateX(8deg)
+            transform:
+              perspective(500px)
+              rotateY(-18deg)
+              rotateX(8deg)
               translate3d(0, 0, 0);
             opacity: 0.25;
           }
 
           50% {
-            transform: perspective(500px) rotateY(12deg) rotateX(-4deg)
+            transform:
+              perspective(500px)
+              rotateY(12deg)
+              rotateX(-4deg)
               translate3d(35px, -25px, 80px);
             opacity: 0.55;
           }
@@ -1409,13 +1619,19 @@ export default function LoginPage() {
         @keyframes panelFloatTwo {
           0%,
           100% {
-            transform: perspective(500px) rotateY(-18deg) rotateX(8deg)
+            transform:
+              perspective(500px)
+              rotateY(-18deg)
+              rotateX(8deg)
               translate3d(0, 0, 0);
             opacity: 0.25;
           }
 
           50% {
-            transform: perspective(500px) rotateY(20deg) rotateX(4deg)
+            transform:
+              perspective(500px)
+              rotateY(20deg)
+              rotateX(4deg)
               translate3d(-30px, 35px, 90px);
             opacity: 0.5;
           }
@@ -1424,17 +1640,25 @@ export default function LoginPage() {
         @keyframes panelFloatThree {
           0%,
           100% {
-            transform: perspective(500px) rotateY(-18deg) rotateX(8deg)
+            transform:
+              perspective(500px)
+              rotateY(-18deg)
+              rotateX(8deg)
               translate3d(0, 0, 0);
           }
 
           50% {
-            transform: perspective(500px) rotateY(18deg) rotateX(-8deg)
+            transform:
+              perspective(500px)
+              rotateY(18deg)
+              rotateX(-8deg)
               translate3d(-20px, -25px, 70px);
           }
         }
 
-        /* Scanner */
+        /* =========================================================
+           SCANNER
+        ========================================================= */
 
         .scanner-beam {
           position: absolute;
@@ -1442,6 +1666,7 @@ export default function LoginPage() {
           width: 120%;
           height: 2px;
           top: 0;
+
           background: linear-gradient(
             90deg,
             transparent,
@@ -1450,7 +1675,9 @@ export default function LoginPage() {
             rgba(245, 217, 139, 0.03),
             transparent
           );
+
           box-shadow: 0 0 22px rgba(231, 184, 75, 0.18);
+
           opacity: 0;
           animation: scannerMove 10s ease-in-out infinite;
         }
@@ -1476,11 +1703,14 @@ export default function LoginPage() {
           }
         }
 
-        /* Cinematic vignette */
+        /* =========================================================
+           CINEMATIC VIGNETTE
+        ========================================================= */
 
         .cinematic-vignette {
           position: absolute;
           inset: 0;
+
           background:
             radial-gradient(
               ellipse at center,
@@ -1491,7 +1721,7 @@ export default function LoginPage() {
         }
 
         /* =========================================================
-           PERFORMANCE / REDUCED MOTION
+           REDUCED MOTION
         ========================================================= */
 
         @media (prefers-reduced-motion: reduce) {
@@ -1512,6 +1742,10 @@ export default function LoginPage() {
             animation: none !important;
           }
         }
+
+        /* =========================================================
+           TABLET
+        ========================================================= */
 
         @media (max-width: 900px) {
           .orbit-one {
@@ -1536,6 +1770,10 @@ export default function LoginPage() {
             opacity: 0.22;
           }
         }
+
+        /* =========================================================
+           MOBILE
+        ========================================================= */
 
         @media (max-width: 640px) {
           .auth-float {

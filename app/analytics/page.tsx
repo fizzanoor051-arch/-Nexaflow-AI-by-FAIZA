@@ -1,1464 +1,1011 @@
+
 "use client";
 
-import { useMemo, useState } from "react";
 import Link from "next/link";
-import Card from "@/components/ui/Card";
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
-type RangeKey = "7d" | "30d" | "90d";
-type ChartStyle = "area" | "line" | "bars" | "stepped";
+type AnalyticsData = {
+  metrics: {
+    totalRuns: number;
+    successfulRuns: number;
+    failedRuns: number;
+    successRate: number;
+    totalLeads: number;
+    qualifiedLeads: number;
+    aiActions: number;
+    responseTime: number;
+    conversionRate: number;
+    totalTasks: number;
+    activeWorkflows: number;
+  };
 
-const rangeLabels: Record<RangeKey, string> = {
-  "7d": "Last 7 days",
-  "30d": "Last 30 days",
-  "90d": "Last 90 days",
+  leadsOverTime: {
+    date: string;
+    leads: number;
+  }[];
+
+  workflowPerformance: {
+    id: string;
+    name: string;
+    runs: number;
+    successRate: number;
+    status: string;
+  }[];
+
+  funnel: {
+    label: string;
+    value: number;
+  }[];
+
+  activity: {
+    id: string;
+    type: string;
+    title: string;
+    description: string;
+    createdAt: string;
+  }[];
 };
 
-const rangeData: Record<
-  RangeKey,
-  {
-    labels: string[];
-    values: number[];
+const fallbackData: AnalyticsData = {
+  metrics: {
+    totalRuns: 0,
+    successfulRuns: 0,
+    failedRuns: 0,
+    successRate: 0,
+    totalLeads: 0,
+    qualifiedLeads: 0,
+    aiActions: 0,
+    responseTime: 0,
+    conversionRate: 0,
+    totalTasks: 0,
+    activeWorkflows: 0,
+  },
+
+  leadsOverTime: [],
+
+  workflowPerformance: [],
+
+  funnel: [
+    {
+      label: "New leads",
+      value: 0,
+    },
+    {
+      label: "Contacted",
+      value: 0,
+    },
+    {
+      label: "Qualified",
+      value: 0,
+    },
+    {
+      label: "Converted",
+      value: 0,
+    },
+  ],
+
+  activity: [],
+};
+
+function formatNumber(value: number) {
+  return new Intl.NumberFormat("en-US").format(value);
+}
+
+function getRelativeTime(date: string) {
+  const seconds = Math.floor(
+    (Date.now() - new Date(date).getTime()) / 1000
+  );
+
+  if (seconds < 10) return "just now";
+  if (seconds < 60) return `${seconds}s ago`;
+
+  const minutes = Math.floor(seconds / 60);
+
+  if (minutes < 60) {
+    return `${minutes}m ago`;
   }
-> = {
-  "7d": {
-    labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-    values: [58, 72, 64, 86, 78, 92, 88],
-  },
-  "30d": {
-    labels: [
-      "Aug 15",
-      "Aug 18",
-      "Aug 21",
-      "Aug 24",
-      "Aug 27",
-      "Aug 30",
-      "Sep 2",
-      "Sep 5",
-      "Sep 8",
-      "Sep 12",
-    ],
-    values: [42, 55, 49, 68, 61, 77, 71, 86, 80, 94],
-  },
-  "90d": {
-    labels: ["Jun", "Jun", "Jul", "Jul", "Aug", "Aug", "Sep"],
-    values: [38, 46, 52, 61, 68, 79, 94],
-  },
-};
 
-const metrics = [
-  {
-    label: "AI runs",
-    value: "1,247",
-    change: "+18.4%",
-    note: "vs. previous period",
-    icon: "✦",
-  },
-  {
-    label: "Successful runs",
-    value: "1,182",
-    change: "+21.7%",
-    note: "94.8% success rate",
-    icon: "✓",
-  },
-  {
-    label: "Leads generated",
-    value: "248",
-    change: "+12.8%",
-    note: "38.6% conversion",
-    icon: "◎",
-  },
-  {
-    label: "Tasks created",
-    value: "436",
-    change: "+16.2%",
-    note: "Automation output",
-    icon: "◌",
-  },
-];
+  const hours = Math.floor(minutes / 60);
 
-const workflows = [
-  {
-    name: "Customer Support",
-    runs: "342",
-    success: 96,
-    trend: "+4.2%",
-  },
-  {
-    name: "Lead Qualification",
-    runs: "286",
-    success: 94,
-    trend: "+3.8%",
-  },
-  {
-    name: "Task Automation",
-    runs: "241",
-    success: 91,
-    trend: "+2.1%",
-  },
-  {
-    name: "Email Processing",
-    runs: "198",
-    success: 89,
-    trend: "+1.6%",
-  },
-];
+  if (hours < 24) {
+    return `${hours}h ago`;
+  }
 
-const activity = [
-  {
-    title: "Lead Qualification",
-    detail: "Workflow completed successfully",
-    time: "2 min ago",
-    status: "success",
-  },
-  {
-    title: "Customer Support",
-    detail: "42 conversations processed",
-    time: "18 min ago",
-    status: "success",
-  },
-  {
-    title: "Task Automation",
-    detail: "18 new tasks generated",
-    time: "41 min ago",
-    status: "active",
-  },
-  {
-    title: "Email Processing",
-    detail: "7 messages classified",
-    time: "1 hr ago",
-    status: "success",
-  },
-];
+  return `${Math.floor(hours / 24)}d ago`;
+}
 
-const chartStyles: {
-  key: ChartStyle;
+function MetricCard({
+  label,
+  value,
+  suffix,
+  detail,
+  icon,
+}: {
   label: string;
-  description: string;
+  value: string;
+  suffix?: string;
+  detail: string;
   icon: string;
-}[] = [
-  {
-    key: "area",
-    label: "Area",
-    description: "Premium filled trend",
-    icon: "◒",
-  },
-  {
-    key: "line",
-    label: "Line",
-    description: "Clean trend line",
-    icon: "⌁",
-  },
-  {
-    key: "bars",
-    label: "Bars",
-    description: "Detailed comparison",
-    icon: "▥",
-  },
-  {
-    key: "stepped",
-    label: "Stepped",
-    description: "Technical progression",
-    icon: "⌞",
-  },
-];
+}) {
+  return (
+    <div className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#10130f]/90 p-5 shadow-xl backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-[#e7b84b]/25">
+      <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-[#e7b84b]/50 to-transparent opacity-0 transition group-hover:opacity-100" />
 
-const hourlyActivity = [
-  22, 31, 28, 42, 51, 48, 62, 58, 71, 68, 79, 74,
-  86, 82, 91, 87, 76, 81, 69, 63, 57, 48, 39, 31,
-];
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/40">
+            {label}
+          </p>
 
-const channelData = [
-  { label: "Email", value: 42 },
-  { label: "Web", value: 28 },
-  { label: "API", value: 18 },
-  { label: "Other", value: 12 },
-];
+          <div className="mt-3 flex items-baseline gap-1">
+            <span className="text-3xl font-bold tracking-tight text-white">
+              {value}
+            </span>
 
-const outcomeData = [
-  { label: "Completed", value: 1182 },
-  { label: "Failed", value: 65 },
-];
+            {suffix && (
+              <span className="text-sm font-semibold text-white/40">
+                {suffix}
+              </span>
+            )}
+          </div>
 
-const leadFunnel = [
-  { label: "Visitors", value: 1240, width: 100 },
-  { label: "Qualified", value: 680, width: 55 },
-  { label: "Engaged", value: 412, width: 33 },
-  { label: "Converted", value: 248, width: 20 },
-];
+          <p className="mt-2 text-xs text-white/35">
+            {detail}
+          </p>
+        </div>
 
-function downloadCsv() {
-  const rows = [
-    ["Metric", "Value", "Change"],
-    ["AI runs", "1247", "18.4%"],
-    ["Successful runs", "1182", "21.7%"],
-    ["Leads generated", "248", "12.8%"],
-    ["Tasks created", "436", "16.2%"],
-  ];
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-lg text-[#e7b84b]">
+          {icon}
+        </div>
+      </div>
+    </div>
+  );
+}
 
-  const csv = rows
-    .map((row) =>
-      row
-        .map((cell) => `"${cell.replaceAll('"', '""')}"`)
-        .join(",")
+function Section({
+  title,
+  description,
+  children,
+  action,
+}: {
+  title: string;
+  description: string;
+  children: React.ReactNode;
+  action?: React.ReactNode;
+}) {
+  return (
+    <section className="rounded-3xl border border-white/10 bg-[#10130f]/85 p-5 shadow-2xl backdrop-blur-xl md:p-6">
+      <div className="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
+        <div>
+          <h2 className="text-sm font-bold tracking-wide text-white">
+            {title}
+          </h2>
+
+          <p className="mt-1 text-xs text-white/35">
+            {description}
+          </p>
+        </div>
+
+        {action}
+      </div>
+
+      {children}
+    </section>
+  );
+}
+
+function LineChart({
+  data,
+}: {
+  data: {
+    date: string;
+    leads: number;
+  }[];
+}) {
+  if (!data.length) {
+    return (
+      <div className="flex h-[260px] items-center justify-center rounded-2xl border border-dashed border-white/10 text-xs text-white/30">
+        No lead activity yet
+      </div>
+    );
+  }
+
+  const maxValue = Math.max(
+    ...data.map((item) => item.leads),
+    1
+  );
+
+  const width = 700;
+  const height = 240;
+  const paddingX = 20;
+  const paddingY = 25;
+
+  const points = data
+    .map((item, index) => {
+      const x =
+        paddingX +
+        (index /
+          Math.max(data.length - 1, 1)) *
+          (width - paddingX * 2);
+
+      const y =
+        height -
+        paddingY -
+        (item.leads / maxValue) *
+          (height - paddingY * 2);
+
+      return {
+        x,
+        y,
+        value: item.leads,
+        date: item.date,
+      };
+    });
+
+  const path = points
+    .map(
+      (point, index) =>
+        `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`
     )
-    .join("\n");
+    .join(" ");
 
-  const blob = new Blob([csv], {
-    type: "text/csv;charset=utf-8;",
-  });
+  const areaPath = `
+    ${path}
+    L ${points[points.length - 1].x} ${height - paddingY}
+    L ${points[0].x} ${height - paddingY}
+    Z
+  `;
 
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement("a");
+  return (
+    <div className="w-full overflow-hidden">
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        className="h-[260px] w-full"
+        preserveAspectRatio="none"
+      >
+        {[0, 1, 2, 3].map((line) => {
+          const y =
+            paddingY +
+            (line / 3) *
+              (height - paddingY * 2);
 
-  anchor.href = url;
-  anchor.download = "nexaflow-analytics.csv";
-  anchor.click();
+          return (
+            <line
+              key={line}
+              x1={paddingX}
+              x2={width - paddingX}
+              y1={y}
+              y2={y}
+              stroke="rgba(255,255,255,0.06)"
+              strokeWidth="1"
+            />
+          );
+        })}
 
-  URL.revokeObjectURL(url);
+        <path
+          d={areaPath}
+          fill="rgba(231,184,75,0.07)"
+        />
+
+        <path
+          d={path}
+          fill="none"
+          stroke="#e7b84b"
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+
+        {points.map((point) => (
+          <g key={point.date}>
+            <circle
+              cx={point.x}
+              cy={point.y}
+              r="5"
+              fill="#10130f"
+              stroke="#e7b84b"
+              strokeWidth="2"
+            />
+
+            <text
+              x={point.x}
+              y={height - 4}
+              textAnchor="middle"
+              fill="rgba(255,255,255,0.35)"
+              fontSize="10"
+            >
+              {point.date}
+            </text>
+          </g>
+        ))}
+      </svg>
+    </div>
+  );
+}
+
+function SuccessBar({
+  name,
+  runs,
+  successRate,
+}: {
+  name: string;
+  runs: number;
+  successRate: number;
+}) {
+  return (
+    <div className="group rounded-2xl border border-white/8 bg-white/[0.025] p-4 transition hover:border-[#e7b84b]/20">
+      <div className="flex items-center justify-between gap-4">
+        <div className="min-w-0">
+          <p className="truncate text-sm font-semibold text-white/85">
+            {name}
+          </p>
+
+          <p className="mt-1 text-[11px] text-white/30">
+            {formatNumber(runs)} executions
+          </p>
+        </div>
+
+        <div className="text-right">
+          <p className="text-sm font-bold text-[#f5d98b]">
+            {successRate}%
+          </p>
+
+          <p className="text-[9px] uppercase tracking-wider text-white/25">
+            success
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
+        <div
+          className="h-full rounded-full bg-gradient-to-r from-[#b88a24] to-[#f5d98b] transition-all duration-700"
+          style={{
+            width: `${Math.min(
+              Math.max(successRate, 0),
+              100
+            )}%`,
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function Funnel({
+  data,
+}: {
+  data: {
+    label: string;
+    value: number;
+  }[];
+}) {
+  const maxValue = Math.max(
+    ...data.map((item) => item.value),
+    1
+  );
+
+  return (
+    <div className="space-y-4">
+      {data.map((item, index) => {
+        const percentage =
+          (item.value / maxValue) * 100;
+
+        return (
+          <div key={item.label}>
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-xs text-white/55">
+                {index + 1}. {item.label}
+              </span>
+
+              <span className="text-xs font-semibold text-white/80">
+                {formatNumber(item.value)}
+              </span>
+            </div>
+
+            <div className="h-8 overflow-hidden rounded-lg border border-white/8 bg-white/[0.025]">
+              <div
+                className="flex h-full items-center rounded-lg bg-gradient-to-r from-[#80601d]/70 via-[#c49a36]/70 to-[#f5d98b]/70 px-3 transition-all duration-700"
+                style={{
+                  width: `${Math.max(
+                    percentage,
+                    item.value > 0 ? 10 : 0
+                  )}%`,
+                }}
+              >
+                {item.value > 0 && (
+                  <span className="text-[10px] font-bold text-[#171811]">
+                    {Math.round(
+                      (item.value / maxValue) * 100
+                    )}
+                    %
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function ActivityIcon({
+  type,
+}: {
+  type: string;
+}) {
+  const icons: Record<string, string> = {
+    workflow: "↗",
+    lead: "◇",
+    task: "✓",
+    ai: "✦",
+  };
+
+  return (
+    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-xs text-[#e7b84b]">
+      {icons[type] || "•"}
+    </span>
+  );
 }
 
 export default function AnalyticsPage() {
-  const [range, setRange] = useState<RangeKey>("30d");
-  const [chartStyle, setChartStyle] =
-    useState<ChartStyle>("area");
-  const [chartMenuOpen, setChartMenuOpen] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
-  const [showAllWorkflows, setShowAllWorkflows] =
+  const [data, setData] =
+    useState<AnalyticsData>(fallbackData);
+
+  const [loading, setLoading] = useState(true);
+
+  const [refreshing, setRefreshing] =
     useState(false);
-  const [message, setMessage] = useState("");
 
-  const chart = rangeData[range];
-  const maxValue = Math.max(...chart.values);
+  async function loadAnalytics(
+    showLoader = false
+  ) {
+    try {
+      if (showLoader) {
+        setRefreshing(true);
+      }
 
-  const visibleWorkflows = useMemo(
-    () =>
-      showAllWorkflows
-        ? workflows
-        : workflows.slice(0, 4),
-    [showAllWorkflows]
-  );
+      const response = await fetch(
+        "/api/analytics",
+        {
+          cache: "no-store",
+        }
+      );
 
-  const handleRefresh = () => {
-    setRefreshing(true);
-    setMessage("");
+      if (!response.ok) {
+        throw new Error(
+          "Analytics request failed."
+        );
+      }
 
-    window.setTimeout(() => {
+      const result =
+        await response.json();
+
+      if (!result.success) {
+        throw new Error(
+          result.error ||
+            "Analytics unavailable."
+        );
+      }
+
+      setData(result);
+    } catch (error) {
+      console.error(
+        "Analytics loading error:",
+        error
+      );
+    } finally {
+      setLoading(false);
       setRefreshing(false);
-      setMessage("Analytics refreshed successfully.");
-    }, 800);
-  };
+    }
+  }
 
-  const handleExport = () => {
-    downloadCsv();
-    setMessage("Analytics report exported successfully.");
-  };
+  useEffect(() => {
+    loadAnalytics();
 
-  const getPointX = (index: number) => {
-    if (chart.values.length <= 1) return 50;
+    function handleWorkflowRun() {
+      loadAnalytics();
+    }
 
-    return (
-      (index / (chart.values.length - 1)) * 100
+    window.addEventListener(
+      "nexaflow:workflow-run",
+      handleWorkflowRun
     );
-  };
 
-  const getPointY = (value: number) =>
-    100 - value;
+    return () => {
+      window.removeEventListener(
+        "nexaflow:workflow-run",
+        handleWorkflowRun
+      );
+    };
+  }, []);
 
-  const linePoints = chart.values
-    .map(
-      (value, index) =>
-        `${getPointX(index)},${getPointY(value)}`
-    )
-    .join(" ");
+  const topWorkflow = useMemo(() => {
+    return data.workflowPerformance[0];
+  }, [data.workflowPerformance]);
 
-  const areaPoints = [
-    "0,100",
-    ...chart.values.map(
-      (value, index) =>
-        `${getPointX(index)},${getPointY(value)}`
-    ),
-    "100,100",
-  ].join(" ");
-
-  const steppedPoints = chart.values
-    .map((value, index) => {
-      const x = getPointX(index);
-      const y = getPointY(value);
-
-      if (index === 0) return `${x},${y}`;
-
-      const previousX = getPointX(index - 1);
-
-      return `${previousX},${y} ${x},${y}`;
-    })
-    .join(" ");
+  const funnelConversion =
+    data.metrics.totalLeads === 0
+      ? 0
+      : Number(
+          (
+            (data.metrics.qualifiedLeads /
+              data.metrics.totalLeads) *
+            100
+          ).toFixed(1)
+        );
 
   return (
-    <main className="min-h-screen bg-[#151713] text-[#F4F0E6]">
-      {/* =========================================================
-          ATMOSPHERIC BACKGROUND
-      ========================================================== */}
+    <main className="min-h-screen bg-[#080a07] text-white">
+      {/* Ambient background */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div
-          className="absolute inset-0 opacity-[0.28]"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(231,184,75,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(231,184,75,0.045) 1px, transparent 1px)",
-            backgroundSize: "72px 72px",
-            maskImage:
-              "linear-gradient(to bottom, black, transparent 90%)",
-            WebkitMaskImage:
-              "linear-gradient(to bottom, black, transparent 90%)",
-          }}
-        />
-
-        <div className="absolute left-[-180px] top-[-260px] h-[650px] w-[650px] rounded-full bg-[#E7B84B]/[0.055] blur-[170px]" />
-
-        <div className="absolute right-[-220px] top-[20%] h-[600px] w-[600px] rounded-full bg-[#7b876f]/[0.055] blur-[180px]" />
-
-        <div className="absolute bottom-[-280px] left-[30%] h-[600px] w-[600px] rounded-full bg-[#E7B84B]/[0.025] blur-[170px]" />
+        <div className="absolute left-[8%] top-[12%] h-72 w-72 rounded-full bg-[#e7b84b]/[0.035] blur-3xl" />
+        <div className="absolute right-[8%] top-[30%] h-96 w-96 rounded-full bg-emerald-400/[0.02] blur-3xl" />
+        <div className="absolute bottom-[5%] left-[35%] h-80 w-80 rounded-full bg-[#e7b84b]/[0.02] blur-3xl" />
       </div>
 
-      <div className="relative mx-auto max-w-[1780px] px-4 py-6 sm:px-6 lg:px-10 xl:px-12">
-        {/* =========================================================
-            HEADER
-        ========================================================== */}
-        <header className="mb-9">
-          <div className="flex flex-col gap-7 xl:flex-row xl:items-end xl:justify-between">
-            <div className="flex min-w-0 items-start gap-4">
-              <div className="flex shrink-0 flex-col gap-3">
-                <Link
-                  href="/dashboard"
-                  className="group inline-flex h-10 items-center gap-2 rounded-xl border border-[#E7B84B]/10 bg-[#1B1F19] px-3.5 text-sm font-medium text-[#9A9D94] transition-all duration-300 hover:border-[#E7B84B]/30 hover:bg-[#252A22] hover:text-[#F5D98B]"
-                >
-                  <span className="text-lg transition-transform duration-300 group-hover:-translate-x-1">
-                    ←
-                  </span>
+      <div className="relative mx-auto max-w-[1500px] px-4 py-6 sm:px-6 lg:px-8">
+        {/* Header */}
+        <header className="mb-8">
+          <div className="mb-4 flex items-center gap-2 text-xs text-white/30">
+            <Link
+              href="/dashboard"
+              className="transition hover:text-white/70"
+            >
+              Dashboard
+            </Link>
 
-                  <span className="hidden sm:inline">
-                    Dashboard
-                  </span>
-                </Link>
+            <span>/</span>
 
-                <div className="inline-flex w-fit items-center gap-2 rounded-xl border border-[#E7B84B]/15 bg-[#E7B84B]/[0.035] px-3 py-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#E7B84B] shadow-[0_0_9px_rgba(231,184,75,0.8)]" />
-
-                  <span className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-[#E7B84B]">
-                    Insights
-                  </span>
-                </div>
-              </div>
-
-              <div className="hidden h-[108px] w-px bg-[#E7B84B]/10 sm:block" />
-
-              <div className="min-w-0 pt-0.5">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-[#E7B84B]">
-                    ANALYTICS / CONTROL CENTER
-                  </span>
-
-                  <span className="text-xs text-[#50544c]">
-                    /
-                  </span>
-
-                  <span className="font-mono text-xs text-[#777b72]">
-                    PERFORMANCE TELEMETRY
-                  </span>
-                </div>
-
-                <div className="mt-3 flex items-center gap-3">
-                  <h1 className="text-3xl font-semibold tracking-[-0.045em] text-[#F4F0E6] sm:text-4xl lg:text-[45px]">
-                    Analytics
-                  </h1>
-
-                  <span className="hidden h-px w-16 bg-[#E7B84B]/35 sm:block" />
-                </div>
-
-                <p className="mt-2 max-w-3xl text-[14px] leading-6 text-[#9A9D94] sm:text-[15px]">
-                  Monitor automation volume, workflow reliability,
-                  conversion performance, system activity and
-                  operational health from one centralized intelligence
-                  layer.
-                </p>
-              </div>
-            </div>
-
-            {/* HEADER CONTROLS */}
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="flex h-10 overflow-hidden rounded-xl border border-[#E7B84B]/10 bg-[#1B1F19]">
-                {(["7d", "30d", "90d"] as RangeKey[]).map(
-                  (item) => (
-                    <button
-                      key={item}
-                      type="button"
-                      onClick={() => setRange(item)}
-                      className={`px-3.5 font-mono text-[10px] font-bold tracking-wider transition ${
-                        range === item
-                          ? "bg-[#E7B84B]/10 text-[#F5D98B]"
-                          : "text-[#777b72] hover:bg-[#252A22] hover:text-[#F4F0E6]"
-                      }`}
-                    >
-                      {item.toUpperCase()}
-                    </button>
-                  )
-                )}
-              </div>
-
-              <button
-                type="button"
-                onClick={handleRefresh}
-                disabled={refreshing}
-                className="inline-flex h-10 items-center gap-2 rounded-xl border border-[#E7B84B]/10 bg-[#1B1F19] px-3.5 text-sm font-medium text-[#9A9D94] transition hover:border-[#E7B84B]/25 hover:bg-[#252A22] hover:text-[#F5D98B] disabled:opacity-50"
-              >
-                <span
-                  className={
-                    refreshing ? "animate-spin" : ""
-                  }
-                >
-                  ↻
-                </span>
-
-                <span className="hidden sm:inline">
-                  Refresh
-                </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={handleExport}
-                className="inline-flex h-10 items-center gap-2 rounded-xl border border-[#E7B84B]/25 bg-[#E7B84B]/[0.07] px-3.5 text-sm font-semibold text-[#F5D98B] transition hover:bg-[#E7B84B]/[0.12] hover:shadow-[0_0_28px_rgba(231,184,75,0.08)]"
-              >
-                ↓
-                <span>Export report</span>
-              </button>
-            </div>
-          </div>
-
-          <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-[#E7B84B]/[0.07] pt-4 font-mono text-[10px] uppercase tracking-wider text-[#686c63]">
-            <span>
-              PERIOD:
-              <span className="ml-2 text-[#B7BAAF]">
-                {rangeLabels[range]}
-              </span>
-            </span>
-
-            <span className="hidden text-[#42463f] sm:inline">
-              /
-            </span>
-
-            <span className="inline-flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#5ED6A0] shadow-[0_0_7px_rgba(94,214,160,0.7)]" />
-              SYSTEMS OPERATIONAL
-            </span>
-
-            {message && (
-              <>
-                <span className="hidden text-[#42463f] sm:inline">
-                  /
-                </span>
-
-                <span className="text-[#5ED6A0]">
-                  {message}
-                </span>
-              </>
-            )}
-          </div>
-        </header>
-
-        {/* =========================================================
-            KPI GRID
-        ========================================================== */}
-        <section className="mb-7">
-          <div className="mb-4 flex items-end justify-between">
-            <div>
-              <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-[#6f736b]">
-                01 / Key performance indicators
-              </p>
-
-              <h2 className="mt-1.5 text-lg font-semibold text-[#F4F0E6]">
-                Automation performance
-              </h2>
-            </div>
-
-            <span className="hidden font-mono text-[9px] uppercase tracking-widest text-[#555950] sm:block">
-              LIVE TELEMETRY
+            <span className="text-white/55">
+              Analytics
             </span>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            {metrics.map((metric, index) => (
-              <div
-                key={metric.label}
-                className="group relative min-h-[166px] overflow-hidden rounded-2xl border border-[#E7B84B]/[0.09] bg-[#1B1F19]/90 p-5 shadow-[0_22px_65px_rgba(0,0,0,0.2)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#E7B84B]/20 hover:bg-[#20241D]"
-              >
-                <div className="absolute inset-x-5 top-0 h-px bg-gradient-to-r from-transparent via-[#E7B84B]/35 to-transparent" />
+          <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
+            <div>
+              <div className="mb-3 flex items-center gap-2">
+                <span className="h-2 w-2 animate-pulse rounded-full bg-[#e7b84b]" />
 
-                <div className="absolute right-[-35px] top-[-45px] h-36 w-36 rounded-full bg-[#E7B84B]/[0.025] blur-3xl transition group-hover:bg-[#E7B84B]/[0.06]" />
-
-                <div className="relative flex h-full flex-col justify-between">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <p className="font-mono text-[9px] font-bold uppercase tracking-[0.14em] text-[#7d8178]">
-                        {String(index + 1).padStart(2, "0")} ·{" "}
-                        {metric.label}
-                      </p>
-
-                      <p className="mt-3 text-[31px] font-semibold tracking-[-0.045em] text-[#F4F0E6]">
-                        {metric.value}
-                      </p>
-                    </div>
-
-                    <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#E7B84B]/15 bg-[#E7B84B]/[0.045] text-sm text-[#E7B84B]">
-                      {metric.icon}
-                    </span>
-                  </div>
-
-                  <div className="mt-5 flex items-center justify-between gap-2">
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-[#5ED6A0]/15 bg-[#5ED6A0]/[0.04] px-2.5 py-1 font-mono text-[9px] font-bold text-[#5ED6A0]">
-                      ↗ {metric.change}
-                    </span>
-
-                    <span className="text-right text-[9px] text-[#646860]">
-                      {metric.note}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* =========================================================
-            MAIN ANALYTICS GRID
-        ========================================================== */}
-        <section className="grid gap-5 xl:grid-cols-[minmax(0,1.55fr)_minmax(320px,0.75fr)]">
-          {/* EXECUTION TREND */}
-          <Card className="min-h-[530px] overflow-visible border-[#E7B84B]/[0.09] bg-[#1B1F19]/95 p-0 shadow-[0_28px_90px_rgba(0,0,0,0.28)]">
-            <div className="border-b border-[#E7B84B]/[0.07] p-6 sm:p-7">
-              <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-[#E7B84B] shadow-[0_0_9px_rgba(231,184,75,0.8)]" />
-
-                    <h2 className="text-base font-semibold text-[#F4F0E6]">
-                      Automation volume
-                    </h2>
-
-                    <span className="rounded-full border border-[#E7B84B]/10 px-2 py-0.5 font-mono text-[8px] text-[#777b72]">
-                      EXECUTIONS
-                    </span>
-                  </div>
-
-                  <p className="mt-2 text-sm leading-6 text-[#777b72]">
-                    AI workflow executions across the selected
-                    reporting period.
-                  </p>
-                </div>
-
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setChartMenuOpen(
-                        (current) => !current
-                      )
-                    }
-                    className="inline-flex h-10 items-center gap-3 rounded-xl border border-[#E7B84B]/10 bg-[#20241D] px-3.5 text-xs font-semibold text-[#B7BAAF] transition hover:border-[#E7B84B]/25 hover:text-[#F5D98B]"
-                  >
-                    <span className="text-[#E7B84B]">
-                      {
-                        chartStyles.find(
-                          (item) =>
-                            item.key === chartStyle
-                        )?.icon
-                      }
-                    </span>
-
-                    <span>
-                      {
-                        chartStyles.find(
-                          (item) =>
-                            item.key === chartStyle
-                        )?.label
-                      }
-                    </span>
-
-                    <span
-                      className={`text-[9px] transition-transform ${
-                        chartMenuOpen
-                          ? "rotate-180"
-                          : ""
-                      }`}
-                    >
-                      ▼
-                    </span>
-                  </button>
-
-                  {chartMenuOpen && (
-                    <div className="absolute right-0 top-12 z-50 w-[235px] overflow-hidden rounded-2xl border border-[#E7B84B]/15 bg-[#20241D]/98 p-1.5 shadow-[0_25px_70px_rgba(0,0,0,0.7)] backdrop-blur-xl">
-                      <div className="px-3 pb-2 pt-2.5">
-                        <p className="font-mono text-[9px] font-bold uppercase tracking-[0.14em] text-[#62665d]">
-                          Visualization mode
-                        </p>
-                      </div>
-
-                      {chartStyles.map((style) => (
-                        <button
-                          key={style.key}
-                          type="button"
-                          onClick={() => {
-                            setChartStyle(style.key);
-                            setChartMenuOpen(false);
-                          }}
-                          className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition ${
-                            chartStyle === style.key
-                              ? "bg-[#E7B84B]/[0.08] text-[#F5D98B]"
-                              : "text-[#9A9D94] hover:bg-[#252A22] hover:text-[#F4F0E6]"
-                          }`}
-                        >
-                          <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#E7B84B]/10 bg-[#151713] text-sm">
-                            {style.icon}
-                          </span>
-
-                          <span className="min-w-0">
-                            <span className="block text-xs font-semibold">
-                              {style.label}
-                            </span>
-
-                            <span className="mt-0.5 block text-[10px] text-[#60645b]">
-                              {style.description}
-                            </span>
-                          </span>
-
-                          {chartStyle === style.key && (
-                            <span className="ml-auto text-xs text-[#E7B84B]">
-                              ✓
-                            </span>
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="mt-6 flex flex-wrap items-end justify-between gap-5">
-                <div>
-                  <p className="font-mono text-[9px] font-bold uppercase tracking-[0.14em] text-[#62665d]">
-                    Total executions
-                  </p>
-
-                  <div className="mt-1 flex items-baseline gap-3">
-                    <span className="text-3xl font-semibold tracking-[-0.04em] text-[#F4F0E6]">
-                      1,247
-                    </span>
-
-                    <span className="rounded-full border border-[#5ED6A0]/15 bg-[#5ED6A0]/[0.04] px-2 py-1 font-mono text-[9px] font-bold text-[#5ED6A0]">
-                      +18.4%
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-5 font-mono text-[9px] uppercase tracking-wider text-[#646860]">
-                  <span className="flex items-center gap-2">
-                    <span className="h-1.5 w-5 rounded-full bg-[#E7B84B]" />
-                    AI RUNS
-                  </span>
-
-                  <span>
-                    PEAK{" "}
-                    <strong className="text-[#B7BAAF]">
-                      {maxValue * 10}
-                    </strong>
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* GRAPH */}
-            <div className="p-6 sm:p-7">
-              <div className="relative h-[320px] w-full">
-                <div className="pointer-events-none absolute inset-x-0 bottom-10 top-2 flex flex-col justify-between">
-                  {[100, 75, 50, 25, 0].map(
-                    (value) => (
-                      <div
-                        key={value}
-                        className="flex items-center gap-3"
-                      >
-                        <span className="w-7 text-right font-mono text-[8px] text-[#50544c]">
-                          {value}
-                        </span>
-
-                        <div className="h-px flex-1 bg-[#E7B84B]/[0.055]" />
-                      </div>
-                    )
-                  )}
-                </div>
-
-                <div className="absolute bottom-10 left-10 right-0 top-2">
-                  <svg
-                    className="absolute inset-0 h-full w-full overflow-visible"
-                    viewBox="0 0 100 100"
-                    preserveAspectRatio="none"
-                  >
-                    <defs>
-                      <linearGradient
-                        id="goldAreaAnalytics"
-                        x1="0"
-                        y1="0"
-                        x2="0"
-                        y2="1"
-                      >
-                        <stop
-                          offset="0%"
-                          stopColor="#E7B84B"
-                          stopOpacity="0.26"
-                        />
-                        <stop
-                          offset="55%"
-                          stopColor="#E7B84B"
-                          stopOpacity="0.07"
-                        />
-                        <stop
-                          offset="100%"
-                          stopColor="#E7B84B"
-                          stopOpacity="0"
-                        />
-                      </linearGradient>
-                    </defs>
-
-                    {chartStyle === "area" && (
-                      <>
-                        <polygon
-                          points={areaPoints}
-                          fill="url(#goldAreaAnalytics)"
-                        />
-
-                        <polyline
-                          points={linePoints}
-                          fill="none"
-                          stroke="#E7B84B"
-                          strokeWidth="0.8"
-                          vectorEffect="non-scaling-stroke"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="drop-shadow-[0_0_9px_rgba(231,184,75,0.35)]"
-                        />
-                      </>
-                    )}
-
-                    {chartStyle === "line" && (
-                      <polyline
-                        points={linePoints}
-                        fill="none"
-                        stroke="#E7B84B"
-                        strokeWidth="1.25"
-                        vectorEffect="non-scaling-stroke"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="drop-shadow-[0_0_10px_rgba(231,184,75,0.45)]"
-                      />
-                    )}
-
-                    {chartStyle === "stepped" && (
-                      <polyline
-                        points={steppedPoints}
-                        fill="none"
-                        stroke="#E7B84B"
-                        strokeWidth="1.1"
-                        vectorEffect="non-scaling-stroke"
-                        strokeLinecap="square"
-                        strokeLinejoin="round"
-                      />
-                    )}
-                  </svg>
-
-                  {chartStyle === "bars" && (
-                    <div className="absolute inset-0 flex items-end gap-2 sm:gap-3">
-                      {chart.values.map(
-                        (value, index) => (
-                          <div
-                            key={`${value}-${index}`}
-                            className="group relative flex h-full flex-1 items-end"
-                          >
-                            <div
-                              className="relative w-full overflow-hidden rounded-t-xl border border-[#E7B84B]/15 bg-gradient-to-t from-[#8c6c20]/20 via-[#E7B84B]/20 to-[#F5D98B]/45 transition-all duration-300 group-hover:from-[#a17b18]/30 group-hover:to-[#F5D98B]/65"
-                              style={{
-                                height: `${value}%`,
-                              }}
-                            >
-                              <div className="absolute inset-x-0 top-0 h-px bg-[#F5D98B] shadow-[0_0_12px_rgba(245,217,139,0.6)]" />
-
-                              <div className="absolute left-1/2 top-2 z-20 -translate-x-1/2 whitespace-nowrap rounded-lg border border-[#E7B84B]/10 bg-[#151713]/95 px-2 py-1 font-mono text-[8px] font-bold text-[#F4F0E6] opacity-0 shadow-xl transition group-hover:opacity-100">
-                                {value * 10} runs
-                              </div>
-                            </div>
-                          </div>
-                        )
-                      )}
-                    </div>
-                  )}
-
-                  {chartStyle !== "bars" && (
-                    <div className="pointer-events-none absolute inset-0">
-                      {chart.values.map(
-                        (value, index) => {
-                          const x = getPointX(index);
-                          const y = getPointY(value);
-
-                          return (
-                            <div
-                              key={`${value}-${index}`}
-                              className="group pointer-events-auto absolute -translate-x-1/2 -translate-y-1/2"
-                              style={{
-                                left: `${x}%`,
-                                top: `${y}%`,
-                              }}
-                            >
-                              <div className="absolute left-1/2 top-1/2 h-9 w-9 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#E7B84B]/10 opacity-0 blur-sm transition group-hover:opacity-100" />
-
-                              <div className="relative h-2.5 w-2.5 rounded-full border-2 border-[#151713] bg-[#F5D98B] shadow-[0_0_9px_rgba(231,184,75,0.8)] transition group-hover:scale-125">
-                                <div className="absolute left-1/2 top-1/2 h-1 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white" />
-                              </div>
-
-                              <div className="absolute bottom-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg border border-[#E7B84B]/10 bg-[#151713]/95 px-2.5 py-1.5 font-mono text-[8px] font-bold text-[#F4F0E6] opacity-0 shadow-xl transition group-hover:opacity-100">
-                                {value * 10} runs
-                              </div>
-                            </div>
-                          );
-                        }
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                <div className="absolute bottom-0 left-10 right-0 flex justify-between gap-2">
-                  {chart.labels.map(
-                    (label, index) => (
-                      <span
-                        key={`${label}-${index}`}
-                        className="max-w-[60px] truncate font-mono text-[8px] text-[#555950]"
-                      >
-                        {label}
-                      </span>
-                    )
-                  )}
-                </div>
-              </div>
-
-              <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#E7B84B]/[0.07] bg-[#20241D] px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#5ED6A0] shadow-[0_0_7px_rgba(94,214,160,0.8)]" />
-
-                  <span className="text-[10px] text-[#777b72]">
-                    Automation activity is trending upward
-                  </span>
-                </div>
-
-                <span className="font-mono text-[9px] font-bold uppercase tracking-wider text-[#5ED6A0]">
-                  +18.4% growth
+                <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#f5d98b]/70">
+                  Intelligence / Analytics
                 </span>
               </div>
-            </div>
-          </Card>
 
-          {/* SUCCESS OVERVIEW */}
-          <Card className="min-h-[530px] border-[#E7B84B]/[0.09] bg-[#1B1F19]/95 p-6 shadow-[0_28px_90px_rgba(0,0,0,0.28)] sm:p-7">
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-[#5ED6A0] shadow-[0_0_8px_rgba(94,214,160,0.8)]" />
+              <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+                Analytics
+              </h1>
 
-                <h2 className="text-base font-semibold text-[#F4F0E6]">
-                  Success overview
-                </h2>
-              </div>
-
-              <p className="mt-2 text-sm leading-6 text-[#777b72]">
-                Reliability across all active AI automation.
+              <p className="mt-2 max-w-2xl text-sm text-white/40">
+                Understand workflow performance,
+                lead movement and AI activity
+                across your automation workspace.
               </p>
             </div>
 
-            <div className="mt-8 flex flex-col items-center">
-              <div className="relative flex h-48 w-48 items-center justify-center rounded-full border-[17px] border-[#5ED6A0]/10">
-                <div className="absolute inset-[-17px] rounded-full border-[17px] border-transparent border-t-[#5ED6A0]/80 border-r-[#5ED6A0]/45 -rotate-[38deg]" />
-
-                <div className="text-center">
-                  <p className="text-[42px] font-semibold tracking-[-0.05em] text-[#F4F0E6]">
-                    94.8%
-                  </p>
-
-                  <p className="mt-1 font-mono text-[9px] font-bold uppercase tracking-[0.13em] text-[#686c63]">
-                    Success rate
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-8 grid w-full grid-cols-2 gap-3">
-                <div className="rounded-2xl border border-[#E7B84B]/[0.07] bg-[#20241D] p-4">
-                  <p className="font-mono text-[9px] font-bold uppercase tracking-[0.1em] text-[#62665d]">
-                    Successful
-                  </p>
-
-                  <p className="mt-1.5 text-lg font-semibold text-[#5ED6A0]">
-                    1,182
-                  </p>
-                </div>
-
-                <div className="rounded-2xl border border-[#E7B84B]/[0.07] bg-[#20241D] p-4">
-                  <p className="font-mono text-[9px] font-bold uppercase tracking-[0.1em] text-[#62665d]">
-                    Failed
-                  </p>
-
-                  <p className="mt-1.5 text-lg font-semibold text-[#B7BAAF]">
-                    65
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-4 flex w-full items-center justify-between rounded-xl border border-[#5ED6A0]/10 bg-[#5ED6A0]/[0.025] px-4 py-3">
-                <span className="text-xs text-[#777b72]">
-                  Reliability trend
-                </span>
-
-                <span className="font-mono text-xs font-bold text-[#5ED6A0]">
-                  +2.6% ↗
-                </span>
-              </div>
-            </div>
-          </Card>
-        </section>
-
-        {/* =========================================================
-            SECONDARY ANALYTICS
-        ========================================================== */}
-        <section className="mt-5 grid gap-5 lg:grid-cols-3">
-          {/* HOURLY ACTIVITY */}
-          <Card className="border-[#E7B84B]/[0.09] bg-[#1B1F19]/95 p-6 shadow-[0_24px_75px_rgba(0,0,0,0.22)]">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="font-mono text-[9px] font-bold uppercase tracking-[0.15em] text-[#656960]">
-                  03 / Activity density
-                </p>
-
-                <h2 className="mt-1.5 text-base font-semibold text-[#F4F0E6]">
-                  Hourly activity
-                </h2>
-
-                <p className="mt-1.5 text-xs text-[#777b72]">
-                  Automation intensity throughout the day.
-                </p>
-              </div>
-
-              <span className="rounded-lg border border-[#E7B84B]/10 bg-[#20241D] px-2 py-1 font-mono text-[8px] text-[#E7B84B]">
-                24H
-              </span>
-            </div>
-
-            <div className="mt-7 flex h-[155px] items-end gap-1">
-              {hourlyActivity.map((value, index) => (
-                <div
-                  key={`${value}-${index}`}
-                  className="group relative flex h-full flex-1 items-end"
-                >
-                  <div
-                    className="w-full rounded-t-sm bg-gradient-to-t from-[#80631e]/25 to-[#E7B84B]/65 transition-all duration-300 group-hover:from-[#A17B18]/40 group-hover:to-[#F5D98B]/80"
-                    style={{
-                      height: `${value}%`,
-                    }}
-                  />
-
-                  <div className="absolute bottom-full left-1/2 mb-2 -translate-x-1/2 whitespace-nowrap rounded-md border border-[#E7B84B]/10 bg-[#151713] px-2 py-1 font-mono text-[8px] text-[#F4F0E6] opacity-0 transition group-hover:opacity-100">
-                    {value}%
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-3 flex justify-between font-mono text-[8px] text-[#555950]">
-              <span>00:00</span>
-              <span>06:00</span>
-              <span>12:00</span>
-              <span>18:00</span>
-              <span>24:00</span>
-            </div>
-          </Card>
-
-          {/* CHANNEL MIX */}
-          <Card className="border-[#E7B84B]/[0.09] bg-[#1B1F19]/95 p-6 shadow-[0_24px_75px_rgba(0,0,0,0.22)]">
-            <div>
-              <p className="font-mono text-[9px] font-bold uppercase tracking-[0.15em] text-[#656960]">
-                04 / Traffic intelligence
-              </p>
-
-              <h2 className="mt-1.5 text-base font-semibold text-[#F4F0E6]">
-                Automation channels
-              </h2>
-
-              <p className="mt-1.5 text-xs text-[#777b72]">
-                Where workflow activity is originating.
-              </p>
-            </div>
-
-            <div className="mt-7">
-              <div className="flex h-4 overflow-hidden rounded-full bg-[#252A22]">
-                {channelData.map((item) => (
-                  <div
-                    key={item.label}
-                    style={{
-                      width: `${item.value}%`,
-                    }}
-                    className="border-r border-[#151713] bg-[#E7B84B]/70 first:bg-[#F5D98B]/85 last:bg-[#9a7a2c]/55"
-                  />
-                ))}
-              </div>
-
-              <div className="mt-6 space-y-4">
-                {channelData.map((item, index) => (
-                  <div key={item.label}>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={`h-2 w-2 rounded-sm ${
-                            index === 0
-                              ? "bg-[#F5D98B]"
-                              : index === 1
-                                ? "bg-[#E7B84B]"
-                                : index === 2
-                                  ? "bg-[#B99845]"
-                                  : "bg-[#776332]"
-                          }`}
-                        />
-
-                        <span className="text-xs text-[#9A9D94]">
-                          {item.label}
-                        </span>
-                      </div>
-
-                      <span className="font-mono text-[10px] font-bold text-[#F4F0E6]">
-                        {item.value}%
-                      </span>
-                    </div>
-
-                    <div className="mt-2 h-1 overflow-hidden rounded-full bg-[#252A22]">
-                      <div
-                        className="h-full rounded-full bg-[#E7B84B]/55"
-                        style={{
-                          width: `${item.value}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Card>
-
-          {/* OUTCOME BREAKDOWN */}
-          <Card className="border-[#E7B84B]/[0.09] bg-[#1B1F19]/95 p-6 shadow-[0_24px_75px_rgba(0,0,0,0.22)]">
-            <div>
-              <p className="font-mono text-[9px] font-bold uppercase tracking-[0.15em] text-[#656960]">
-                05 / Outcome distribution
-              </p>
-
-              <h2 className="mt-1.5 text-base font-semibold text-[#F4F0E6]">
-                Run outcomes
-              </h2>
-
-              <p className="mt-1.5 text-xs text-[#777b72]">
-                Successful vs failed automation executions.
-              </p>
-            </div>
-
-            <div className="mt-7 flex items-center gap-6">
-              <div
-                className="relative h-32 w-32 shrink-0 rounded-full"
-                style={{
-                  background:
-                    "conic-gradient(#5ED6A0 0deg 341.28deg, #E87575 341.28deg 360deg)",
-                }}
-              >
-                <div className="absolute inset-[13px] flex flex-col items-center justify-center rounded-full bg-[#1B1F19]">
-                  <span className="text-2xl font-semibold text-[#F4F0E6]">
-                    94.8%
-                  </span>
-
-                  <span className="font-mono text-[8px] uppercase tracking-wider text-[#656960]">
-                    healthy
-                  </span>
-                </div>
-              </div>
-
-              <div className="min-w-0 flex-1 space-y-5">
-                {outcomeData.map((item, index) => (
-                  <div key={item.label}>
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="flex items-center gap-2 text-xs text-[#9A9D94]">
-                        <span
-                          className={`h-2 w-2 rounded-full ${
-                            index === 0
-                              ? "bg-[#5ED6A0]"
-                              : "bg-[#E87575]"
-                          }`}
-                        />
-
-                        {item.label}
-                      </span>
-
-                      <span className="font-mono text-[10px] font-bold text-[#F4F0E6]">
-                        {item.value}
-                      </span>
-                    </div>
-
-                    <div className="mt-2 h-1 overflow-hidden rounded-full bg-[#252A22]">
-                      <div
-                        className={`h-full rounded-full ${
-                          index === 0
-                            ? "bg-[#5ED6A0]"
-                            : "bg-[#E87575]"
-                        }`}
-                        style={{
-                          width:
-                            index === 0
-                              ? "94.8%"
-                              : "5.2%",
-                        }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Card>
-        </section>
-
-        {/* =========================================================
-            WORKFLOW + ACTIVITY
-        ========================================================== */}
-        <section className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1.25fr)_minmax(340px,0.75fr)]">
-          {/* WORKFLOW PERFORMANCE */}
-          <Card className="border-[#E7B84B]/[0.09] bg-[#1B1F19]/95 p-6 shadow-[0_25px_80px_rgba(0,0,0,0.25)] sm:p-7">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-[#E7B84B] shadow-[0_0_8px_rgba(231,184,75,0.7)]" />
-
-                  <h2 className="text-base font-semibold text-[#F4F0E6]">
-                    Workflow performance
-                  </h2>
-                </div>
-
-                <p className="mt-2 text-sm leading-6 text-[#777b72]">
-                  Compare reliability and execution volume across
-                  your automations.
-                </p>
-              </div>
-
+            <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() =>
-                  setShowAllWorkflows(
-                    (current) => !current
-                  )
+                  loadAnalytics(true)
                 }
-                className="w-fit font-mono text-[10px] font-bold uppercase tracking-wider text-[#E7B84B] transition hover:text-[#F5D98B]"
+                disabled={refreshing}
+                className="rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-xs font-semibold text-white/70 transition hover:border-[#e7b84b]/30 hover:bg-[#e7b84b]/[0.06] hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {showAllWorkflows
-                  ? "Show less"
-                  : "View all"}{" "}
-                →
+                {refreshing
+                  ? "Refreshing..."
+                  : "↻ Refresh"}
               </button>
+
+              <Link
+                href="/workflows"
+                className="rounded-xl border border-[#e7b84b]/20 bg-[#e7b84b]/[0.07] px-4 py-2.5 text-xs font-semibold text-[#f5d98b] transition hover:bg-[#e7b84b]/[0.12]"
+              >
+                View workflows →
+              </Link>
             </div>
+          </div>
+        </header>
 
-            <div className="mt-7 space-y-7">
-              {visibleWorkflows.map((workflow, index) => (
-                <div key={workflow.name}>
-                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono text-[9px] text-[#555950]">
-                          0{index + 1}
-                        </span>
+        {/* KPI row */}
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <MetricCard
+            label="Workflow runs"
+            value={formatNumber(
+              data.metrics.totalRuns
+            )}
+            detail={`${formatNumber(
+              data.metrics.successfulRuns
+            )} successful executions`}
+            icon="↗"
+          />
 
-                        <p className="truncate text-sm font-semibold text-[#D9D9CF]">
-                          {workflow.name}
-                        </p>
-                      </div>
+          <MetricCard
+            label="Success rate"
+            value={String(
+              data.metrics.successRate
+            )}
+            suffix="%"
+            detail={`${formatNumber(
+              data.metrics.failedRuns
+            )} runs need review`}
+            icon="✓"
+          />
 
-                      <p className="mt-1 text-[10px] text-[#62665d]">
-                        {workflow.runs} executions
-                      </p>
-                    </div>
+          <MetricCard
+            label="AI actions"
+            value={formatNumber(
+              data.metrics.aiActions
+            )}
+            detail="AI-assisted workflow activity"
+            icon="✦"
+          />
 
-                    <div className="flex items-center gap-3">
-                      <span className="font-mono text-[10px] font-bold text-[#5ED6A0]">
-                        {workflow.trend}
-                      </span>
+          <MetricCard
+            label="Response time"
+            value={String(
+              data.metrics.responseTime
+            )}
+            suffix="ms"
+            detail="Average automation response"
+            icon="◌"
+          />
+        </div>
 
-                      <span className="text-sm font-semibold text-[#F4F0E6]">
-                        {workflow.success}%
-                      </span>
-                    </div>
-                  </div>
+        {/* Lead trend + workflow success */}
+        <div className="mt-5 grid gap-5 xl:grid-cols-[1.35fr_0.9fr]">
+          <Section
+            title="Leads over time"
+            description="Inbound lead activity across the last 7 days."
+            action={
+              <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[9px] font-semibold uppercase tracking-wider text-white/35">
+                7 days
+              </span>
+            }
+          >
+            <LineChart
+              data={data.leadsOverTime}
+            />
 
-                  <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#252A22]">
-                    <div
-                      className="h-full rounded-full bg-gradient-to-r from-[#8b6b22] via-[#E7B84B] to-[#F5D98B] transition-all duration-700"
-                      style={{
-                        width: `${workflow.success}%`,
-                      }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Card>
+            <div className="mt-4 flex items-center justify-between border-t border-white/8 pt-4">
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-white/30">
+                  Total leads
+                </p>
 
-          {/* ACTIVITY */}
-          <Card className="border-[#E7B84B]/[0.09] bg-[#1B1F19]/95 p-6 shadow-[0_25px_80px_rgba(0,0,0,0.25)] sm:p-7">
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-[#E7B84B] shadow-[0_0_8px_rgba(231,184,75,0.7)]" />
-
-                <h2 className="text-base font-semibold text-[#F4F0E6]">
-                  Recent activity
-                </h2>
+                <p className="mt-1 text-lg font-bold text-white">
+                  {formatNumber(
+                    data.metrics.totalLeads
+                  )}
+                </p>
               </div>
 
-              <p className="mt-2 text-sm leading-6 text-[#777b72]">
-                Latest automation events from your workspace.
-              </p>
+              <div className="text-right">
+                <p className="text-[10px] uppercase tracking-wider text-white/30">
+                  Qualified
+                </p>
+
+                <p className="mt-1 text-lg font-bold text-[#f5d98b]">
+                  {formatNumber(
+                    data.metrics.qualifiedLeads
+                  )}
+                </p>
+              </div>
             </div>
+          </Section>
 
-            <div className="mt-7 space-y-1">
-              {activity.map((item, index) => (
-                <div
-                  key={`${item.title}-${index}`}
-                  className="group flex gap-3 rounded-xl px-2 py-3 transition hover:bg-[#252A22]"
-                >
-                  <div className="relative flex w-5 justify-center">
-                    {index < activity.length - 1 && (
-                      <span className="absolute top-5 h-full w-px bg-[#E7B84B]/[0.07]" />
-                    )}
-
-                    <span
-                      className={`relative z-10 mt-1 h-2 w-2 rounded-full ${
-                        item.status === "success"
-                          ? "bg-[#5ED6A0] shadow-[0_0_7px_rgba(94,214,160,0.7)]"
-                          : "bg-[#E7B84B] shadow-[0_0_7px_rgba(231,184,75,0.7)]"
-                      }`}
+          <Section
+            title="Workflow success rate"
+            description="Performance ranked by execution reliability."
+          >
+            {loading ? (
+              <div className="space-y-3">
+                {[1, 2, 3].map((item) => (
+                  <div
+                    key={item}
+                    className="h-20 animate-pulse rounded-2xl bg-white/[0.04]"
+                  />
+                ))}
+              </div>
+            ) : data.workflowPerformance.length ? (
+              <div className="space-y-3">
+                {data.workflowPerformance.map(
+                  (workflow) => (
+                    <SuccessBar
+                      key={workflow.id}
+                      name={workflow.name}
+                      runs={workflow.runs}
+                      successRate={
+                        workflow.successRate
+                      }
                     />
+                  )
+                )}
+              </div>
+            ) : (
+              <div className="flex h-48 items-center justify-center rounded-2xl border border-dashed border-white/10 text-xs text-white/30">
+                No workflows available
+              </div>
+            )}
+          </Section>
+        </div>
+
+        {/* Intelligence overview */}
+        <div className="mt-5 grid gap-5 lg:grid-cols-3">
+          <Section
+            title="AI intelligence"
+            description="Current AI-assisted operational activity."
+          >
+            <div className="space-y-5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-white/40">
+                  AI actions
+                </span>
+
+                <span className="text-xl font-bold text-white">
+                  {formatNumber(
+                    data.metrics.aiActions
+                  )}
+                </span>
+              </div>
+
+              <div className="h-2 overflow-hidden rounded-full bg-white/[0.06]">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-[#8b691f] to-[#f5d98b]"
+                  style={{
+                    width: `${Math.min(
+                      data.metrics.aiActions /
+                        Math.max(
+                          data.metrics.totalRuns,
+                          1
+                        ) *
+                        100,
+                      100
+                    )}%`,
+                  }}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-xl border border-white/8 bg-white/[0.025] p-3">
+                  <p className="text-[9px] uppercase tracking-wider text-white/25">
+                    Success
+                  </p>
+
+                  <p className="mt-1 text-sm font-bold text-[#5ed6a0]">
+                    {data.metrics.successRate}%
+                  </p>
+                </div>
+
+                <div className="rounded-xl border border-white/8 bg-white/[0.025] p-3">
+                  <p className="text-[9px] uppercase tracking-wider text-white/25">
+                    Response
+                  </p>
+
+                  <p className="mt-1 text-sm font-bold text-[#f5d98b]">
+                    {data.metrics.responseTime}ms
+                  </p>
+                </div>
+              </div>
+            </div>
+          </Section>
+
+          <Section
+            title="Conversion funnel"
+            description="Lead progression through the workspace."
+          >
+            <Funnel data={data.funnel} />
+
+            <div className="mt-5 border-t border-white/8 pt-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-white/35">
+                  Lead qualification
+                </span>
+
+                <span className="text-sm font-bold text-[#f5d98b]">
+                  {funnelConversion}%
+                </span>
+              </div>
+            </div>
+          </Section>
+
+          <Section
+            title="Top-performing workflow"
+            description="Highest current workflow reliability."
+          >
+            {topWorkflow ? (
+              <div className="flex h-full min-h-[220px] flex-col justify-between">
+                <div>
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-[#e7b84b]/20 bg-[#e7b84b]/[0.07] text-xl text-[#f5d98b]">
+                    ★
                   </div>
 
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                      <p className="text-sm font-semibold text-[#C8C9BF]">
-                        {item.title}
-                      </p>
+                  <h3 className="text-lg font-bold text-white">
+                    {topWorkflow.name}
+                  </h3>
 
-                      <span className="font-mono text-[9px] text-[#555950]">
-                        {item.time}
-                      </span>
-                    </div>
+                  <p className="mt-2 text-xs leading-5 text-white/35">
+                    Currently leading the workspace
+                    in execution reliability.
+                  </p>
+                </div>
 
-                    <p className="mt-1 text-xs leading-5 text-[#62665d]">
-                      {item.detail}
+                <div className="mt-6 flex items-end justify-between">
+                  <div>
+                    <p className="text-[9px] uppercase tracking-wider text-white/25">
+                      Success rate
+                    </p>
+
+                    <p className="mt-1 text-3xl font-bold text-[#f5d98b]">
+                      {topWorkflow.successRate}%
+                    </p>
+                  </div>
+
+                  <div className="text-right">
+                    <p className="text-[9px] uppercase tracking-wider text-white/25">
+                      Runs
+                    </p>
+
+                    <p className="mt-1 text-lg font-bold text-white">
+                      {formatNumber(
+                        topWorkflow.runs
+                      )}
                     </p>
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            ) : (
+              <div className="flex min-h-[220px] items-center justify-center text-xs text-white/30">
+                No workflow performance data
+              </div>
+            )}
+          </Section>
+        </div>
 
-            <div className="mt-5 border-t border-[#E7B84B]/[0.07] pt-4">
-              <span className="font-mono text-[9px] uppercase tracking-widest text-[#555950]">
-                LIVE EVENT STREAM
-              </span>
-            </div>
-          </Card>
-        </section>
+        {/* Execution outcomes */}
+        <div className="mt-5">
+          <Section
+            title="Execution outcomes"
+            description="Current workflow execution health."
+          >
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="rounded-2xl border border-emerald-400/10 bg-emerald-400/[0.035] p-5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-white/40">
+                    Successful
+                  </span>
 
-        {/* =========================================================
-            LEAD FUNNEL
-        ========================================================== */}
-        <section className="mt-5">
-          <Card className="border-[#E7B84B]/[0.09] bg-[#1B1F19]/95 p-6 shadow-[0_25px_80px_rgba(0,0,0,0.25)] sm:p-7">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <p className="font-mono text-[9px] font-bold uppercase tracking-[0.15em] text-[#656960]">
-                  06 / Conversion intelligence
+                  <span className="text-emerald-300">
+                    ✓
+                  </span>
+                </div>
+
+                <p className="mt-4 text-2xl font-bold text-white">
+                  {formatNumber(
+                    data.metrics.successfulRuns
+                  )}
                 </p>
 
-                <h2 className="mt-1.5 text-base font-semibold text-[#F4F0E6]">
-                  Lead conversion funnel
-                </h2>
-
-                <p className="mt-1.5 text-xs text-[#777b72]">
-                  Track how automation turns incoming activity into
-                  qualified outcomes.
+                <p className="mt-1 text-[10px] text-emerald-300/60">
+                  Completed successfully
                 </p>
               </div>
 
-              <span className="font-mono text-[9px] uppercase tracking-widest text-[#5ED6A0]">
-                38.6% conversion
-              </span>
-            </div>
+              <div className="rounded-2xl border border-[#e7b84b]/10 bg-[#e7b84b]/[0.035] p-5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-white/40">
+                    Active workflows
+                  </span>
 
-            <div className="mt-8 grid gap-5 md:grid-cols-4">
-              {leadFunnel.map((item, index) => (
-                <div
-                  key={item.label}
-                  className="relative"
-                >
-                  <div className="flex items-end justify-between gap-3">
-                    <div>
-                      <p className="font-mono text-[9px] uppercase tracking-wider text-[#62665d]">
-                        0{index + 1}
-                      </p>
-
-                      <p className="mt-2 text-sm font-semibold text-[#D9D9CF]">
-                        {item.label}
-                      </p>
-                    </div>
-
-                    <span className="font-mono text-lg font-bold text-[#F4F0E6]">
-                      {item.value.toLocaleString()}
-                    </span>
-                  </div>
-
-                  <div className="mt-4 h-3 overflow-hidden rounded-full bg-[#252A22]">
-                    <div
-                      className="h-full rounded-full bg-gradient-to-r from-[#80631e] via-[#E7B84B] to-[#F5D98B]"
-                      style={{
-                        width: `${item.width}%`,
-                      }}
-                    />
-                  </div>
-
-                  {index < leadFunnel.length - 1 && (
-                    <div className="absolute right-[-17px] top-[72px] hidden text-[#555950] md:block">
-                      →
-                    </div>
-                  )}
+                  <span className="text-[#f5d98b]">
+                    ●
+                  </span>
                 </div>
-              ))}
+
+                <p className="mt-4 text-2xl font-bold text-white">
+                  {data.metrics.activeWorkflows}
+                </p>
+
+                <p className="mt-1 text-[10px] text-[#f5d98b]/60">
+                  Currently operational
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-red-400/10 bg-red-400/[0.025] p-5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-white/40">
+                    Needs review
+                  </span>
+
+                  <span className="text-red-300">
+                    !
+                  </span>
+                </div>
+
+                <p className="mt-4 text-2xl font-bold text-white">
+                  {formatNumber(
+                    data.metrics.failedRuns
+                  )}
+                </p>
+
+                <p className="mt-1 text-[10px] text-red-300/60">
+                  Failed executions
+                </p>
+              </div>
             </div>
-          </Card>
-        </section>
+          </Section>
+        </div>
 
-        {/* =========================================================
-            BOTTOM HEALTH METRICS
-        ========================================================== */}
-        <section className="mt-5 grid gap-4 md:grid-cols-3">
-          <div className="group rounded-2xl border border-[#E7B84B]/[0.09] bg-[#1B1F19]/90 p-5 transition hover:border-[#E7B84B]/20 hover:bg-[#20241D]">
-            <p className="font-mono text-[9px] font-bold uppercase tracking-[0.13em] text-[#62665d]">
-              Lead conversion
-            </p>
+        {/* Recent activity */}
+        <div className="mt-5">
+          <Section
+            title="Recent activity"
+            description="Live events generated by the NexaFlow workspace."
+          >
+            {data.activity.length ? (
+              <div className="divide-y divide-white/6">
+                {data.activity
+                  .slice(0, 10)
+                  .map((activity) => (
+                    <div
+                      key={activity.id}
+                      className="flex items-center gap-3 py-3.5"
+                    >
+                      <ActivityIcon
+                        type={activity.type}
+                      />
 
-            <div className="mt-3 flex items-end justify-between">
-              <p className="text-2xl font-semibold tracking-tight text-[#F4F0E6]">
-                38.6%
-              </p>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-xs font-semibold text-white/75">
+                          {activity.title}
+                        </p>
 
-              <span className="font-mono text-[10px] font-bold text-[#5ED6A0]">
-                +6.4%
-              </span>
-            </div>
+                        <p className="mt-0.5 truncate text-[10px] text-white/30">
+                          {activity.description}
+                        </p>
+                      </div>
 
-            <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-[#252A22]">
-              <div className="h-full w-[38.6%] rounded-full bg-[#E7B84B]" />
-            </div>
-          </div>
+                      <span className="shrink-0 text-[9px] text-white/25">
+                        {getRelativeTime(
+                          activity.createdAt
+                        )}
+                      </span>
+                    </div>
+                  ))}
+              </div>
+            ) : (
+              <div className="flex h-32 items-center justify-center rounded-2xl border border-dashed border-white/10 text-xs text-white/30">
+                No recent activity
+              </div>
+            )}
+          </Section>
+        </div>
 
-          <div className="group rounded-2xl border border-[#E7B84B]/[0.09] bg-[#1B1F19]/90 p-5 transition hover:border-[#E7B84B]/20 hover:bg-[#20241D]">
-            <p className="font-mono text-[9px] font-bold uppercase tracking-[0.13em] text-[#62665d]">
-              Average response
-            </p>
-
-            <div className="mt-3 flex items-end justify-between">
-              <p className="text-2xl font-semibold tracking-tight text-[#F4F0E6]">
-                1.8s
-              </p>
-
-              <span className="font-mono text-[10px] font-bold text-[#5ED6A0]">
-                -12.2%
-              </span>
-            </div>
-
-            <p className="mt-3 text-xs text-[#62665d]">
-              Faster than the previous period
-            </p>
-          </div>
-
-          <div className="group rounded-2xl border border-[#E7B84B]/[0.09] bg-[#1B1F19]/90 p-5 transition hover:border-[#E7B84B]/20 hover:bg-[#20241D]">
-            <p className="font-mono text-[9px] font-bold uppercase tracking-[0.13em] text-[#62665d]">
-              Active workflows
-            </p>
-
-            <div className="mt-3 flex items-end justify-between">
-              <p className="text-2xl font-semibold tracking-tight text-[#F4F0E6]">
-                12
-              </p>
-
-              <span className="font-mono text-[10px] font-bold text-[#E7B84B]">
-                4 running now
-              </span>
-            </div>
-
-            <p className="mt-3 text-xs text-[#62665d]">
-              Automation capacity is healthy
-            </p>
-          </div>
-        </section>
-
-        {/* =========================================================
-            SYSTEM HEALTH STRIP
-        ========================================================== */}
-        <section className="mt-5 overflow-hidden rounded-2xl border border-[#E7B84B]/10 bg-[#1B1F19]/80">
-          <div className="flex flex-col gap-4 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-              <span className="font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-[#656960]">
-                SYSTEM HEALTH
-              </span>
-
-              <span className="flex items-center gap-2 font-mono text-[9px] text-[#5ED6A0]">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#5ED6A0]" />
-                API OPERATIONAL
-              </span>
-
-              <span className="flex items-center gap-2 font-mono text-[9px] text-[#5ED6A0]">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#5ED6A0]" />
-                AUTOMATION HEALTHY
-              </span>
-
-              <span className="flex items-center gap-2 font-mono text-[9px] text-[#5ED6A0]">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#5ED6A0]" />
-                DATA SYNCED
-              </span>
-            </div>
-
-            <span className="font-mono text-[9px] uppercase tracking-widest text-[#555950]">
-              LAST SYNC · JUST NOW
-            </span>
-          </div>
-        </section>
-
-        {/* =========================================================
-            FOOTER
-        ========================================================== */}
-        <footer className="mt-7 flex flex-col items-center justify-between gap-2 border-t border-[#E7B84B]/[0.06] px-1 pb-3 pt-5 font-mono text-[9px] uppercase tracking-wider text-[#555950] sm:flex-row">
-          <span>
-            NexaFlow AI · Analytics Control Center
-          </span>
-
+        {/* Bottom status */}
+        <div className="mt-5 flex flex-col justify-between gap-3 rounded-2xl border border-white/8 bg-white/[0.02] px-5 py-4 sm:flex-row sm:items-center">
           <div className="flex items-center gap-3">
-            <span>Performance</span>
-            <span className="text-[#3f433c]">•</span>
-            <span>Automation</span>
-            <span className="text-[#3f433c]">•</span>
-            <span>Telemetry</span>
-            <span className="text-[#3f433c]">•</span>
-            <span>Insights</span>
+            <span className="h-2 w-2 animate-pulse rounded-full bg-[#5ed6a0]" />
+
+            <div>
+              <p className="text-xs font-semibold text-white/65">
+                Analytics engine operational
+              </p>
+
+              <p className="text-[10px] text-white/25">
+                Metrics synchronized with the shared
+                NexaFlow workspace store.
+              </p>
+            </div>
           </div>
-        </footer>
+
+          <div className="text-[9px] font-semibold uppercase tracking-[0.18em] text-white/20">
+            NEXAFLOW / CONTROL
+          </div>
+        </div>
       </div>
     </main>
   );

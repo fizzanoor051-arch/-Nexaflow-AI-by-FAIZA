@@ -1,5 +1,6 @@
 
 import { NextResponse } from "next/server";
+import { executeAICommand } from "@/lib/ai/command-actions";
 
 export const runtime = "nodejs";
 
@@ -11,13 +12,19 @@ type ChatMessage = {
 type AIRequestBody = {
   message?: string;
   messages?: ChatMessage[];
+  pageContext?: unknown;
 };
 
 type DemoAnalysis = {
   intent: string;
+  sentiment: "Positive" | "Neutral" | "Frustrated" | "Negative";
   priority: "Low" | "Medium" | "High";
+  confidence: number;
   actions: string[];
   response: string;
+  suggestedReply?: string;
+  recommendedAction?: string;
+  actionType?: string;
 };
 
 function getSafeMessages(
@@ -42,8 +49,196 @@ function getSafeMessages(
     }));
 }
 
+function analyzeCustomerSupport(
+  text: string
+): DemoAnalysis | null {
+  const lower = text.toLowerCase();
+
+  const refundWords = [
+    "refund",
+    "money back",
+    "return my money",
+    "want my money",
+    "chargeback",
+    "reimbursement",
+    "charged",
+    "charged me",
+  ];
+
+  const supportWords = [
+    "support",
+    "help",
+    "issue",
+    "problem",
+    "complaint",
+    "customer service",
+    "not working",
+    "doesn't work",
+    "cant use",
+    "can't use",
+  ];
+
+  const frustratedWords = [
+    "waiting",
+    "10 days",
+    "days",
+    "nobody",
+    "no one",
+    "still",
+    "again",
+    "frustrated",
+    "angry",
+    "disappointed",
+    "unacceptable",
+    "terrible",
+    "ridiculous",
+    "ignored",
+    "not helping",
+    "not helping me",
+  ];
+
+  const negativeWords = [
+    "bad",
+    "worst",
+    "hate",
+    "awful",
+    "terrible",
+    "angry",
+    "unacceptable",
+  ];
+
+  const hasRefundIntent = refundWords.some((word) =>
+    lower.includes(word)
+  );
+
+  const hasSupportIntent = supportWords.some((word) =>
+    lower.includes(word)
+  );
+
+  const hasFrustration = frustratedWords.some((word) =>
+    lower.includes(word)
+  );
+
+  const hasNegative = negativeWords.some((word) =>
+    lower.includes(word)
+  );
+
+  if (!hasRefundIntent && !hasSupportIntent) {
+    return null;
+  }
+
+  let sentiment: DemoAnalysis["sentiment"] = "Neutral";
+
+  if (hasFrustration) {
+    sentiment = "Frustrated";
+  } else if (hasNegative) {
+    sentiment = "Negative";
+  }
+
+  const priority: DemoAnalysis["priority"] =
+    hasRefundIntent || hasFrustration
+      ? "High"
+      : hasSupportIntent
+        ? "Medium"
+        : "Low";
+
+  if (hasRefundIntent) {
+    return {
+      intent: "Refund Request",
+      sentiment,
+      priority,
+      confidence: hasFrustration ? 97 : 94,
+      actions: [
+        "Detect refund intent",
+        "Analyze customer sentiment",
+        "Generate a helpful response",
+        "Create a support follow-up task",
+        "Track the refund request",
+      ],
+      response: `I detected a refund request and analyzed the customer's emotional state.
+
+Intent: Refund Request
+Sentiment: ${sentiment}
+Priority: ${priority}
+
+Recommended action:
+Offer a clear refund response and create a support follow-up task so the request is not lost.`,
+      suggestedReply:
+        "I'm sorry you've had to wait this long. I understand how frustrating that is. I'll make sure your refund request is reviewed and followed up on promptly.",
+      recommendedAction:
+        "Offer refund + create support task",
+      actionType: "refund",
+    };
+  }
+
+  return {
+    intent: "Customer Support Request",
+    sentiment,
+    priority,
+    confidence: hasFrustration ? 94 : 91,
+    actions: [
+      "Classify the customer request",
+      "Analyze customer sentiment",
+      "Generate a suggested response",
+      "Create a support follow-up task",
+      "Track the interaction",
+    ],
+    response: `I analyzed this customer support request.
+
+Intent: Customer Support Request
+Sentiment: ${sentiment}
+Priority: ${priority}
+
+Recommended action:
+Respond to the customer and create a support follow-up task when human assistance is required.`,
+    suggestedReply:
+      "Thanks for reaching out. I'm sorry you're experiencing this issue. I'll review your request and make sure the appropriate next step is taken.",
+    recommendedAction:
+      "Respond + create support task",
+    actionType: "support",
+  };
+}
+
 function analyzeRequest(message: string): DemoAnalysis {
   const text = message.toLowerCase().trim();
+
+  /*
+   * Explicit task commands are checked first so commands such as
+   * "Create a follow-up task..." are treated as executable tasks.
+   */
+  if (
+    /\b(create|make|add|set up)\b.*\btask\b/i.test(text) ||
+    /\bfollow[- ]?up task\b/i.test(text)
+  ) {
+    return {
+      intent: "Task automation",
+      sentiment: "Neutral",
+      priority:
+        text.includes("urgent") || text.includes("asap")
+          ? "High"
+          : "Medium",
+      confidence: 99,
+      actions: [
+        "Understand the task request",
+        "Extract task details",
+        "Create the task",
+        "Track task status",
+      ],
+      response:
+        "I can create this task and track it in your NexaFlow workspace.",
+    };
+  }
+
+  /*
+   * Customer-support intelligence is checked before generic
+   * business automation so real customer messages are analyzed
+   * as support conversations.
+   */
+  const customerAnalysis = analyzeCustomerSupport(text);
+
+  if (customerAnalysis) {
+    return customerAnalysis;
+  }
 
   if (
     /^(hi|hello|hey|hy|helo|salam|aoa|assalamualaikum|good morning|good afternoon|good evening)[!. ]*$/i.test(
@@ -52,7 +247,9 @@ function analyzeRequest(message: string): DemoAnalysis {
   ) {
     return {
       intent: "General assistance",
+      sentiment: "Positive",
       priority: "Low",
+      confidence: 99,
       actions: [
         "Understand the business request",
         "Identify the required automation",
@@ -64,37 +261,6 @@ function analyzeRequest(message: string): DemoAnalysis {
   }
 
   if (
-    text.includes("customer support") ||
-    text.includes("customer inquiry") ||
-    text.includes("customer inquiries") ||
-    text.includes("support request") ||
-    text.includes("customer service") ||
-    text.includes("customer message")
-  ) {
-    return {
-      intent: "Customer support automation",
-      priority: "High",
-      actions: [
-        "Classify the customer inquiry",
-        "Generate an appropriate response",
-        "Create a follow-up task when required",
-        "Save the interaction in activity history",
-      ],
-      response: `I identified this as a customer support automation request.
-
-Recommended workflow:
-
-1. Receive the customer message
-2. Analyze and classify the inquiry
-3. Generate a suggested reply
-4. Create a follow-up task if needed
-5. Save the interaction for tracking
-
-NexaFlow can turn this into a repeatable support workflow.`,
-    };
-  }
-
-  if (
     text.includes("lead") ||
     text.includes("prospect") ||
     text.includes("potential customer") ||
@@ -102,7 +268,9 @@ NexaFlow can turn this into a repeatable support workflow.`,
   ) {
     return {
       intent: "Lead management automation",
+      sentiment: "Neutral",
       priority: "High",
+      confidence: 96,
       actions: [
         "Extract lead information",
         "Classify lead quality",
@@ -132,7 +300,9 @@ This can become an automated lead qualification and follow-up workflow.`,
   ) {
     return {
       intent: "Follow-up automation",
+      sentiment: "Neutral",
       priority: "Medium",
+      confidence: 95,
       actions: [
         "Identify the customer or lead",
         "Create a follow-up task",
@@ -160,7 +330,9 @@ NexaFlow can centralize these follow-ups so important opportunities are not miss
   ) {
     return {
       intent: "Task automation",
+      sentiment: "Neutral",
       priority: "Medium",
+      confidence: 94,
       actions: [
         "Understand the requested task",
         "Create a structured task",
@@ -189,7 +361,9 @@ This can be connected to leads, customers, and other NexaFlow workflows.`,
   ) {
     return {
       intent: "Sales automation",
+      sentiment: "Neutral",
       priority: "High",
+      confidence: 95,
       actions: [
         "Capture potential opportunities",
         "Qualify prospects",
@@ -206,7 +380,7 @@ Recommended workflow:
 4. Schedule follow-up
 5. Track the sales activity
 
-NexaFlow can connect these steps into one repeatable workflow.`,
+NexaFlow can connect these steps into one repeatable automation.`,
     };
   }
 
@@ -219,7 +393,9 @@ NexaFlow can connect these steps into one repeatable workflow.`,
   ) {
     return {
       intent: "Business analytics",
+      sentiment: "Neutral",
       priority: "Medium",
+      confidence: 93,
       actions: [
         "Collect workspace activity",
         "Summarize important events",
@@ -247,7 +423,9 @@ The Analytics area can turn these events into a clear business activity overview
   ) {
     return {
       intent: "Workflow automation",
+      sentiment: "Neutral",
       priority: "High",
+      confidence: 95,
       actions: [
         "Understand the business process",
         "Break the process into steps",
@@ -278,7 +456,9 @@ NexaFlow is designed to turn these processes into reusable automations.`,
   ) {
     return {
       intent: "E-commerce automation",
+      sentiment: "Neutral",
       priority: "High",
+      confidence: 94,
       actions: [
         "Analyze customer or order information",
         "Classify the request",
@@ -302,7 +482,9 @@ This could become a reusable automation for an online store.`,
 
   return {
     intent: "Business automation planning",
+    sentiment: "Neutral",
     priority: "Medium",
+    confidence: 88,
     actions: [
       "Understand the business request",
       "Identify the required information",
@@ -341,13 +523,20 @@ export async function POST(request: Request) {
     }
 
     const directMessage =
-      typeof body.message === "string" ? body.message.trim() : "";
+      typeof body.message === "string"
+        ? body.message.trim()
+        : "";
 
-    const conversationMessages = getSafeMessages(body.messages);
+    const conversationMessages = getSafeMessages(
+      body.messages
+    );
 
     let userMessage = directMessage;
 
-    if (!userMessage && conversationMessages.length > 0) {
+    if (
+      !userMessage &&
+      conversationMessages.length > 0
+    ) {
       const lastUserMessage = [...conversationMessages]
         .reverse()
         .find((item) => item.role === "user");
@@ -367,6 +556,57 @@ export async function POST(request: Request) {
 
     const analysis = analyzeRequest(userMessage);
 
+    /*
+     * Explicit NexaFlow commands still execute through the
+     * existing command system.
+     */
+    const actionResult = await executeAICommand(
+      userMessage
+    );
+
+    if (actionResult.handled) {
+      return NextResponse.json({
+        success: true,
+        mode: "demo",
+        message:
+          actionResult.message ||
+          "Action completed successfully.",
+        reply:
+          actionResult.message ||
+          "Action completed successfully.",
+        action: {
+          type: actionResult.type,
+          status: "completed",
+        },
+        task: actionResult.task,
+        workflow: {
+          intent: analysis.intent,
+          priority: analysis.priority,
+          actions: actionResult.type
+            ? [
+                "Understand the task request",
+                "Extract task details",
+                "Create the task",
+                "Track task status",
+              ]
+            : analysis.actions,
+          status: "completed",
+        },
+        analysis: {
+          intent: analysis.intent,
+          sentiment: analysis.sentiment,
+          priority: analysis.priority,
+          confidence: analysis.confidence,
+          actions: analysis.actions,
+          suggestedReply: analysis.suggestedReply,
+          recommendedAction:
+            analysis.recommendedAction,
+          actionType: analysis.actionType,
+        },
+        usage: null,
+      });
+    }
+
     return NextResponse.json({
       success: true,
       mode: "demo",
@@ -380,18 +620,28 @@ export async function POST(request: Request) {
       },
       analysis: {
         intent: analysis.intent,
+        sentiment: analysis.sentiment,
         priority: analysis.priority,
+        confidence: analysis.confidence,
         actions: analysis.actions,
+        suggestedReply: analysis.suggestedReply,
+        recommendedAction:
+          analysis.recommendedAction,
+        actionType: analysis.actionType,
       },
       usage: null,
     });
   } catch (error) {
-    console.error("NexaFlow Demo AI error:", error);
+    console.error(
+      "NexaFlow Demo AI error:",
+      error
+    );
 
     return NextResponse.json(
       {
         success: false,
-        error: "Unable to process the request right now.",
+        error:
+          "Unable to process the request right now.",
       },
       { status: 500 }
     );

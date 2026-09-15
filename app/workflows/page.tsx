@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import VisualWorkflowBuilder from "@/components/workflows/VisualWorkflowBuilder";
 
 import type {
   Workflow,
@@ -619,6 +620,12 @@ export default function WorkflowsPage() {
             </div>
           ))}
         </section>
+        
+{/* VISUAL WORKFLOW BUILDER */}
+<section className="mb-8">
+  <VisualWorkflowBuilder />
+</section>
+
 
         {/* TOOLBAR */}
         <section className="mb-5 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">

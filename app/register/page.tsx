@@ -1,24 +1,73 @@
-
+﻿
 "use client";
 
 import { FormEvent, useState } from "react";
+
 import Link from "next/link";
+
 import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
   const router = useRouter();
 
   const [name, setName] = useState("");
+
   const [email, setEmail] = useState("");
+
   const [password, setPassword] = useState("");
+
   const [confirmPassword, setConfirmPassword] = useState("");
+
   const [loading, setLoading] = useState(false);
+
   const [guestLoading, setGuestLoading] = useState(false);
+
   const [error, setError] = useState("");
+
+  const [success, setSuccess] = useState("");
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
     setError("");
+    setSuccess("");
+
+    const normalizedName = name.trim();
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (normalizedName.length < 2) {
+      setError("Please enter your full name.");
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters.");
+      return;
+    }
+
+    if (!/[A-Z]/.test(password)) {
+      setError("Password must contain at least one uppercase letter.");
+      return;
+    }
+
+    if (!/[a-z]/.test(password)) {
+      setError("Password must contain at least one lowercase letter.");
+      return;
+    }
+
+    if (!/[0-9]/.test(password)) {
+      setError("Password must contain at least one number.");
+      return;
+    }
 
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
@@ -34,8 +83,8 @@ export default function RegisterPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name,
-          email,
+          name: normalizedName,
+          email: normalizedEmail,
           password,
           confirmPassword,
         }),
@@ -50,7 +99,13 @@ export default function RegisterPage() {
 
       localStorage.removeItem("nexaflow_guest");
 
-      router.push("/dashboard");
+      setSuccess(
+        data.message || "Account created successfully. Opening workspace..."
+      );
+
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 700);
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
@@ -58,21 +113,42 @@ export default function RegisterPage() {
     }
   }
 
-  function handleGuestContinue() {
+  async function handleGuestContinue() {
     setError("");
+    setSuccess("");
     setGuestLoading(true);
 
-    localStorage.setItem("nexaflow_guest", "true");
+    try {
+      const response = await fetch("/api/auth/guest", {
+        method: "POST",
+      });
 
-    router.push("/dashboard");
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        setError(data.error || "Unable to open guest workspace.");
+        return;
+      }
+
+      localStorage.setItem("nexaflow_guest", "true");
+
+      setSuccess("Guest workspace ready. Opening dashboard...");
+
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 400);
+    } catch {
+      setError("Unable to open guest workspace. Please try again.");
+    } finally {
+      setGuestLoading(false);
+    }
   }
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#151713] px-4 py-4 text-[#F4F0E6] sm:px-8 lg:px-12">
       {/* =========================================================
-          ORIGINAL BACKGROUND ARTWORK — UNCHANGED
+          ORIGINAL BACKGROUND ARTWORK â€” UNCHANGED
       ========================================================= */}
-
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
@@ -93,7 +169,6 @@ export default function RegisterPage() {
           CINEMATIC 3D SAAS WORLD
           BACKGROUND ONLY
       ========================================================= */}
-
       <div
         className="cinematic-world pointer-events-none absolute inset-0 z-[1]"
         aria-hidden="true"
@@ -113,9 +188,7 @@ export default function RegisterPage() {
           <div className="orbit-ring orbit-ring-a" />
           <div className="orbit-ring orbit-ring-b" />
           <div className="orbit-ring orbit-ring-c" />
-
           <div className="orbit-core" />
-
           <div className="orbit-node node-a" />
           <div className="orbit-node node-b" />
           <div className="orbit-node node-c" />
@@ -125,9 +198,7 @@ export default function RegisterPage() {
         <div className="orbit-system orbit-two">
           <div className="orbit-ring orbit-ring-a" />
           <div className="orbit-ring orbit-ring-b" />
-
           <div className="orbit-core" />
-
           <div className="orbit-node node-a" />
           <div className="orbit-node node-b" />
         </div>
@@ -140,14 +211,19 @@ export default function RegisterPage() {
         {/* =====================================================
             NEURAL NETWORK / AI CONNECTIONS
         ===================================================== */}
-
         <svg
           className="neural-network"
           viewBox="0 0 1600 900"
           preserveAspectRatio="none"
         >
           <defs>
-            <linearGradient id="registerNeuralGold" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient
+              id="registerNeuralGold"
+              x1="0%"
+              y1="0%"
+              x2="100%"
+              y2="100%"
+            >
               <stop offset="0%" stopColor="rgba(231,184,75,0)" />
               <stop offset="42%" stopColor="rgba(231,184,75,.28)" />
               <stop offset="72%" stopColor="rgba(245,217,139,.58)" />
@@ -156,7 +232,6 @@ export default function RegisterPage() {
 
             <filter id="registerNetworkGlow">
               <feGaussianBlur stdDeviation="2.5" result="blur" />
-
               <feMerge>
                 <feMergeNode in="blur" />
                 <feMergeNode in="SourceGraphic" />
@@ -172,17 +247,11 @@ export default function RegisterPage() {
             filter="url(#registerNetworkGlow)"
           >
             <path d="M0 160 C180 90 260 280 430 210 S690 100 820 230 S1100 320 1260 180 S1450 80 1600 160" />
-
             <path d="M0 380 C160 290 260 450 410 370 S650 270 810 400 S1050 510 1210 350 S1450 270 1600 340" />
-
             <path d="M0 650 C190 550 280 710 470 600 S720 490 900 640 S1120 750 1300 580 S1460 510 1600 590" />
-
             <path d="M180 0 C250 150 200 290 330 420 S500 590 430 900" />
-
             <path d="M520 0 C600 150 540 270 650 390 S820 610 760 900" />
-
             <path d="M1050 0 C980 180 1080 310 960 450 S850 680 930 900" />
-
             <path d="M1390 0 C1300 170 1410 300 1290 440 S1190 650 1260 900" />
           </g>
         </svg>
@@ -190,7 +259,6 @@ export default function RegisterPage() {
         {/* =====================================================
             MOVING ENERGY BEAMS
         ===================================================== */}
-
         <div className="energy-path energy-path-one">
           <span />
         </div>
@@ -206,7 +274,6 @@ export default function RegisterPage() {
         {/* =====================================================
             FLOATING AI PARTICLES
         ===================================================== */}
-
         <div className="particle-field">
           <span className="particle p01" />
           <span className="particle p02" />
@@ -233,7 +300,6 @@ export default function RegisterPage() {
         {/* =====================================================
             FLOATING 3D GLASS FRAGMENTS
         ===================================================== */}
-
         <div className="glass-fragment fragment-one" />
         <div className="glass-fragment fragment-two" />
         <div className="glass-fragment fragment-three" />
@@ -242,7 +308,6 @@ export default function RegisterPage() {
         {/* =====================================================
             HOLOGRAPHIC MICRO PANELS
         ===================================================== */}
-
         <div className="holo-panel panel-one">
           <span />
           <span />
@@ -269,9 +334,8 @@ export default function RegisterPage() {
       </div>
 
       {/* =========================================================
-          ARCHITECTURAL GRID — ORIGINAL
+          ARCHITECTURAL GRID â€” ORIGINAL
       ========================================================= */}
-
       <div
         className="absolute inset-0 z-[2] opacity-[0.035]"
         style={{
@@ -291,7 +355,7 @@ export default function RegisterPage() {
         className="group absolute left-5 top-5 z-30 inline-flex items-center gap-3 rounded-full border border-[#F5D98B]/10 bg-[#151713]/65 px-4 py-2.5 text-xs font-medium text-[#9A9D94] shadow-[0_10px_35px_rgba(0,0,0,0.22)] backdrop-blur-xl transition-all duration-300 hover:-translate-x-1 hover:border-[#E7B84B]/35 hover:bg-[#20241D]/90 hover:text-[#F5D98B] sm:left-8 sm:top-6 lg:left-3 lg:top-7"
       >
         <span className="flex h-6 w-6 items-center justify-center rounded-full border border-[#E7B84B]/15 bg-[#20241D] transition-transform duration-300 group-hover:-translate-x-0.5">
-          ←
+          â†
         </span>
 
         <span>Back to home</span>
@@ -328,7 +392,6 @@ export default function RegisterPage() {
       {/* =========================================================
           LEFT AUTH AREA
       ========================================================= */}
-
       <div className="relative z-10 w-full max-w-xl pt-[9.5rem] sm:pt-[9rem] lg:ml-[3vw] lg:pt-[8.5rem] xl:ml-[6vw]">
         {/* Header */}
         <div className="mb-4">
@@ -390,6 +453,12 @@ export default function RegisterPage() {
                 </div>
               )}
 
+              {success && (
+                <div className="rounded-xl border border-[#5ED6A0]/25 bg-[#5ED6A0]/[0.08] p-3 text-sm text-[#9BE7BE]">
+                  {success}
+                </div>
+              )}
+
               <label className="block">
                 <span className="mb-1.5 block text-sm font-medium text-[#D8D4C8]">
                   Full name
@@ -399,9 +468,13 @@ export default function RegisterPage() {
                   type="text"
                   required
                   value={name}
-                  onChange={(event) => setName(event.target.value)}
+                  onChange={(event) => {
+                    setName(event.target.value);
+                    setError("");
+                  }}
                   placeholder="Your name"
-                  className="w-full rounded-xl border border-[#F5D98B]/[0.10] bg-[#20241D]/80 px-4 py-2.5 text-sm text-[#F4F0E6] outline-none transition-all duration-300 placeholder:text-[#73776F] focus:border-[#E7B84B]/50 focus:bg-[#252A22] focus:shadow-[0_0_25px_rgba(231,184,75,0.06)] focus:ring-1 focus:ring-[#E7B84B]/15"
+                  disabled={loading || guestLoading}
+                  className="w-full rounded-xl border border-[#F5D98B]/[0.10] bg-[#20241D]/80 px-4 py-2.5 text-sm text-[#F4F0E6] outline-none transition-all duration-300 placeholder:text-[#73776F] focus:border-[#E7B84B]/50 focus:bg-[#252A22] focus:shadow-[0_0_25px_rgba(231,184,75,0.06)] focus:ring-1 focus:ring-[#E7B84B]/15 disabled:cursor-not-allowed disabled:opacity-60"
                 />
               </label>
 
@@ -414,9 +487,13 @@ export default function RegisterPage() {
                   type="email"
                   required
                   value={email}
-                  onChange={(event) => setEmail(event.target.value)}
+                  onChange={(event) => {
+                    setEmail(event.target.value);
+                    setError("");
+                  }}
                   placeholder="you@example.com"
-                  className="w-full rounded-xl border border-[#F5D98B]/[0.10] bg-[#20241D]/80 px-4 py-2.5 text-sm text-[#F4F0E6] outline-none transition-all duration-300 placeholder:text-[#73776F] focus:border-[#E7B84B]/50 focus:bg-[#252A22] focus:shadow-[0_0_25px_rgba(231,184,75,0.06)] focus:ring-1 focus:ring-[#E7B84B]/15"
+                  disabled={loading || guestLoading}
+                  className="w-full rounded-xl border border-[#F5D98B]/[0.10] bg-[#20241D]/80 px-4 py-2.5 text-sm text-[#F4F0E6] outline-none transition-all duration-300 placeholder:text-[#73776F] focus:border-[#E7B84B]/50 focus:bg-[#252A22] focus:shadow-[0_0_25px_rgba(231,184,75,0.06)] focus:ring-1 focus:ring-[#E7B84B]/15 disabled:cursor-not-allowed disabled:opacity-60"
                 />
               </label>
 
@@ -429,10 +506,27 @@ export default function RegisterPage() {
                   type="password"
                   required
                   value={password}
-                  onChange={(event) => setPassword(event.target.value)}
+                  onChange={(event) => {
+                    setPassword(event.target.value);
+                    setError("");
+                  }}
                   placeholder="Minimum 8 characters"
-                  className="w-full rounded-xl border border-[#F5D98B]/[0.10] bg-[#20241D]/80 px-4 py-2.5 text-sm text-[#F4F0E6] outline-none transition-all duration-300 placeholder:text-[#73776F] focus:border-[#E7B84B]/50 focus:bg-[#252A22] focus:shadow-[0_0_25px_rgba(231,184,75,0.06)] focus:ring-1 focus:ring-[#E7B84B]/15"
+                  disabled={loading || guestLoading}
+                  className="w-full rounded-xl border border-[#F5D98B]/[0.10] bg-[#20241D]/80 px-4 py-2.5 text-sm text-[#F4F0E6] outline-none transition-all duration-300 placeholder:text-[#73776F] focus:border-[#E7B84B]/50 focus:bg-[#252A22] focus:shadow-[0_0_25px_rgba(231,184,75,0.06)] focus:ring-1 focus:ring-[#E7B84B]/15 disabled:cursor-not-allowed disabled:opacity-60"
                 />
+
+                <div className="mt-1 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setShowPassword((value) => !value)
+                    }
+                    disabled={loading || guestLoading}
+                    className="text-[11px] font-medium text-[#73776F] transition-colors duration-300 hover:text-[#F5D98B] disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {showPassword ? "Hide password" : "Show password"}
+                  </button>
+                </div>
               </label>
 
               <label className="block">
@@ -444,12 +538,29 @@ export default function RegisterPage() {
                   type="password"
                   required
                   value={confirmPassword}
-                  onChange={(event) =>
-                    setConfirmPassword(event.target.value)
-                  }
+                  onChange={(event) => {
+                    setConfirmPassword(event.target.value);
+                    setError("");
+                  }}
                   placeholder="Repeat your password"
-                  className="w-full rounded-xl border border-[#F5D98B]/[0.10] bg-[#20241D]/80 px-4 py-2.5 text-sm text-[#F4F0E6] outline-none transition-all duration-300 placeholder:text-[#73776F] focus:border-[#E7B84B]/50 focus:bg-[#252A22] focus:shadow-[0_0_25px_rgba(231,184,75,0.06)] focus:ring-1 focus:ring-[#E7B84B]/15"
+                  disabled={loading || guestLoading}
+                  className="w-full rounded-xl border border-[#F5D98B]/[0.10] bg-[#20241D]/80 px-4 py-2.5 text-sm text-[#F4F0E6] outline-none transition-all duration-300 placeholder:text-[#73776F] focus:border-[#E7B84B]/50 focus:bg-[#252A22] focus:shadow-[0_0_25px_rgba(231,184,75,0.06)] focus:ring-1 focus:ring-[#E7B84B]/15 disabled:cursor-not-allowed disabled:opacity-60"
                 />
+
+                <div className="mt-1 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setShowConfirmPassword((value) => !value)
+                    }
+                    disabled={loading || guestLoading}
+                    className="text-[11px] font-medium text-[#73776F] transition-colors duration-300 hover:text-[#F5D98B] disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {showConfirmPassword
+                      ? "Hide password"
+                      : "Show password"}
+                  </button>
+                </div>
               </label>
 
               <button
@@ -460,11 +571,13 @@ export default function RegisterPage() {
                 <span className="absolute inset-y-0 -left-20 w-12 rotate-12 bg-[#F5D98B]/20 blur-md transition-all duration-700 group-hover/button:left-[120%]" />
 
                 <span className="relative flex items-center justify-center gap-2">
-                  {loading ? "Creating workspace..." : "Create account"}
+                  {loading
+                    ? "Creating workspace..."
+                    : "Create Account"}
 
                   {!loading && (
                     <span className="transition-transform duration-300 group-hover/button:translate-x-1">
-                      →
+                      
                     </span>
                   )}
                 </span>
@@ -500,6 +613,7 @@ export default function RegisterPage() {
 
             <p className="mt-4 text-center text-sm text-[#73776F]">
               Already have an account?{" "}
+
               <Link
                 href="/login"
                 className="font-medium text-[#E7B84B] transition-all duration-300 hover:text-[#F5D98B] hover:underline hover:underline-offset-4"
@@ -548,6 +662,7 @@ export default function RegisterPage() {
             rgba(245, 217, 139, 0.95) 335deg,
             transparent 360deg
           );
+
           animation: borderSpin 7s linear infinite;
           opacity: 0.7;
           padding: 1px;
@@ -816,7 +931,6 @@ export default function RegisterPage() {
           inset: 0;
           border-radius: 50%;
           border: 1px solid rgba(231, 184, 75, 0.17);
-
           box-shadow:
             0 0 25px rgba(231, 184, 75, 0.035),
             inset 0 0 25px rgba(231, 184, 75, 0.025);
@@ -842,9 +956,7 @@ export default function RegisterPage() {
           top: 50%;
           width: 30px;
           height: 30px;
-
           transform: translate(-50%, -50%);
-
           border-radius: 50%;
 
           background:
@@ -1050,9 +1162,7 @@ export default function RegisterPage() {
           left: -20%;
           width: 20%;
           height: 5px;
-
           border-radius: 50%;
-
           background: #f5d98b;
 
           box-shadow:
@@ -1142,7 +1252,6 @@ export default function RegisterPage() {
           width: 3px;
           height: 3px;
           border-radius: 50%;
-
           background: rgba(245, 217, 139, 0.8);
 
           box-shadow:
@@ -1308,7 +1417,6 @@ export default function RegisterPage() {
 
         .glass-fragment {
           position: absolute;
-
           border: 1px solid rgba(245, 217, 139, 0.12);
 
           background: linear-gradient(
@@ -1412,16 +1520,12 @@ export default function RegisterPage() {
 
         .holo-panel {
           position: absolute;
-
           width: 90px;
           height: 42px;
-
           padding: 9px;
 
           border: 1px solid rgba(231, 184, 75, 0.1);
-
           background: rgba(21, 23, 19, 0.16);
-
           backdrop-filter: blur(5px);
 
           transform:
@@ -1478,7 +1582,6 @@ export default function RegisterPage() {
               rotateY(-18deg)
               rotateX(8deg)
               translate3d(0, 0, 0);
-
             opacity: 0.25;
           }
 
@@ -1488,7 +1591,6 @@ export default function RegisterPage() {
               rotateY(12deg)
               rotateX(-4deg)
               translate3d(35px, -25px, 80px);
-
             opacity: 0.55;
           }
         }
@@ -1501,7 +1603,6 @@ export default function RegisterPage() {
               rotateY(-18deg)
               rotateX(8deg)
               translate3d(0, 0, 0);
-
             opacity: 0.25;
           }
 
@@ -1511,7 +1612,6 @@ export default function RegisterPage() {
               rotateY(20deg)
               rotateX(4deg)
               translate3d(-30px, 35px, 90px);
-
             opacity: 0.5;
           }
         }
@@ -1558,7 +1658,6 @@ export default function RegisterPage() {
           box-shadow: 0 0 22px rgba(231, 184, 75, 0.18);
 
           opacity: 0;
-
           animation: scannerMove 10s ease-in-out infinite;
         }
 
@@ -1710,3 +1809,4 @@ export default function RegisterPage() {
     </main>
   );
 }
+

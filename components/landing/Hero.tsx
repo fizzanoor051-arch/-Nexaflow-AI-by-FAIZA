@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -65,29 +66,80 @@ export default function Hero() {
   return (
     <section className="nf-hero relative min-h-screen overflow-hidden bg-[#080806] pt-28 text-white sm:pt-32">
       {/* =========================================================
-          PREMIUM BACKGROUND
+          PREMIUM CINEMATIC BACKGROUND
       ========================================================== */}
 
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-        {/* Moving golden pearl field */}
+        {/* Existing particle system */}
         <AmbientParticles />
 
-        {/* Central golden atmosphere */}
-        <div className="absolute left-1/2 top-[27%] h-[680px] w-[900px] -translate-x-1/2 rounded-full bg-amber-400/[0.045] blur-[170px]" />
+        {/* Slow cinematic atmosphere drift */}
+        <div className="nf-cinematic-drift absolute inset-[-8%]">
+          {/* Central golden atmosphere */}
+          <div className="absolute left-1/2 top-[27%] h-[680px] w-[900px] -translate-x-1/2 rounded-full bg-amber-400/[0.045] blur-[170px]" />
 
-        {/* Soft secondary atmosphere */}
-        <div className="absolute left-[8%] top-[18%] h-[420px] w-[420px] rounded-full bg-yellow-500/[0.015] blur-[150px]" />
+          {/* Secondary atmosphere */}
+          <div className="absolute left-[8%] top-[18%] h-[420px] w-[420px] rounded-full bg-yellow-500/[0.015] blur-[150px]" />
 
-        <div className="absolute right-[-5%] top-[25%] h-[500px] w-[500px] rounded-full bg-amber-300/[0.018] blur-[160px]" />
+          <div className="absolute right-[-5%] top-[25%] h-[500px] w-[500px] rounded-full bg-amber-300/[0.018] blur-[160px]" />
 
-        {/* Central glow */}
-        <div
-          className="absolute left-1/2 top-[34%] h-[520px] w-[760px] -translate-x-1/2 rounded-full blur-[130px]"
-          style={{
-            background:
-              "radial-gradient(ellipse, rgba(245,185,75,0.035) 0%, rgba(245,185,75,0.012) 35%, transparent 72%)",
-          }}
-        />
+          {/* Central glow */}
+          <div
+            className="absolute left-1/2 top-[34%] h-[520px] w-[760px] -translate-x-1/2 rounded-full blur-[130px]"
+            style={{
+              background:
+                "radial-gradient(ellipse, rgba(245,185,75,0.035) 0%, rgba(245,185,75,0.012) 35%, transparent 72%)",
+            }}
+          />
+        </div>
+
+        {/* =====================================================
+            3D PERSPECTIVE FLOOR
+        ====================================================== */}
+
+        <div className="nf-perspective-floor absolute left-1/2 top-[51%] h-[72%] w-[150%] -translate-x-1/2">
+          <div className="nf-grid-plane absolute inset-0" />
+        </div>
+
+        {/* =====================================================
+            HOLOGRAPHIC ORBIT RINGS
+        ====================================================== */}
+
+        <div className="nf-orbit-system absolute left-1/2 top-[48%] h-[720px] w-[720px] -translate-x-1/2">
+          <div className="nf-orbit nf-orbit-one" />
+          <div className="nf-orbit nf-orbit-two" />
+          <div className="nf-orbit nf-orbit-three" />
+
+          <span className="nf-orbit-dot nf-orbit-dot-1" />
+          <span className="nf-orbit-dot nf-orbit-dot-2" />
+          <span className="nf-orbit-dot nf-orbit-dot-3" />
+        </div>
+
+        {/* =====================================================
+            AI NETWORK
+        ====================================================== */}
+
+        <div className="nf-network absolute inset-0">
+          <span className="nf-network-line nf-network-line-1" />
+          <span className="nf-network-line nf-network-line-2" />
+          <span className="nf-network-line nf-network-line-3" />
+          <span className="nf-network-line nf-network-line-4" />
+          <span className="nf-network-line nf-network-line-5" />
+
+          <span className="nf-network-node nf-network-node-1" />
+          <span className="nf-network-node nf-network-node-2" />
+          <span className="nf-network-node nf-network-node-3" />
+          <span className="nf-network-node nf-network-node-4" />
+          <span className="nf-network-node nf-network-node-5" />
+          <span className="nf-network-node nf-network-node-6" />
+        </div>
+
+        {/* =====================================================
+            MOVING LIGHT BEAMS
+        ====================================================== */}
+
+        <span className="nf-light-beam nf-light-beam-1" />
+        <span className="nf-light-beam nf-light-beam-2" />
 
         {/* Architectural vertical light */}
         <div
@@ -106,7 +158,7 @@ export default function Hero() {
           }}
         />
 
-        {/* Horizontal horizon */}
+        {/* Horizon */}
         <div
           className="absolute left-1/2 top-[56%] h-px w-[90%] -translate-x-1/2"
           style={{
@@ -139,6 +191,8 @@ export default function Hero() {
         <span className="nf-ambient-light nf-light-2" />
         <span className="nf-ambient-light nf-light-3" />
         <span className="nf-ambient-light nf-light-4" />
+        <span className="nf-ambient-light nf-light-5" />
+        <span className="nf-ambient-light nf-light-6" />
       </div>
 
       {/* =========================================================
@@ -252,9 +306,7 @@ export default function Hero() {
                   `,
                 }}
               >
-                {/* =================================================
-                    CENTRAL AUTOMATION ENGINE
-                ================================================== */}
+                {/* CENTRAL AUTOMATION ENGINE */}
 
                 <div className="absolute left-1/2 top-[47%] z-30 -translate-x-1/2 -translate-y-1/2">
                   {/* Back plate */}
@@ -293,9 +345,7 @@ export default function Hero() {
                   <div className="nf-engine-ring-reverse absolute left-1/2 top-1/2 h-[205px] w-[205px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-amber-300/[0.09]" />
                 </div>
 
-                {/* =================================================
-                    INPUT REQUEST
-                ================================================== */}
+                {/* INPUT REQUEST */}
 
                 <div
                   className="nf-floating-card absolute left-[2%] top-[4%] z-40 w-[225px] sm:left-[4%] sm:w-[245px]"
@@ -339,9 +389,7 @@ export default function Hero() {
                   <div className="nf-connector-horizontal absolute -bottom-7 right-[-30px] h-px w-[75px]" />
                 </div>
 
-                {/* =================================================
-                    ANALYZE NODE
-                ================================================== */}
+                {/* ANALYZE NODE */}
 
                 <div className="nf-node node-analyze absolute left-[3%] top-[38%] z-20 sm:left-[5%]">
                   <div className="nf-node-card">
@@ -359,9 +407,7 @@ export default function Hero() {
                   </div>
                 </div>
 
-                {/* =================================================
-                    RIGHT SIDE OUTPUT NODES
-                ================================================== */}
+                {/* RIGHT SIDE OUTPUT NODES */}
 
                 {automationNodes.slice(1).map((node, index) => (
                   <div
@@ -390,9 +436,7 @@ export default function Hero() {
                   </div>
                 ))}
 
-                {/* =================================================
-                    CONNECTING LINES
-                ================================================== */}
+                {/* CONNECTING LINES */}
 
                 <div className="nf-flow-line nf-flow-line-left absolute left-[26%] top-[48%] h-px w-[17%]" />
 
@@ -407,9 +451,7 @@ export default function Hero() {
                 <span className="nf-data-packet nf-packet-2" />
                 <span className="nf-data-packet nf-packet-3" />
 
-                {/* =================================================
-                    COMPLETED STATUS
-                ================================================== */}
+                {/* COMPLETED STATUS */}
 
                 <div
                   className="absolute bottom-[5%] left-1/2 z-40 -translate-x-1/2"
@@ -433,9 +475,7 @@ export default function Hero() {
                 </div>
               </div>
 
-              {/* =================================================
-                  TECHNICAL LABELS
-              ================================================== */}
+              {/* TECHNICAL LABELS */}
 
               <div className="absolute left-0 top-1/2 hidden -translate-y-1/2 -rotate-90 text-[8px] font-medium uppercase tracking-[0.35em] text-slate-700 sm:block">
                 AUTOMATION / ENGINE
@@ -500,20 +540,17 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* =========================================================
-          BOTTOM FADE
-      ========================================================== */}
-
+      {/* Bottom fade */}
       <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-36 bg-gradient-to-t from-[#080806] to-transparent" />
 
       {/* =========================================================
-          HERO-SPECIFIC CSS
+          HERO CSS
       ========================================================== */}
 
       <style jsx>{`
-        /* -------------------------------------------------------
+        /* =====================================================
            HERO REVEAL
-        ------------------------------------------------------- */
+        ====================================================== */
 
         .nf-hero-reveal {
           animation: nfHeroReveal 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -549,27 +586,391 @@ export default function Hero() {
           }
         }
 
-        /* -------------------------------------------------------
-           HEADING
-        ------------------------------------------------------- */
+        /* =====================================================
+           CINEMATIC DRIFT
+        ====================================================== */
 
-        .nf-heading-accent {
-          background: linear-gradient(
-            105deg,
-            #fffdf6 0%,
-            #f5d78c 42%,
-            #d6a94f 78%,
-            #b8872e 100%
-          );
-          -webkit-background-clip: text;
-          background-clip: text;
-          color: transparent;
-          text-shadow: 0 0 45px rgba(245, 185, 75, 0.06);
+        .nf-cinematic-drift {
+          animation: cinematicDrift 24s ease-in-out infinite;
+          transform-origin: center center;
+          will-change: transform;
         }
 
-        /* -------------------------------------------------------
+        @keyframes cinematicDrift {
+          0%,
+          100% {
+            transform: scale(1) translate3d(0, 0, 0);
+          }
+
+          50% {
+            transform: scale(1.045) translate3d(-1.2%, -0.8%, 0);
+          }
+        }
+
+        /* =====================================================
+           3D FLOOR
+        ====================================================== */
+
+        .nf-perspective-floor {
+          transform:
+            translateX(-50%)
+            perspective(900px)
+            rotateX(68deg)
+            translateY(8%);
+          transform-origin: center top;
+          opacity: 0.32;
+        }
+
+        .nf-grid-plane {
+          background-image:
+            linear-gradient(
+              rgba(245, 197, 107, 0.13) 1px,
+              transparent 1px
+            ),
+            linear-gradient(
+              90deg,
+              rgba(245, 197, 107, 0.13) 1px,
+              transparent 1px
+            );
+          background-size: 70px 70px;
+          mask-image: linear-gradient(
+            to bottom,
+            transparent 0%,
+            black 25%,
+            black 70%,
+            transparent 100%
+          );
+          -webkit-mask-image: linear-gradient(
+            to bottom,
+            transparent 0%,
+            black 25%,
+            black 70%,
+            transparent 100%
+          );
+          animation: gridMove 18s linear infinite;
+        }
+
+        @keyframes gridMove {
+          from {
+            background-position: 0 0;
+          }
+
+          to {
+            background-position: 0 140px;
+          }
+        }
+
+        /* =====================================================
+           ORBIT SYSTEM
+        ====================================================== */
+
+        .nf-orbit-system {
+          transform-style: preserve-3d;
+          opacity: 0.38;
+          animation: orbitFloat 12s ease-in-out infinite;
+        }
+
+        .nf-orbit {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          border: 1px solid rgba(245, 197, 107, 0.10);
+          border-radius: 999px;
+          transform-style: preserve-3d;
+        }
+
+        .nf-orbit-one {
+          width: 560px;
+          height: 180px;
+          transform: translate(-50%, -50%) rotateX(70deg) rotateZ(8deg);
+          animation: orbitOne 20s linear infinite;
+        }
+
+        .nf-orbit-two {
+          width: 650px;
+          height: 240px;
+          transform: translate(-50%, -50%) rotateX(67deg) rotateZ(-22deg);
+          border-style: dashed;
+          opacity: 0.55;
+          animation: orbitTwo 27s linear infinite reverse;
+        }
+
+        .nf-orbit-three {
+          width: 460px;
+          height: 460px;
+          transform: translate(-50%, -50%) rotateX(73deg) rotateZ(45deg);
+          border-color: rgba(245, 197, 107, 0.055);
+          animation: orbitThree 32s linear infinite;
+        }
+
+        @keyframes orbitOne {
+          from {
+            transform: translate(-50%, -50%) rotateX(70deg) rotateZ(8deg);
+          }
+
+          to {
+            transform: translate(-50%, -50%) rotateX(70deg) rotateZ(368deg);
+          }
+        }
+
+        @keyframes orbitTwo {
+          from {
+            transform: translate(-50%, -50%) rotateX(67deg) rotateZ(-22deg);
+          }
+
+          to {
+            transform: translate(-50%, -50%) rotateX(67deg) rotateZ(-382deg);
+          }
+        }
+
+        @keyframes orbitThree {
+          from {
+            transform: translate(-50%, -50%) rotateX(73deg) rotateZ(45deg);
+          }
+
+          to {
+            transform: translate(-50%, -50%) rotateX(73deg) rotateZ(405deg);
+          }
+        }
+
+        @keyframes orbitFloat {
+          0%,
+          100% {
+            transform: translate(-50%, -50%) translate3d(0, 0, 0);
+          }
+
+          50% {
+            transform: translate(-50%, -50%) translate3d(0, -16px, 18px);
+          }
+        }
+
+        .nf-orbit-dot {
+          position: absolute;
+          height: 5px;
+          width: 5px;
+          border-radius: 999px;
+          background: #f5c56b;
+          box-shadow:
+            0 0 10px rgba(245, 197, 107, 0.9),
+            0 0 28px rgba(245, 185, 75, 0.35);
+        }
+
+        .nf-orbit-dot-1 {
+          left: 17%;
+          top: 44%;
+          animation: orbitDot 5s ease-in-out infinite;
+        }
+
+        .nf-orbit-dot-2 {
+          right: 16%;
+          top: 30%;
+          animation: orbitDot 6s ease-in-out infinite -2s;
+        }
+
+        .nf-orbit-dot-3 {
+          left: 48%;
+          bottom: 9%;
+          animation: orbitDot 7s ease-in-out infinite -4s;
+        }
+
+        @keyframes orbitDot {
+          0%,
+          100% {
+            opacity: 0.2;
+            transform: scale(0.7) translate3d(0, 0, 0);
+          }
+
+          50% {
+            opacity: 1;
+            transform: scale(1.3) translate3d(0, -10px, 0);
+          }
+        }
+
+        /* =====================================================
+           AI NETWORK
+        ====================================================== */
+
+        .nf-network {
+          opacity: 0.28;
+          transform-style: preserve-3d;
+        }
+
+        .nf-network-line {
+          position: absolute;
+          height: 1px;
+          transform-origin: left center;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(245, 197, 107, 0.28),
+            transparent
+          );
+          animation: networkPulse 5s ease-in-out infinite;
+        }
+
+        .nf-network-line-1 {
+          left: 7%;
+          top: 32%;
+          width: 26%;
+          transform: rotate(12deg);
+        }
+
+        .nf-network-line-2 {
+          left: 68%;
+          top: 27%;
+          width: 25%;
+          transform: rotate(-14deg);
+          animation-delay: -1s;
+        }
+
+        .nf-network-line-3 {
+          left: 9%;
+          top: 72%;
+          width: 25%;
+          transform: rotate(-12deg);
+          animation-delay: -2s;
+        }
+
+        .nf-network-line-4 {
+          left: 67%;
+          top: 73%;
+          width: 27%;
+          transform: rotate(13deg);
+          animation-delay: -3s;
+        }
+
+        .nf-network-line-5 {
+          left: 40%;
+          top: 13%;
+          width: 21%;
+          transform: rotate(90deg);
+          animation-delay: -4s;
+        }
+
+        @keyframes networkPulse {
+          0%,
+          100% {
+            opacity: 0.15;
+          }
+
+          50% {
+            opacity: 0.75;
+          }
+        }
+
+        .nf-network-node {
+          position: absolute;
+          height: 4px;
+          width: 4px;
+          border-radius: 999px;
+          background: #e8c978;
+          box-shadow: 0 0 14px rgba(245, 197, 107, 0.65);
+          animation: networkNode 4s ease-in-out infinite;
+        }
+
+        .nf-network-node-1 {
+          left: 7%;
+          top: 32%;
+        }
+
+        .nf-network-node-2 {
+          left: 33%;
+          top: 37%;
+          animation-delay: -1s;
+        }
+
+        .nf-network-node-3 {
+          left: 68%;
+          top: 27%;
+          animation-delay: -2s;
+        }
+
+        .nf-network-node-4 {
+          left: 9%;
+          top: 72%;
+          animation-delay: -1.5s;
+        }
+
+        .nf-network-node-5 {
+          left: 67%;
+          top: 73%;
+          animation-delay: -2.5s;
+        }
+
+        .nf-network-node-6 {
+          left: 51%;
+          top: 13%;
+          animation-delay: -3s;
+        }
+
+        @keyframes networkNode {
+          0%,
+          100% {
+            opacity: 0.15;
+            transform: scale(0.8);
+          }
+
+          50% {
+            opacity: 0.9;
+            transform: scale(1.8);
+          }
+        }
+
+        /* =====================================================
+           LIGHT BEAMS
+        ====================================================== */
+
+        .nf-light-beam {
+          position: absolute;
+          top: -20%;
+          width: 1px;
+          height: 140%;
+          opacity: 0;
+          background: linear-gradient(
+            to bottom,
+            transparent,
+            rgba(245, 197, 107, 0.55),
+            transparent
+          );
+          filter: blur(1px);
+          transform: rotate(18deg);
+        }
+
+        .nf-light-beam-1 {
+          left: 28%;
+          animation: beamSweep 11s ease-in-out infinite;
+        }
+
+        .nf-light-beam-2 {
+          left: 72%;
+          transform: rotate(-18deg);
+          animation: beamSweep 14s ease-in-out infinite -6s;
+        }
+
+        @keyframes beamSweep {
+          0%,
+          100% {
+            opacity: 0;
+            transform: translateX(-120px) rotate(18deg);
+          }
+
+          45% {
+            opacity: 0.12;
+          }
+
+          55% {
+            opacity: 0.04;
+          }
+
+          100% {
+            opacity: 0;
+            transform: translateX(220px) rotate(18deg);
+          }
+        }
+
+        /* =====================================================
            AMBIENT LIGHTS
-        ------------------------------------------------------- */
+        ====================================================== */
 
         .nf-ambient-light {
           position: absolute;
@@ -604,6 +1005,18 @@ export default function Hero() {
           animation-delay: -5.5s;
         }
 
+        .nf-light-5 {
+          left: 46%;
+          top: 22%;
+          animation-delay: -1.5s;
+        }
+
+        .nf-light-6 {
+          left: 57%;
+          top: 82%;
+          animation-delay: -3.5s;
+        }
+
         @keyframes ambientFloat {
           0%,
           100% {
@@ -617,9 +1030,27 @@ export default function Hero() {
           }
         }
 
-        /* -------------------------------------------------------
+        /* =====================================================
+           HEADING
+        ====================================================== */
+
+        .nf-heading-accent {
+          background: linear-gradient(
+            105deg,
+            #fffdf6 0%,
+            #f5d78c 42%,
+            #d6a94f 78%,
+            #b8872e 100%
+          );
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: transparent;
+          text-shadow: 0 0 45px rgba(245, 185, 75, 0.06);
+        }
+
+        /* =====================================================
            3D ENGINE
-        ------------------------------------------------------- */
+        ====================================================== */
 
         .nf-engine-scene {
           transform-style: preserve-3d;
@@ -660,9 +1091,9 @@ export default function Hero() {
           }
         }
 
-        /* -------------------------------------------------------
+        /* =====================================================
            FLOATING INPUT CARD
-        ------------------------------------------------------- */
+        ====================================================== */
 
         .nf-floating-card {
           animation: floatingCard 5s ease-in-out infinite;
@@ -680,9 +1111,9 @@ export default function Hero() {
           }
         }
 
-        /* -------------------------------------------------------
+        /* =====================================================
            NODES
-        ------------------------------------------------------- */
+        ====================================================== */
 
         .nf-node {
           transform-style: preserve-3d;
@@ -795,9 +1226,9 @@ export default function Hero() {
           transform: translateZ(25px);
         }
 
-        /* -------------------------------------------------------
+        /* =====================================================
            FLOW LINES
-        ------------------------------------------------------- */
+        ====================================================== */
 
         .nf-flow-line,
         .nf-connector-horizontal,
@@ -855,9 +1286,9 @@ export default function Hero() {
           }
         }
 
-        /* -------------------------------------------------------
+        /* =====================================================
            DATA PACKETS
-        ------------------------------------------------------- */
+        ====================================================== */
 
         .nf-data-packet {
           position: absolute;
@@ -949,9 +1380,9 @@ export default function Hero() {
           }
         }
 
-        /* -------------------------------------------------------
+        /* =====================================================
            CORNER MARKERS
-        ------------------------------------------------------- */
+        ====================================================== */
 
         .nf-corner-marker {
           position: absolute;
@@ -988,9 +1419,9 @@ export default function Hero() {
           border-right: 1px solid;
         }
 
-        /* -------------------------------------------------------
+        /* =====================================================
            RESPONSIVE
-        ------------------------------------------------------- */
+        ====================================================== */
 
         @media (max-width: 640px) {
           .nf-engine-scene {
@@ -1036,14 +1467,56 @@ export default function Hero() {
             left: 64%;
             width: 10%;
           }
+
+          .nf-orbit-system {
+            width: 430px;
+            height: 430px;
+            opacity: 0.22;
+          }
+
+          .nf-orbit-one {
+            width: 340px;
+            height: 120px;
+          }
+
+          .nf-orbit-two {
+            width: 390px;
+            height: 150px;
+          }
+
+          .nf-orbit-three {
+            width: 300px;
+            height: 300px;
+          }
+
+          .nf-perspective-floor {
+            top: 55%;
+            width: 190%;
+          }
+
+          .nf-network {
+            opacity: 0.16;
+          }
+
+          .nf-light-beam {
+            display: none;
+          }
         }
 
-        /* -------------------------------------------------------
+        /* =====================================================
            REDUCED MOTION
-        ------------------------------------------------------- */
+        ====================================================== */
 
         @media (prefers-reduced-motion: reduce) {
           .nf-hero-reveal,
+          .nf-cinematic-drift,
+          .nf-grid-plane,
+          .nf-orbit-system,
+          .nf-orbit,
+          .nf-orbit-dot,
+          .nf-network-line,
+          .nf-network-node,
+          .nf-light-beam,
           .nf-ambient-light,
           .nf-engine-ring,
           .nf-engine-ring-reverse,

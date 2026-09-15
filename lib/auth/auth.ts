@@ -1,10 +1,11 @@
+
 import { getSession } from "./session";
 
 export interface AuthUser {
   id: string;
   name: string;
   email: string;
-  role: "user" | "admin";
+  role: "user" | "admin" | "guest";
 }
 
 export async function getCurrentUser(): Promise<AuthUser | null> {
