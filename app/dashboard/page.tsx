@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import RealSaaSStats from "@/components/dashboard/RealSaaSStats";
 
@@ -1112,12 +1112,35 @@ export default function DashboardPage() {
 
   const [showWorkflowMenu, setShowWorkflowMenu] =
     useState(false);
+  
+     const [isRefreshing, setIsRefreshing] = 
+  useState(false); 
 
-  const [isRefreshing, setIsRefreshing] =
-    useState(false);
+const [userName, setUserName] = useState("Faiza");
 
-  const [workflows, setWorkflows] =
-    useState(initialWorkflows);
+
+useEffect(() => {
+  try {
+    const savedProfile = window.localStorage.getItem("nexaflow-profile");
+
+    if (!savedProfile) return;
+
+    const profile = JSON.parse(savedProfile);
+
+    if (
+      typeof profile?.fullName === "string" &&
+      profile.fullName.trim()
+    ) {
+      setUserName(profile.fullName.trim());
+    }
+  } catch {
+    setUserName("Faiza");
+  }
+}, []);
+
+ const [workflows, setWorkflows] = 
+  useState(initialWorkflows);
+  
 
   const [activities, setActivities] =
     useState(initialActivities);
@@ -1328,7 +1351,7 @@ export default function DashboardPage() {
           </div>
 
           <h2 className="text-3xl font-semibold tracking-[-0.045em] text-[#F4F0E6] sm:text-[38px]">
-            Good to see you, Faiza.
+            Good to see you, {userName}.
           </h2>
 
           <p className="mt-2 max-w-2xl text-[12px] leading-6 text-[#9A9D94]">

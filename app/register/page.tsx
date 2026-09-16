@@ -86,12 +86,18 @@ if (!/[0-9]/.test(password)) {
         return;
       }
 
-      localStorage.removeItem("nexaflow_guest");
+   localStorage.removeItem("nexaflow_guest");
 
-      setSuccess(
-        data.message || "Account created successfully. Opening workspace..."
-      );
+localStorage.setItem(
+  "nexaflow-profile",
+  JSON.stringify({
+    fullName: normalizedName,
+  })
+);
 
+setSuccess(
+  data.message || "Account created successfully. Opening workspace..."
+);
       setTimeout(() => {
         router.push("/dashboard");
       }, 700);
