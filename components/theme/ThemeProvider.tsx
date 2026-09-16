@@ -1,76 +1,10 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 
 const THEME_STORAGE_KEY = "nexaflow-theme";
 
-function removeInjectedDarkStyles() {
-  if (typeof document === "undefined") {
-    return;
-  }
-
-  const darkStyle = document.getElementById(
-    "nexaflow-true-dark-mode",
-  );
-
-  if (darkStyle) {
-    darkStyle.remove();
-  }
-}
-
-function removeThemeVariables(root: HTMLElement) {
-  const variables = [
-    "--nf-bg",
-    "--nf-bg-soft",
-    "--nf-bg-elevated",
-    "--nf-bg-panel",
-
-    "--nf-surface",
-    "--nf-surface-strong",
-    "--nf-surface-soft",
-
-    "--nf-text",
-    "--nf-text-soft",
-    "--nf-text-muted",
-    "--nf-text-faint",
-
-    "--nf-border",
-    "--nf-border-soft",
-    "--nf-border-strong",
-
-    "--nf-fire-1",
-    "--nf-fire-2",
-    "--nf-fire-3",
-    "--nf-fire-4",
-    "--nf-fire-5",
-    "--nf-fire-6",
-    "--nf-fire-7",
-
-    "--nf-success",
-    "--nf-warning",
-    "--nf-danger",
-
-    "--nf-fire-glow",
-    "--nf-fire-glow-soft",
-    "--nf-fire-glow-strong",
-
-    "--nf-shadow-sm",
-    "--nf-shadow-md",
-    "--nf-shadow-lg",
-
-    "--nf-black",
-    "--nf-black-soft",
-    "--nf-black-panel",
-    "--nf-card",
-    "--nf-card-hover",
-  ];
-
-  variables.forEach((variable) => {
-    root.style.removeProperty(variable);
-  });
-}
-
-function restoreOriginalTheme() {
+function applyTheme() {
   if (typeof document === "undefined") {
     return;
   }
@@ -78,9 +12,7 @@ function restoreOriginalTheme() {
   const root = document.documentElement;
   const body = document.body;
 
-  /*
-   * Remove every custom theme state.
-   */
+  // Remove existing theme classes.
   root.classList.remove(
     "light",
     "dark",
@@ -90,47 +22,97 @@ function restoreOriginalTheme() {
     "theme-normal",
   );
 
-  /*
-   * Remove custom theme attributes.
-   */
-  root.removeAttribute("data-theme");
-  root.removeAttribute("data-color-mode");
+  // Normal theme.
+  root.classList.add("normal");
 
-  body.removeAttribute("data-theme");
-  body.removeAttribute("data-color-mode");
+  root.setAttribute("data-theme", "normal");
+  body.setAttribute("data-theme", "normal");
+
+  // Background colors.
+  root.style.setProperty("--nf-bg", "#171914");
+  root.style.setProperty("--nf-bg-soft", "#1B1F19");
+  root.style.setProperty("--nf-bg-elevated", "#20241D");
+  root.style.setProperty("--nf-bg-panel", "#252A22");
+
+  root.style.setProperty("--nf-surface", "#1B1F19");
+  root.style.setProperty("--nf-surface-strong", "#20241D");
+  root.style.setProperty("--nf-surface-soft", "#181B16");
+
+  // Text colors.
+  root.style.setProperty("--nf-text", "#F4F0E6");
+  root.style.setProperty("--nf-text-soft", "#D9D6CC");
+  root.style.setProperty("--nf-text-muted", "#9A9D94");
+  root.style.setProperty("--nf-text-faint", "#70736B");
+
+  // NO BORDERS.
+  root.style.setProperty("--nf-border", "transparent");
+  root.style.setProperty("--nf-border-soft", "transparent");
+  root.style.setProperty("--nf-border-strong", "transparent");
+
+  // Gold accent colors.
+  root.style.setProperty("--nf-fire-1", "#E7B84B");
+  root.style.setProperty("--nf-fire-2", "#F5D98B");
+  root.style.setProperty("--nf-fire-3", "#D6A63D");
+  root.style.setProperty("--nf-fire-4", "#BD8F2F");
+  root.style.setProperty("--nf-fire-5", "#9F7828");
+  root.style.setProperty("--nf-fire-6", "#806020");
+  root.style.setProperty("--nf-fire-7", "#624A19");
+
+  root.style.setProperty("--nf-success", "#5ED6A0");
+  root.style.setProperty("--nf-warning", "#E7B84B");
+  root.style.setProperty("--nf-danger", "#E87575");
+
+  // Gold glow.
+  root.style.setProperty(
+    "--nf-fire-glow",
+    "rgba(231, 184, 75, 0.30)",
+  );
+
+  root.style.setProperty(
+    "--nf-fire-glow-soft",
+    "rgba(231, 184, 75, 0.14)",
+  );
+
+  root.style.setProperty(
+    "--nf-fire-glow-strong",
+    "rgba(245, 217, 139, 0.40)",
+  );
+
+  // Shadows.
+  root.style.setProperty(
+    "--nf-shadow-sm",
+    "0 4px 14px rgba(0, 0, 0, 0.20)",
+  );
+
+  root.style.setProperty(
+    "--nf-shadow-md",
+    "0 10px 30px rgba(0, 0, 0, 0.28)",
+  );
+
+  root.style.setProperty(
+    "--nf-shadow-lg",
+    "0 20px 55px rgba(0, 0, 0, 0.36)",
+  );
+
+  // Card colors.
+  root.style.setProperty("--nf-black", "#171914");
+  root.style.setProperty("--nf-black-soft", "#1B1F19");
+  root.style.setProperty("--nf-black-panel", "#20241D");
+  root.style.setProperty("--nf-card", "#1B1F19");
+  root.style.setProperty("--nf-card-hover", "#252A22");
+
+  // Normal page background.
+  root.style.setProperty("background-color", "#171914");
+  body.style.setProperty("background-color", "#171914");
+  body.style.setProperty("background", "#171914");
 
   /*
-   * Remove inline theme variables.
-   *
-   * The original NexaFlow variables from globals.css
-   * will become active again.
+   * Remove borders globally from the theme layer.
+   * This prevents the red debug border from appearing again.
    */
-  removeThemeVariables(root);
+  root.style.setProperty("border", "none");
+  body.style.setProperty("border", "none");
 
-  /*
-   * Remove inline styles injected by DarkTheme.
-   */
-  removeInjectedDarkStyles();
-
-  /*
-   * Remove theme-specific inline body styles.
-   */
-  body.style.removeProperty("background");
-  body.style.removeProperty("background-color");
-  body.style.removeProperty("color");
-  body.style.removeProperty("color-scheme");
-
-  /*
-   * Restore browser rendering to the original document state.
-   */
-  root.style.removeProperty("color-scheme");
-
-  /*
-   * Normal is intentionally NOT a new visual theme.
-   *
-   * It means:
-   * "Use NexaFlow exactly as originally designed."
-   */
   window.localStorage.setItem(
     THEME_STORAGE_KEY,
     "normal",
@@ -138,52 +120,9 @@ function restoreOriginalTheme() {
 }
 
 export default function ThemeProvider() {
-  const activateNormalTheme = useCallback(() => {
-    restoreOriginalTheme();
-  }, []);
-
   useEffect(() => {
-    /*
-     * Only restore the original NexaFlow theme
-     * when Normal is selected.
-     */
-    const savedTheme =
-      window.localStorage.getItem(
-        THEME_STORAGE_KEY,
-      );
-
-    if (
-      savedTheme === "normal" ||
-      savedTheme === null
-    ) {
-      activateNormalTheme();
-    }
-
-    /*
-     * If another theme is selected,
-     * ThemeProvider does not interfere.
-     */
-    const handleStorage = (event: StorageEvent) => {
-      if (
-        event.key === THEME_STORAGE_KEY &&
-        event.newValue === "normal"
-      ) {
-        activateNormalTheme();
-      }
-    };
-
-    window.addEventListener(
-      "storage",
-      handleStorage,
-    );
-
-    return () => {
-      window.removeEventListener(
-        "storage",
-        handleStorage,
-      );
-    };
-  }, [activateNormalTheme]);
+    applyTheme();
+  }, []);
 
   return null;
 }
