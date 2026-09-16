@@ -23,14 +23,28 @@ type SearchItem = {
   href: string;
   category: string;
   keywords: string;
+  external?: boolean;
   icon:
+    | "home"
     | "dashboard"
     | "workflow"
     | "chat"
     | "leads"
     | "tasks"
     | "analytics"
-    | "settings";
+    | "settings"
+    | "account"
+    | "login"
+    | "register"
+    | "about"
+    | "contact"
+    | "portfolio"
+    | "privacy"
+    | "terms"
+    | "security"
+    | "email"
+    | "github"
+    | "linkedin";
 };
 
 type Theme = "light" | "dark" | "normal";
@@ -325,39 +339,277 @@ function AnalyticsIcon() {
   );
 }
 
+function AccountIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      className="h-4 w-4"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="8" r="3" />
+      <path d="M5 20a7 7 0 0 1 14 0" />
+      <path d="M18 5h3M19.5 3.5v3" />
+    </svg>
+  );
+}
+
+function LoginIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      className="h-4 w-4"
+      aria-hidden="true"
+    >
+      <path d="M10 5H5v14h5" />
+      <path d="M13 8l4 4-4 4" />
+      <path d="M17 12H8" />
+    </svg>
+  );
+}
+
+function RegisterIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      className="h-4 w-4"
+      aria-hidden="true"
+    >
+      <circle cx="9" cy="8" r="3" />
+      <path d="M3.5 20a5.5 5.5 0 0 1 11 0" />
+      <path d="M17 8v6M14 11h6" />
+    </svg>
+  );
+}
+
+function InfoIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      className="h-4 w-4"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 10.5v5" />
+      <path d="M12 7.5h.01" />
+    </svg>
+  );
+}
+
+function ContactIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      className="h-4 w-4"
+      aria-hidden="true"
+    >
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="m4 7 8 6 8-6" />
+    </svg>
+  );
+}
+
+function PortfolioIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      className="h-4 w-4"
+      aria-hidden="true"
+    >
+      <rect x="3" y="6" width="18" height="14" rx="2" />
+      <path d="M8 6V4.5A1.5 1.5 0 0 1 9.5 3h5A1.5 1.5 0 0 1 16 4.5V6" />
+      <path d="M3 11h18M10 11v2h4v-2" />
+    </svg>
+  );
+}
+
+function DocumentIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      className="h-4 w-4"
+      aria-hidden="true"
+    >
+      <path d="M7 3h7l4 4v14H7z" />
+      <path d="M14 3v5h5M10 12h5M10 16h5" />
+    </svg>
+  );
+}
+
+function SecurityIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      className="h-4 w-4"
+      aria-hidden="true"
+    >
+      <path d="M12 3 20 6v5c0 5-3.3 8.5-8 10-4.7-1.5-8-5-8-10V6l8-3Z" />
+      <path d="m9 12 2 2 4-4" />
+    </svg>
+  );
+}
+
+function MailIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      className="h-4 w-4"
+      aria-hidden="true"
+    >
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="m4 7 8 6 8-6" />
+    </svg>
+  );
+}
+
+function GithubIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      className="h-4 w-4"
+      aria-hidden="true"
+    >
+      <path d="M9 19c-4 .9-4-2-5-2m10 4v-3.5c0-1 .1-1.5-.5-2 1.9-.2 3.8-.9 3.8-4.2 0-.9-.3-1.6-.8-2.2.1-.2.4-1.1-.1-2.2 0 0-.7-.2-2.3.8a7.9 7.9 0 0 0-4.2 0c-1.6-1-2.3-.8-2.3-.8-.5 1.1-.2 2-.1 2.2-.5.6-.8 1.3-.8 2.2 0 3.3 1.9 4 3.8 4.2-.6.5-.6 1.1-.6 2V21" />
+    </svg>
+  );
+}
+
+function LinkedinIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      className="h-4 w-4"
+      aria-hidden="true"
+    >
+      <rect x="4" y="4" width="16" height="16" rx="2" />
+      <path d="M8 10v6M8 8v.01M12 16v-3.2a2.2 2.2 0 0 1 4.4 0V16M12 10v6" />
+    </svg>
+  );
+}
+
 function SearchResultIcon({
   type,
 }: {
   type: SearchItem["icon"];
 }) {
-  if (type === "dashboard") {
-    return <DashboardIcon />;
-  }
+  switch (type) {
+    case "home":
+      return <HomeIcon />;
 
-  if (type === "workflow") {
-    return <WorkflowIcon />;
-  }
+    case "dashboard":
+      return <DashboardIcon />;
 
-  if (type === "chat") {
-    return <ChatIcon />;
-  }
+    case "workflow":
+      return <WorkflowIcon />;
 
-  if (type === "leads") {
-    return <LeadsIcon />;
-  }
+    case "chat":
+      return <ChatIcon />;
 
-  if (type === "tasks") {
-    return <TasksIcon />;
-  }
+    case "leads":
+      return <LeadsIcon />;
 
-  if (type === "analytics") {
-    return <AnalyticsIcon />;
-  }
+    case "tasks":
+      return <TasksIcon />;
 
-  return <SettingsIcon />;
+    case "analytics":
+      return <AnalyticsIcon />;
+
+    case "settings":
+      return <SettingsIcon />;
+
+    case "account":
+      return <AccountIcon />;
+
+    case "login":
+      return <LoginIcon />;
+
+    case "register":
+      return <RegisterIcon />;
+
+    case "about":
+      return <InfoIcon />;
+
+    case "contact":
+      return <ContactIcon />;
+
+    case "portfolio":
+      return <PortfolioIcon />;
+
+    case "privacy":
+      return <DocumentIcon />;
+
+    case "terms":
+      return <DocumentIcon />;
+
+    case "security":
+      return <SecurityIcon />;
+
+    case "email":
+      return <MailIcon />;
+
+    case "github":
+      return <GithubIcon />;
+
+    case "linkedin":
+      return <LinkedinIcon />;
+
+    default:
+      return <SettingsIcon />;
+  }
 }
 
+/* ============================================================
+   GLOBAL SEARCH DATA
+   Sidebar + Footer + External Links
+   ============================================================ */
+
 const SEARCH_ITEMS: SearchItem[] = [
+  /* HOME */
+
+  {
+    title: "Home",
+    description: "NexaFlow AI landing page and product overview.",
+    href: "/",
+    category: "Home",
+    keywords:
+      "home landing nexaflow ai product overview main website start",
+    icon: "home",
+  },
+
+  /* WORKSPACE */
+
   {
     title: "Dashboard",
     description:
@@ -365,9 +617,10 @@ const SEARCH_ITEMS: SearchItem[] = [
     href: "/dashboard",
     category: "Workspace",
     keywords:
-      "home overview workspace dashboard activity automation",
+      "dashboard overview workspace activity automation analytics home",
     icon: "dashboard",
   },
+
   {
     title: "Workflows",
     description:
@@ -375,9 +628,10 @@ const SEARCH_ITEMS: SearchItem[] = [
     href: "/workflows",
     category: "Automation",
     keywords:
-      "workflow workflows automation flow builder",
+      "workflow workflows automation flow builder automations",
     icon: "workflow",
   },
+
   {
     title: "New Workflow",
     description:
@@ -385,9 +639,10 @@ const SEARCH_ITEMS: SearchItem[] = [
     href: "/workflows/new",
     category: "Automation",
     keywords:
-      "new workflow create automation workflow builder",
+      "new workflow create automation workflow builder start",
     icon: "workflow",
   },
+
   {
     title: "AI Conversations",
     description:
@@ -395,9 +650,10 @@ const SEARCH_ITEMS: SearchItem[] = [
     href: "/conversations",
     category: "AI",
     keywords:
-      "ai chat conversations assistant messages",
+      "ai chat conversations assistant messages intelligence",
     icon: "chat",
   },
+
   {
     title: "Leads",
     description:
@@ -405,9 +661,10 @@ const SEARCH_ITEMS: SearchItem[] = [
     href: "/leads",
     category: "CRM",
     keywords:
-      "leads customers prospects crm contacts",
+      "leads customers prospects crm contacts sales opportunities",
     icon: "leads",
   },
+
   {
     title: "Tasks",
     description:
@@ -415,9 +672,10 @@ const SEARCH_ITEMS: SearchItem[] = [
     href: "/tasks",
     category: "Workspace",
     keywords:
-      "tasks todo task management priority",
+      "tasks todo task management priority actions follow up",
     icon: "tasks",
   },
+
   {
     title: "Analytics",
     description:
@@ -425,18 +683,210 @@ const SEARCH_ITEMS: SearchItem[] = [
     href: "/analytics",
     category: "Insights",
     keywords:
-      "analytics metrics statistics performance reports",
+      "analytics metrics statistics performance reports insights data",
     icon: "analytics",
   },
+
+  /* ACCOUNT / SYSTEM */
+
   {
     title: "Settings",
     description:
       "Manage account, workspace and automation settings.",
     href: "/settings",
-    category: "Workspace",
+    category: "System",
     keywords:
-      "settings account preferences configuration workspace",
+      "settings account preferences configuration workspace system",
     icon: "settings",
+  },
+
+  {
+    title: "Account",
+    description:
+      "Manage your profile, subscription, billing and account details.",
+    href: "/account",
+    category: "System",
+    keywords:
+      "account profile user personal professional subscription billing payment security",
+    icon: "account",
+  },
+
+  /* AUTH */
+
+  {
+    title: "Sign In",
+    description:
+      "Sign in to your NexaFlow workspace.",
+    href: "/login",
+    category: "Account",
+    keywords:
+      "login sign in signin authentication access account",
+    icon: "login",
+  },
+
+  {
+    title: "Create Account",
+    description:
+      "Create a new NexaFlow account.",
+    href: "/register",
+    category: "Account",
+    keywords:
+      "register signup sign up create account new user authentication",
+    icon: "register",
+  },
+
+  /* PRODUCT / COMPANY */
+
+  {
+    title: "Features",
+    description:
+      "Explore NexaFlow AI automation features.",
+    href: "/#features",
+    category: "Product",
+    keywords:
+      "features product ai automation capabilities tools",
+    icon: "dashboard",
+  },
+
+  {
+    title: "How It Works",
+    description:
+      "Learn how NexaFlow AI turns requests into automation.",
+    href: "/#how-it-works",
+    category: "Product",
+    keywords:
+      "how it works process workflow automation ai explanation",
+    icon: "workflow",
+  },
+
+  {
+    title: "Use Cases",
+    description:
+      "Explore business use cases for NexaFlow AI.",
+    href: "/#use-cases",
+    category: "Product",
+    keywords:
+      "use cases business automation examples ai workflows",
+    icon: "analytics",
+  },
+
+  {
+    title: "Pricing",
+    description:
+      "View NexaFlow AI plans and pricing.",
+    href: "/#pricing",
+    category: "Product",
+    keywords:
+      "pricing plans starter growth scale payment subscription",
+    icon: "account",
+  },
+
+  {
+    title: "About",
+    description:
+      "Learn more about NexaFlow AI.",
+    href: "/#about",
+    category: "Company",
+    keywords:
+      "about company nexaflow information team product",
+    icon: "about",
+  },
+
+  {
+    title: "Contact",
+    description:
+      "Get in touch with Faiza Noor.",
+    href: "https://faiza-noor10.vercel.app/",
+    category: "Company",
+    keywords:
+      "contact faiza noor hire developer web development ai automation",
+    external: true,
+    icon: "contact",
+  },
+
+  {
+    title: "Portfolio",
+    description:
+      "Open Faiza Noor's professional portfolio.",
+    href: "https://faiza-noor10.vercel.app/",
+    category: "Company",
+    keywords:
+      "portfolio faiza noor web developer full stack projects work",
+    external: true,
+    icon: "portfolio",
+  },
+
+  /* LEGAL / SECURITY */
+
+  {
+    title: "Privacy",
+    description:
+      "Read the NexaFlow privacy information.",
+    href: "/privacy",
+    category: "Legal",
+    keywords:
+      "privacy policy data personal information protection legal",
+    icon: "privacy",
+  },
+
+  {
+    title: "Terms",
+    description:
+      "Read the NexaFlow terms and conditions.",
+    href: "/terms",
+    category: "Legal",
+    keywords:
+      "terms conditions legal agreement usage rules",
+    icon: "terms",
+  },
+
+  {
+    title: "Security",
+    description:
+      "Learn about NexaFlow security practices.",
+    href: "/security",
+    category: "Legal",
+    keywords:
+      "security protection privacy secure authentication safety",
+    icon: "security",
+  },
+
+  /* PERSONAL / EXTERNAL */
+
+  {
+    title: "Email Faiza",
+    description:
+      "Send an email to Faiza Noor.",
+    href: "mailto:fizzanoor051@gmail.com",
+    category: "Contact",
+    keywords:
+      "email mail gmail fizzanoor051 contact faiza message",
+    external: true,
+    icon: "email",
+  },
+
+  {
+    title: "GitHub",
+    description:
+      "Open Faiza Noor's GitHub profile and repositories.",
+    href: "https://github.com/fizzanoor051-arch",
+    category: "Social",
+    keywords:
+      "github git repositories code developer source open source",
+    external: true,
+    icon: "github",
+  },
+
+  {
+    title: "LinkedIn",
+    description:
+      "Open Faiza Noor's LinkedIn professional profile.",
+    href: "https://www.linkedin.com/in/faiza-noor-b2711b42b",
+    category: "Social",
+    keywords:
+      "linkedin professional profile career jobs recruiter networking",
+    external: true,
+    icon: "linkedin",
   },
 ];
 
@@ -481,6 +931,10 @@ export default function Topbar({
       ? "Monitor automation, activity and workspace performance."
       : "Manage your workspace and automation.");
 
+  /* ============================================================
+     SEARCH FILTER
+     ============================================================ */
+
   const filteredResults = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
 
@@ -524,9 +978,29 @@ export default function Topbar({
     }
   }
 
-  function handleResultClick(href: string) {
+  /* ============================================================
+     SEARCH RESULT ACTION
+     ============================================================ */
+
+  function handleResultClick(item: SearchItem) {
     closeSearch();
-    router.push(href);
+
+    if (item.external) {
+      if (item.href.startsWith("mailto:")) {
+        window.location.href = item.href;
+        return;
+      }
+
+      window.open(
+        item.href,
+        "_blank",
+        "noopener,noreferrer",
+      );
+
+      return;
+    }
+
+    router.push(item.href);
   }
 
   function handleBack() {
@@ -538,17 +1012,10 @@ export default function Topbar({
     router.push("/dashboard");
   }
 
-  /*
-   * THEME CONTROL
-   *
-   * Topbar does not apply any visual theme itself.
-   *
-   * Each theme is handled by its own component:
-   *
-   * Light  -> LightTheme.tsx
-   * Dark   -> DarkTheme.tsx
-   * Normal -> ThemeProvider.tsx
-   */
+  /* ============================================================
+     THEME CONTROL
+     ============================================================ */
+
   function applyTheme(nextTheme: Theme) {
     setTheme(nextTheme);
     setThemeMenuOpen(false);
@@ -571,13 +1038,10 @@ export default function Topbar({
     return "Normal";
   }
 
-  /*
-   * LOAD SAVED THEME
-   *
-   * No classes are manually added here.
-   * The selected theme component handles the
-   * actual visual state.
-   */
+  /* ============================================================
+     LOAD SAVED THEME
+     ============================================================ */
+
   useEffect(() => {
     const savedTheme =
       window.localStorage.getItem("nexaflow-theme");
@@ -591,6 +1055,10 @@ export default function Topbar({
 
     setTheme(nextTheme);
   }, []);
+
+  /* ============================================================
+     KEYBOARD SHORTCUTS
+     ============================================================ */
 
   useEffect(() => {
     function handleKeyboard(event: KeyboardEvent) {
@@ -667,7 +1135,7 @@ export default function Topbar({
           filteredResults[selectedIndex];
 
         if (selected) {
-          handleResultClick(selected.href);
+          handleResultClick(selected);
         }
       }
     }
@@ -689,6 +1157,10 @@ export default function Topbar({
     filteredResults,
     selectedIndex,
   ]);
+
+  /* ============================================================
+     OUTSIDE CLICK
+     ============================================================ */
 
   useEffect(() => {
     function handleOutsideClick(event: MouseEvent) {
@@ -726,6 +1198,10 @@ export default function Topbar({
     };
   }, [searchOpen]);
 
+  /* ============================================================
+     KEEP SELECTED RESULT VALID
+     ============================================================ */
+
   useEffect(() => {
     if (selectedIndex >= filteredResults.length) {
       setSelectedIndex(0);
@@ -738,13 +1214,10 @@ export default function Topbar({
           THEME COMPONENT CONNECTIONS
           ===================================================== */}
 
-      {/* LIGHT BUTTON -> LightTheme.tsx */}
       {theme === "light" && <LightTheme active />}
 
-      {/* DARK BUTTON -> DarkTheme.tsx */}
       {theme === "dark" && <DarkTheme />}
 
-      {/* NORMAL BUTTON -> ThemeProvider.tsx */}
       {theme === "normal" && <ThemeProvider />}
 
       <header className="sticky top-0 z-30 border-b border-[#F5D98B]/[0.08] bg-[#1B1F19]/[0.94] text-[#F4F0E6] shadow-[0_12px_35px_rgba(0,0,0,0.24)] backdrop-blur-2xl">
@@ -789,7 +1262,10 @@ export default function Topbar({
             </div>
           </div>
 
-          {/* GLOBAL SEARCH */}
+          {/* =================================================
+              GLOBAL SEARCH
+              ================================================= */}
+
           {showSearch && (
             <div
               ref={searchContainerRef}
@@ -817,6 +1293,7 @@ export default function Topbar({
                 </button>
               ) : (
                 <>
+                  {/* SEARCH INPUT */}
                   <div className="flex h-10 w-[320px] items-center gap-2.5 rounded-xl border border-[#E7B84B]/35 bg-[#20241D] px-3 shadow-[0_12px_35px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(245,217,139,0.04)]">
                     <span className="shrink-0 text-[#E7B84B]">
                       <SearchIcon />
@@ -827,7 +1304,9 @@ export default function Topbar({
                       type="text"
                       value={searchQuery}
                       onChange={(event) =>
-                        setSearchQuery(event.target.value)
+                        setSearchQuery(
+                          event.target.value,
+                        )
                       }
                       placeholder="Search workspace..."
                       autoComplete="off"
@@ -840,6 +1319,7 @@ export default function Topbar({
                         type="button"
                         onClick={() => {
                           setSearchQuery("");
+                          setSelectedIndex(0);
                           searchInputRef.current?.focus();
                         }}
                         aria-label="Clear search"
@@ -859,8 +1339,12 @@ export default function Topbar({
                     </button>
                   </div>
 
-                  {/* SEARCH RESULTS */}
-                  <div className="absolute right-0 top-[48px] w-[360px] overflow-hidden rounded-2xl border border-[#F5D98B]/[0.10] bg-[#20241D]/[0.98] shadow-[0_30px_80px_rgba(0,0,0,0.48)] backdrop-blur-2xl">
+                  {/* =================================================
+                      SEARCH RESULTS
+                      ================================================= */}
+
+                  <div className="absolute right-0 top-[48px] w-[390px] overflow-hidden rounded-2xl border border-[#F5D98B]/[0.10] bg-[#20241D]/[0.98] shadow-[0_30px_80px_rgba(0,0,0,0.48)] backdrop-blur-2xl">
+                    {/* RESULT HEADER */}
                     <div className="flex items-center justify-between border-b border-[#F5D98B]/[0.07] px-4 py-3">
                       <div>
                         <p className="text-[10px] font-semibold text-[#F4F0E6]">
@@ -892,22 +1376,28 @@ export default function Topbar({
                       </div>
                     </div>
 
+                    {/* RESULTS */}
                     {filteredResults.length > 0 ? (
-                      <div className="max-h-[390px] overflow-y-auto p-2">
+                      <div className="max-h-[430px] overflow-y-auto p-2">
                         {filteredResults.map(
                           (item, index) => {
                             const isSelected =
-                              index === selectedIndex;
+                              index ===
+                              selectedIndex;
 
                             return (
                               <button
-                                key={item.href}
+                                key={`${item.title}-${item.href}`}
                                 type="button"
                                 onMouseEnter={() =>
-                                  setSelectedIndex(index)
+                                  setSelectedIndex(
+                                    index,
+                                  )
                                 }
                                 onClick={() =>
-                                  handleResultClick(item.href)
+                                  handleResultClick(
+                                    item,
+                                  )
                                 }
                                 className={`group relative flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition-all duration-150 ${
                                   isSelected
@@ -915,10 +1405,12 @@ export default function Topbar({
                                     : "hover:bg-[#F4F0E6]/[0.025]"
                                 }`}
                               >
+                                {/* SELECTED INDICATOR */}
                                 {isSelected && (
                                   <span className="absolute left-0 top-1/2 h-7 w-[2px] -translate-y-1/2 rounded-r-full bg-[#E7B84B] shadow-[0_0_8px_rgba(231,184,75,0.45)]" />
                                 )}
 
+                                {/* ICON */}
                                 <span
                                   className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border transition-all ${
                                     isSelected
@@ -927,10 +1419,13 @@ export default function Topbar({
                                   }`}
                                 >
                                   <SearchResultIcon
-                                    type={item.icon}
+                                    type={
+                                      item.icon
+                                    }
                                   />
                                 </span>
 
+                                {/* TEXT */}
                                 <span className="min-w-0 flex-1">
                                   <span className="flex items-center gap-2">
                                     <span
@@ -949,10 +1444,13 @@ export default function Topbar({
                                   </span>
 
                                   <span className="mt-1 block truncate text-[8px] leading-4 text-[#777D70]">
-                                    {item.description}
+                                    {
+                                      item.description
+                                    }
                                   </span>
                                 </span>
 
+                                {/* ACTION */}
                                 <span
                                   className={`shrink-0 text-[12px] transition-all ${
                                     isSelected
@@ -960,7 +1458,9 @@ export default function Topbar({
                                       : "-translate-x-1 text-[#777D70] opacity-0 group-hover:translate-x-0 group-hover:opacity-100"
                                   }`}
                                 >
-                                  →
+                                  {item.external
+                                    ? "↗"
+                                    : "→"}
                                 </span>
                               </button>
                             );
@@ -968,6 +1468,7 @@ export default function Topbar({
                         )}
                       </div>
                     ) : (
+                      /* NO RESULTS */
                       <div className="px-5 py-10 text-center">
                         <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl border border-[#F5D98B]/[0.07] bg-[#151713]/60 text-[#777D70]">
                           <SearchIcon />
@@ -978,12 +1479,14 @@ export default function Topbar({
                         </p>
 
                         <p className="mt-1 text-[8px] text-[#777D70]">
-                          Try Dashboard, Workflows, Leads
-                          or Settings.
+                          Try Dashboard,
+                          Portfolio, GitHub,
+                          LinkedIn or Settings.
                         </p>
                       </div>
                     )}
 
+                    {/* SEARCH FOOTER */}
                     <div className="flex items-center justify-between border-t border-[#F5D98B]/[0.07] px-4 py-2.5">
                       <span className="text-[7px] text-[#777D70]">
                         Press Enter to open
@@ -1003,7 +1506,10 @@ export default function Topbar({
             </div>
           )}
 
-          {/* RIGHT SIDE */}
+          {/* =================================================
+              RIGHT SIDE
+              ================================================= */}
+
           <div className="flex shrink-0 items-center gap-2">
             {/* THEME MENU */}
             <div
@@ -1013,7 +1519,9 @@ export default function Topbar({
               <button
                 type="button"
                 onClick={() =>
-                  setThemeMenuOpen((current) => !current)
+                  setThemeMenuOpen(
+                    (current) => !current,
+                  )
                 }
                 aria-label="Choose theme"
                 aria-haspopup="menu"
@@ -1210,8 +1718,8 @@ export default function Topbar({
             {/* PROFILE */}
             {showProfile && (
               <Link
-                href="/settings"
-                aria-label="Open settings"
+                href="/account"
+                aria-label="Open account"
                 className="group flex h-9 items-center gap-2 rounded-xl border border-[#F5D98B]/[0.08] bg-[#20241D]/75 px-2 shadow-[inset_0_1px_0_rgba(245,217,139,0.025)] transition-all duration-200 hover:border-[#E7B84B]/25 hover:bg-[#252A22]"
               >
                 <span className="flex h-6 w-6 items-center justify-center rounded-lg border border-[#E7B84B]/25 bg-[#E7B84B]/[0.08] text-[9px] font-bold text-[#E7B84B]">
@@ -1227,7 +1735,7 @@ export default function Topbar({
                 </span>
 
                 <span className="sr-only">
-                  Open settings
+                  Open account
                 </span>
 
                 <span className="text-[#777D70] transition-colors group-hover:text-[#F5D98B]">

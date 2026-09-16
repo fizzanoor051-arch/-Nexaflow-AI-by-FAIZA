@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -18,6 +19,7 @@ const plans = [
     ],
     button: "Start free",
     featured: false,
+    paymentPlan: "starter",
   },
   {
     name: "Growth",
@@ -34,6 +36,7 @@ const plans = [
     ],
     button: "Get started",
     featured: true,
+    paymentPlan: "growth",
   },
   {
     name: "Scale",
@@ -50,6 +53,7 @@ const plans = [
     ],
     button: "Contact sales",
     featured: false,
+    paymentPlan: "scale",
   },
 ];
 
@@ -165,8 +169,9 @@ export default function Pricing() {
                 </span>
               </div>
 
+              {/* Connected payment button */}
               <Link
-                href="/register"
+                href={`/payment?plan=${plan.paymentPlan}`}
                 className={`relative mt-7 flex w-full items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-300 ${
                   plan.featured
                     ? "border border-amber-200/20 bg-amber-300 text-[#17130a] shadow-[0_10px_30px_rgba(245,158,11,0.12)] hover:bg-amber-200 hover:shadow-[0_14px_40px_rgba(245,158,11,0.2)]"
