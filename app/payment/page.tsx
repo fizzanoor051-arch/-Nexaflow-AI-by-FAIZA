@@ -1,7 +1,6 @@
-
 "use client";
 
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
@@ -31,6 +30,23 @@ const plans = {
 };
 
 export default function PaymentPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="flex min-h-screen items-center justify-center bg-[#151713] text-[#F4F0E6]">
+          <div className="flex items-center gap-3 text-sm text-[#9A9D94]">
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#E7B84B]/30 border-t-[#E7B84B]" />
+            Loading checkout...
+          </div>
+        </main>
+      }
+    >
+      <PaymentContent />
+    </Suspense>
+  );
+}
+
+function PaymentContent() {
   const searchParams = useSearchParams();
 
   const requestedPlan =
@@ -68,14 +84,19 @@ export default function PaymentPage() {
   const handleCardNumber = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const value = event.target.value.replace(/\D/g, "").slice(0, 16);
+    const value = event.target.value
+      .replace(/\D/g, "")
+      .slice(0, 16);
+
     setCardNumber(value);
   };
 
   const handleExpiry = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    let value = event.target.value.replace(/\D/g, "").slice(0, 4);
+    let value = event.target.value
+      .replace(/\D/g, "")
+      .slice(0, 4);
 
     if (value.length >= 3) {
       value = `${value.slice(0, 2)}/${value.slice(2)}`;
@@ -92,7 +113,9 @@ export default function PaymentPage() {
     setProcessing(true);
     setSuccess(false);
 
-    await new Promise((resolve) => setTimeout(resolve, 1600));
+    await new Promise((resolve) =>
+      setTimeout(resolve, 1600)
+    );
 
     setProcessing(false);
     setSuccess(true);
@@ -118,41 +141,39 @@ export default function PaymentPage() {
       {/* Header */}
       <header className="relative z-10 border-b border-white/8 bg-[#151713]/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-5 sm:px-8">
-{/* Left: Back Home + Logo */}
-<div className="flex items-center gap-3 sm:gap-5">
-  <Link
-    href="/"
-    className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2 text-xs text-[#C8CBC1] transition hover:border-[#E7B84B]/30 hover:bg-[#E7B84B]/5 hover:text-[#F5D98B] sm:text-sm"
-  >
-    ← Back to Home
-  </Link>
+          {/* Left: Back Home + Logo */}
+          <div className="flex items-center gap-3 sm:gap-5">
+            <Link
+              href="/"
+              className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2 text-xs text-[#C8CBC1] transition hover:border-[#E7B84B]/30 hover:bg-[#E7B84B]/5 hover:text-[#F5D98B] sm:text-sm"
+            >
+              ← Back to Home
+            </Link>
 
-  <Link
-    href="/"
-    className="group flex items-center gap-3"
-  >
-    <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#E7B84B]/30 bg-[#20241D] shadow-[0_0_30px_rgba(231,184,75,0.08)] transition group-hover:border-[#E7B84B]/60">
-      <span className="text-sm font-bold text-[#E7B84B]">
-        NF
-      </span>
-    </div>
+            <Link
+              href="/"
+              className="group flex items-center gap-3"
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#E7B84B]/30 bg-[#20241D] shadow-[0_0_30px_rgba(231,184,75,0.08)] transition group-hover:border-[#E7B84B]/60">
+                <span className="text-sm font-bold text-[#E7B84B]">
+                  NF
+                </span>
+              </div>
 
-    <div className="hidden sm:block">
-      <div className="text-sm font-semibold tracking-[0.22em] text-[#F4F0E6]">
-        NEXAFLOW
-      </div>
+              <div className="hidden sm:block">
+                <div className="text-sm font-semibold tracking-[0.22em] text-[#F4F0E6]">
+                  NEXAFLOW
+                </div>
 
-      <div className="text-[10px] uppercase tracking-[0.22em] text-[#9A9D94]">
-        AI Operations
-      </div>
-    </div>
-  </Link>
-</div>
+                <div className="text-[10px] uppercase tracking-[0.22em] text-[#9A9D94]">
+                  AI Operations
+                </div>
+              </div>
+            </Link>
+          </div>
 
-          {/* Right: Pricing + Dashboard */}
+          {/* Right: Dashboard */}
           <div className="flex items-center gap-2 sm:gap-3">
-           
-
             <Link
               href="/dashboard"
               className="group flex items-center gap-2 rounded-xl border border-[#E7B84B]/25 bg-[#E7B84B]/8 px-4 py-2 text-xs font-medium text-[#F5D98B] transition hover:border-[#E7B84B]/50 hover:bg-[#E7B84B]/15 hover:text-[#F5D98B] hover:shadow-[0_0_25px_rgba(231,184,75,0.08)] sm:text-sm"
@@ -210,62 +231,64 @@ export default function PaymentPage() {
               </div>
 
               <div className="space-y-3">
-                {(Object.keys(plans) as Array<keyof typeof plans>).map(
-                  (key) => {
-                    const item = plans[key];
-                    const active = selectedPlan === key;
+                {(
+                  Object.keys(plans) as Array<
+                    keyof typeof plans
+                  >
+                ).map((key) => {
+                  const item = plans[key];
+                  const active = selectedPlan === key;
 
-                    return (
-                      <button
-                        key={key}
-                        type="button"
-                        onClick={() => {
-                          setSelectedPlan(key);
-                          setSuccess(false);
-                        }}
-                        className={`w-full rounded-2xl border p-4 text-left transition ${
-                          active
-                            ? "border-[#E7B84B]/55 bg-[#E7B84B]/8 shadow-[0_0_35px_rgba(231,184,75,0.08)]"
-                            : "border-white/8 bg-white/[0.02] hover:border-white/15 hover:bg-white/[0.04]"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between gap-4">
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium">
-                                {item.name}
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => {
+                        setSelectedPlan(key);
+                        setSuccess(false);
+                      }}
+                      className={`w-full rounded-2xl border p-4 text-left transition ${
+                        active
+                          ? "border-[#E7B84B]/55 bg-[#E7B84B]/8 shadow-[0_0_35px_rgba(231,184,75,0.08)]"
+                          : "border-white/8 bg-white/[0.02] hover:border-white/15 hover:bg-white/[0.04]"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-4">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">
+                              {item.name}
+                            </span>
+
+                            {key === "growth" && (
+                              <span className="rounded-full bg-[#E7B84B]/10 px-2 py-0.5 text-[9px] uppercase tracking-wider text-[#F5D98B]">
+                                Popular
                               </span>
-
-                              {key === "growth" && (
-                                <span className="rounded-full bg-[#E7B84B]/10 px-2 py-0.5 text-[9px] uppercase tracking-wider text-[#F5D98B]">
-                                  Popular
-                                </span>
-                              )}
-                            </div>
-
-                            <p className="mt-1 text-xs leading-5 text-[#858980]">
-                              {item.description}
-                            </p>
-                          </div>
-
-                          <div className="text-right">
-                            <div className="text-lg font-semibold text-[#F5D98B]">
-                              {item.price === 0
-                                ? "Free"
-                                : `$${item.price}`}
-                            </div>
-
-                            {item.price > 0 && (
-                              <div className="text-[10px] text-[#858980]">
-                                / month
-                              </div>
                             )}
                           </div>
+
+                          <p className="mt-1 text-xs leading-5 text-[#858980]">
+                            {item.description}
+                          </p>
                         </div>
-                      </button>
-                    );
-                  }
-                )}
+
+                        <div className="text-right">
+                          <div className="text-lg font-semibold text-[#F5D98B]">
+                            {item.price === 0
+                              ? "Free"
+                              : `$${item.price}`}
+                          </div>
+
+                          {item.price > 0 && (
+                            <div className="text-[10px] text-[#858980]">
+                              / month
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -383,7 +406,8 @@ export default function PaymentPage() {
                   icon: "P",
                 },
               ].map((method) => {
-                const active = paymentMethod === method.id;
+                const active =
+                  paymentMethod === method.id;
 
                 return (
                   <button
@@ -795,7 +819,9 @@ function WalletForm({
         <input
           required
           value={accountName}
-          onChange={(e) => setAccountName(e.target.value)}
+          onChange={(e) =>
+            setAccountName(e.target.value)
+          }
           placeholder="Faiza Noor"
           className={inputClass}
         />
@@ -809,7 +835,9 @@ function WalletForm({
         <input
           required
           value={accountNumber}
-          onChange={(e) => setAccountNumber(e.target.value)}
+          onChange={(e) =>
+            setAccountNumber(e.target.value)
+          }
           placeholder="03XX XXXXXXX"
           inputMode="numeric"
           className={inputClass}
