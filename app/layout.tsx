@@ -4,7 +4,7 @@ import "./globals.css";
 
 import { AIPageContextProvider } from "@/components/ai/AIPageContext";
 import GlobalAIChat from "@/components/ai/GlobalAIChat";
-import ProjectVisitTracker from "@/components/analytics/ProjectVisitTracker";
+import ProjectVisitTracker from "@/components/analyticsa/ProjectVisitTracker";
 
 export const metadata: Metadata = {
   title: {
