@@ -4,6 +4,7 @@ import "./globals.css";
 
 import { AIPageContextProvider } from "@/components/ai/AIPageContext";
 import GlobalAIChat from "@/components/ai/GlobalAIChat";
+import ProjectVisitTracker from "@/components/analytics/ProjectVisitTracker";
 
 export const metadata: Metadata = {
   title: {
@@ -54,6 +55,11 @@ export default function RootLayout({
     <html lang="en">
       <body className="min-h-screen bg-[#050816] text-white antialiased">
         <AIPageContextProvider>
+          <ProjectVisitTracker
+            projectName="NexaFlow AI"
+            projectSlug="nexaflow-ai"
+          />
+
           {children}
 
           {/* Global NexaFlow AI shortcut */}
